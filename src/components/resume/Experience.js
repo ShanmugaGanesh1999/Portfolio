@@ -20,8 +20,8 @@ const Experience = () => {
             subTitle="Fitness enthusiast since 2014"
             result="Intermediate"
             des={[
-              "I'm passionate about maintaining a healthy lifestyle through regular gym workouts",
-              "I focus on strength training and cardio exercises, and have seen significant improvements in my overall fitness and well-being",
+              "Passionate about maintaining a healthy lifestyle through regular gym workouts.",
+              "Focus on strength training and cardio exercises for overall fitness improvement.",
             ]}
           />
           <ResumeCard
@@ -29,8 +29,8 @@ const Experience = () => {
             subTitle="Experimenting with flavors since 2022"
             result="Intermediate"
             des={[
-              "I enjoy trying out new recipes and creating fusion dishes",
-              "I've hosted several dinner parties for friends, showcasing my culinary skills",
+              "Enjoy trying new recipes and creating fusion dishes.",
+              "Host dinner parties to showcase culinary skills.",
             ]}
           />
           <ResumeCard
@@ -38,10 +38,10 @@ const Experience = () => {
             subTitle="Avid watcher since childhood"
             result="Enthusiast"
             des={[
-              "I'm a big fan of spy, crime, and horror movies, always looking for thrilling plots and unexpected twists",
-              "I enjoy binge-watching series like Game of Thrones, Vikings, Friends, and Stranger Things",
-              "Anime holds a special place in my heart, with Naruto being my all-time favorite I also love Death Note and many other anime series",
-              "I'm always eager to discuss and analyze the storylines, characters, and themes in the shows and movies I watch",
+              "Fan of spy, crime, and horror movies with thrilling plots and unexpected twists.",
+              "Enjoy binge-watching series like Game of Thrones, Vikings, Friends, and Stranger Things.",
+              "Anime enthusiast, with Naruto as all-time favorite.",
+              "Love discussing and analyzing storylines, characters, and themes in shows and movies.",
             ]}
           />
           <ResumeCard
@@ -49,10 +49,10 @@ const Experience = () => {
             subTitle="Exploring the places since 2019"
             result="Enthusiast"
             des={[
-              "I'm passionate about various outdoor activities, including hiking, camping, and cycling",
-              "I love exploring new destinations, from local trails to international landmarks",
-              "Travelling is a big part of my life, allowing me to experience diverse cultures and landscapes",
-              "I enjoy riding motorcycles and bicycles, which gives me a unique perspective on my journeys",
+              "Passionate about hiking, camping, and cycling.",
+              "Love exploring new destinations, from local trails to international landmarks.",
+              "Travelling is a big part of life, experiencing diverse cultures and landscapes.",
+              "Enjoy riding motorcycles and bicycles for a unique perspective on journeys.",
             ]}
           />
         </div>
@@ -70,8 +70,8 @@ const Experience = () => {
             subTitle="Fluent"
             result="Professional"
             des={[
-              "I have professional-level proficiency in English",
-              "I've been learning English since I was 7 years old and I've been using it extensively in my professional life, academic pursuits, and personal interactions",
+              "Professional-level proficiency in English.",
+              "Learning since age 7, used extensively in professional, academic, and personal life.",
             ]}
           />
           <ResumeCard
@@ -79,8 +79,8 @@ const Experience = () => {
             subTitle="Native"
             result="Native"
             des={[
-              "Tamil is my mother tongue",
-              "I'm fluent in both speaking and writing, and I often engage in Tamil literature and cultural activities",
+              "Tamil is my mother tongue.",
+              "Fluent in speaking and writing, engage in Tamil literature and cultural activities.",
             ]}
           />
         </div>

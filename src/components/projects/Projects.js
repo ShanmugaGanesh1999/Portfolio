@@ -17,6 +17,7 @@ import hmsImage from "../../assets/images/projects/hms.png";
 import lmsImage from "../../assets/images/projects/lms.png";
 import rmsImage from "../../assets/images/projects/rms.png";
 import melodyMapperImage from "../../assets/images/projects/melodymapper.png";
+import portfolio from "../../assets/images/projects/portfolio.png";
 
 const Projects = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -29,6 +30,13 @@ const Projects = () => {
       des: "Real-time system for mapping, scheduling, and grading student presentations in intercollegiate competitions.",
       src: projectTwo,
       githubLink: "https://github.com/lokeshvelayudham/intersection",
+    },
+    {
+      title: "Portfolio",
+      secondaryTitle: "Personal Portfolio Website",
+      des: "A responsive portfolio website showcasing my projects, skills, and experiences. Built with React and styled with Tailwind CSS for a modern, interactive user experience.",
+      src: portfolio,
+      githubLink: "https://github.com/ShanmugaGanesh1999/Portfolio",
     },
     {
       title: "GitCraft",

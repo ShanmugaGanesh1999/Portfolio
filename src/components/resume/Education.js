@@ -21,13 +21,11 @@ const Education = () => {
             result="3.67/4"
             country="Cleveland - OH, USA"
             des={[
-              "Selected participant of Tech Side Hustle (Spring ‘24) in Entrepreneur Educational Consortium",
-              "Member of programming club",
-              "Member of Quantum Computing club",
-              "TA in CSDS 438 High Performance Data & Computing",
-              "TA in CSDS 410 Analysis of Algorithms",
-              "GA in Undergraduate Research Office (Intersection)",
-              "Database & Debug Specialist for Access Services",
+              "Participated in Tech Side Hustle program for entrepreneurship skills",
+              "Active in programming and Quantum Computing clubs",
+              "Teaching Assistant for advanced computer science courses",
+              "Graduate Assistant in Undergraduate Research Office",
+              "Database Specialist managing library systems",
             ]}
           />
           <ResumeCard
@@ -36,20 +34,20 @@ const Education = () => {
             result="8.62/10"
             country="Chennai - TN, IND"
             des={[
-              "Member and organizer of math club",
-              "Member of coding club",
-              "College football team member",
+              "Organized math club events and activities",
+              "Participated in coding club projects",
+              "Represented college in football tournaments",
             ]}
           />
           <ResumeCard
             title="12th"
             subTitle="Kamala Niketan Montessori School"
             country="Trichy - TN, IND"
-            result="79.2/100"
+            result="78.4/100"
             des={[
-              "Science club member",
-              "School football team member",
-              "NCC cadet",
+              "Conducted science experiments in club",
+              "Played as defender in school football",
+              "Participated in NCC training camps",
             ]}
           />
           <ResumeCard
@@ -57,7 +55,11 @@ const Education = () => {
             subTitle="R.S.K Higher Secondary School"
             country="Trichy - TN, IND"
             result="7/10"
-            des={["School football team member", "LDA student", "NCC cadet"]}
+            des={[
+              "Represented school in football tournaments",
+              "Received support as LDA student",
+              "Engaged in NCC activities and drills",
+            ]}
           />
         </div>
       </div>
@@ -73,9 +75,9 @@ const Education = () => {
             result="IND"
             country="Chennai - TN"
             des={[
-              "Revamped the Tax Configuration page, implementing client and server-side changes for seamless API Versioning Movement, which reduced compatibility issues by over 62% and significantly improved userexperience",
-              "Spearheaded the development and implementation of a high-performing, non-blocking I/O (NIO) validationrule system within the API, incorporating multi-threading techniques to enable efficient validation of records during creation and updates, resulting in a significant 26% decrease in data discrepancies",
-              "Designed and implemented Rollup Summary feature, enabling automatic aggregation of related lists onto a single field on parent, which reduced manual data manipulation by 80%, saving an average of 13.5 hours/week",
+              "Improved Tax Configuration page with API Versioning, reducing compatibility issues by 62% and enhancing user experience. Implemented changes on both client and server sides for seamless integration",
+              "Developed a high-performance, non-blocking I/O validation rule system using multi-threading. This improved record validation during creation and updates, resulting in a 26% decrease in data discrepancies and increased overall system efficiency",
+              "Created Rollup Summary feature for automatic aggregation of related lists onto parent fields. This innovation reduced manual data manipulation by 80%, saving teams an average of 13.5 hours per week in data processing time",
             ]}
           />
           <ResumeCard
@@ -84,8 +86,8 @@ const Education = () => {
             result="IND"
             country="Coimbatore - TN"
             des={[
-              "Developed and deployed cross-platform applications and web applications for 5+ clients, driving increased user engagement and boosting revenue by 15% on average",
-              "Developed a classification neural network model to identify the most appropriate lead owner for a given region, simplifying the sales process",
+              "Developed and deployed cross-platform and web applications for multiple clients. These projects increased user engagement and boosted client revenue by an average of 15%, demonstrating the impact of effective software solutions on business performance",
+              "Engineered a classification neural network model to optimize lead assignment based on geographical regions. This innovation streamlined the sales process by automatically identifying the most suitable lead owner, improving response times and conversion rates",
             ]}
           />
           <ResumeCard
@@ -94,8 +96,8 @@ const Education = () => {
             result="IND"
             country="Coimbatore - TN"
             des={[
-              "Contributed to a market analysis project, examining customer demographics in key regions",
-              "Played a key role in a strategic marketing initiative that boosted target audience engagement",
+              "Assisted in a comprehensive market analysis project, focusing on customer demographics in key regions. This research provided valuable insights for targeted marketing strategies and product development",
+              "Contributed to a strategic marketing initiative that significantly increased target audience engagement. Utilized data-driven approaches to identify effective communication channels and messaging, resulting in improved campaign performance",
             ]}
           />
         </div>
