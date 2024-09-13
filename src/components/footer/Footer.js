@@ -55,7 +55,7 @@ const Footer = () => {
   );
 };
 
-const SocialLink = ({ href, icon, ariaLabel }) => (
+export const SocialLink = ({ href, icon, ariaLabel }) => (
   <a
     href={href}
     target="_blank"

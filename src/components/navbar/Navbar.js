@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { Link } from "react-scroll";
 import { FiMenu } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
-import { FaFacebookF, FaTwitter, FaLinkedinIn } from "react-icons/fa";
+import { FaFacebookF, FaLinkedinIn, FaInstagram } from "react-icons/fa";
 import { logo } from "../../assets/index";
 import { navLinksdata } from "../../constants";
+import { SocialLink } from "../footer/Footer";
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -48,13 +49,14 @@ const Navbar = () => {
         {showMenu && (
           <div className="w-[80%] h-screen overflow-scroll absolute top-0 left-0 bg-gray-900 p-4 scrollbar-hide">
             <div className="flex flex-col gap-8 py-2 relative">
-              <div>
-                <img className="w-32" src={logo} alt="logo" />
-                <p className="text-sm text-gray-400 mt-2">
-                  Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                  Earum soluta perspiciatis molestias enim cum repellat, magnam
-                  exercitationem distinctio aliquid nam.
-                </p>
+              <div className="flex flex-col xl:flex-row gap-6 lgl:gap-0 justify-between">
+                <div>
+                  <img
+                    src={logo}
+                    className="rounded-full z-10 object-cover object-center bannerIcon"
+                    alt="logo"
+                  />
+                </div>
               </div>
               <ul className="flex flex-col gap-4">
                 {navLinksdata.map((item) => (
@@ -81,15 +83,21 @@ const Navbar = () => {
                   Find me in
                 </h2>
                 <div className="flex gap-4">
-                  <span className="bannerIcon">
-                    <FaFacebookF />
-                  </span>
-                  <span className="bannerIcon">
-                    <FaTwitter />
-                  </span>
-                  <span className="bannerIcon">
-                    <FaLinkedinIn />
-                  </span>
+                  <SocialLink
+                    href="https://www.facebook.com/shanmuga.ganesh.94"
+                    icon={<FaFacebookF />}
+                    ariaLabel="Facebook"
+                  />
+                  <SocialLink
+                    href="https://www.instagram.com/_sg.uchiha"
+                    icon={<FaInstagram />}
+                    ariaLabel="Instagram"
+                  />
+                  <SocialLink
+                    href="https://www.linkedin.com/in/shanmuga-ganesh"
+                    icon={<FaLinkedinIn />}
+                    ariaLabel="LinkedIn"
+                  />
                 </div>
               </div>
               <span
