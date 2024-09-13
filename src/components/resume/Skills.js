@@ -14,6 +14,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaAws,
+  FaSeedling,
 } from "react-icons/fa";
 import {
   SiFigma,
@@ -45,21 +46,22 @@ const Skills = () => {
 
   const otherSkills = [
     { name: "Photography", percentage: 70, icon: <MdOutlinePhotoCamera /> },
-    { name: "Figma", percentage: 35, icon: <SiFigma /> },
+    { name: "Gardening", percentage: 30, icon: <FaSeedling /> },
   ];
 
   const skillSets = [
     {
       title: "Frontend Development",
       skills: [
-        { name: "React", percentage: 70, icon: <FaReact /> },
         { name: "HTML 5", percentage: 95, icon: <FaHtml5 /> },
         { name: "CSS3", percentage: 80, icon: <FaCss3Alt /> },
         { name: "JavaScript", percentage: 90, icon: <FaJs /> },
+        { name: "React", percentage: 70, icon: <FaReact /> },
         { name: "TypeScript", percentage: 90, icon: <SiTypescript /> },
         { name: "Angular", percentage: 75, icon: <SiAngular /> },
         { name: "Tailwind CSS", percentage: 35, icon: <SiTailwindcss /> },
         { name: "Bootstrap", percentage: 70, icon: <SiBootstrap /> },
+        { name: "Figma", percentage: 35, icon: <SiFigma /> },
       ],
     },
     {
