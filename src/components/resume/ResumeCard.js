@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
@@ -7,13 +7,18 @@ const ResumeCard = ({ title, subTitle, result, des, country }) => {
   const totalPages = desPages.length;
   const [currentPage, setCurrentPage] = useState(1);
 
-  const nextPage = () => {
+  const nextPage = useCallback(() => {
     setCurrentPage((prev) => (prev % totalPages) + 1);
-  };
+  }, [totalPages]);
 
   const prevPage = () => {
     setCurrentPage((prev) => ((prev - 2 + totalPages) % totalPages) + 1);
   };
+
+  useEffect(() => {
+    const interval = setInterval(nextPage, 5000);
+    return () => clearInterval(interval);
+  }, [nextPage]);
 
   return (
     <div className="w-full h-1/3 group flex">

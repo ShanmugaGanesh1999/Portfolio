@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   FaReact,
@@ -138,15 +138,20 @@ const Skills = () => {
     ));
   };
 
-  const nextSkillSet = () => {
+  const nextSkillSet = useCallback(() => {
     setCurrentSkillSet((prev) => (prev + 1) % skillSets.length);
-  };
+  }, [skillSets.length]);
 
   const prevSkillSet = () => {
     setCurrentSkillSet(
       (prev) => (prev - 1 + skillSets.length) % skillSets.length
     );
   };
+
+  useEffect(() => {
+    const interval = setInterval(nextSkillSet, 5000);
+    return () => clearInterval(interval);
+  }, [nextSkillSet]);
 
   return (
     <motion.div
