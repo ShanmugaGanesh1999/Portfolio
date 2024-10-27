@@ -35,6 +35,7 @@ import {
   SiScikitlearn,
   SiTensorflow,
   SiOpenai,
+  SiEmberdotjs,
 } from "react-icons/si";
 import { MdOutlinePhotoCamera } from "react-icons/md";
 import { DiMongodb } from "react-icons/di";
@@ -45,8 +46,8 @@ const Skills = () => {
   const [currentSkillSet, setCurrentSkillSet] = useState(0);
 
   const otherSkills = [
-    { name: "Photography", percentage: 70, icon: <MdOutlinePhotoCamera /> },
-    { name: "Gardening", percentage: 30, icon: <FaSeedling /> },
+    { name: "Photography", percentage: 60, icon: <MdOutlinePhotoCamera /> },
+    { name: "Gardening", percentage: 45, icon: <FaSeedling /> },
   ];
 
   const skillSets = [
@@ -59,6 +60,7 @@ const Skills = () => {
         { name: "React", percentage: 70, icon: <FaReact /> },
         { name: "TypeScript", percentage: 90, icon: <SiTypescript /> },
         { name: "Angular", percentage: 75, icon: <SiAngular /> },
+        { name: "EmberJs", percentage: 75, icon: <SiEmberdotjs /> },
         { name: "Tailwind CSS", percentage: 35, icon: <SiTailwindcss /> },
         { name: "Bootstrap", percentage: 70, icon: <SiBootstrap /> },
         { name: "Figma", percentage: 35, icon: <SiFigma /> },
@@ -68,11 +70,11 @@ const Skills = () => {
       title: "Backend Development",
       skills: [
         { name: "Node.js", percentage: 80, icon: <FaNodeJs /> },
-        { name: "Express.js", percentage: 70, icon: <SiExpress /> },
+        { name: "Express.js", percentage: 80, icon: <SiExpress /> },
         { name: "Java", percentage: 85, icon: <FaJava /> },
         { name: "Spring Boot", percentage: 80, icon: <SiSpringboot /> },
-        { name: "Python", percentage: 70, icon: <FaPython /> },
-        { name: "C", percentage: 90, icon: <SiC /> },
+        { name: "Python", percentage: 75, icon: <FaPython /> },
+        { name: "C", percentage: 95, icon: <SiC /> },
         { name: "Hibernate", percentage: 80, icon: <SiHibernate /> },
       ],
     },
@@ -80,33 +82,38 @@ const Skills = () => {
       title: "Database & Storage",
       skills: [
         { name: "MongoDB", percentage: 70, icon: <DiMongodb /> },
-        { name: "MySQL", percentage: 90, icon: <SiMysql /> },
-        { name: "PostgreSQL", percentage: 70, icon: <SiPostgresql /> },
-        { name: "Redis", percentage: 85, icon: <SiRedis /> },
+        { name: "MySQL", percentage: 95, icon: <SiMysql /> },
+        { name: "PostgreSQL", percentage: 85, icon: <SiPostgresql /> },
+        { name: "Redis", percentage: 90, icon: <SiRedis /> },
       ],
     },
     {
       title: "DevOps & Cloud",
       skills: [
-        { name: "Git", percentage: 70, icon: <FaGitAlt /> },
-        { name: "GitHub", percentage: 70, icon: <FaGithub /> },
-        { name: "Docker", percentage: 60, icon: <FaDocker /> },
-        { name: "Kafka", percentage: 75, icon: <SiApachekafka /> },
+        { name: "Git", percentage: 80, icon: <FaGitAlt /> },
+        { name: "GitHub", percentage: 60, icon: <FaGithub /> },
+        { name: "Docker", percentage: 75, icon: <FaDocker /> },
+        { name: "Kafka", percentage: 70, icon: <SiApachekafka /> },
         {
           name: "Microservices",
           percentage: 80,
           icon: <AiOutlineCloudServer />,
         },
-        { name: "AWS", percentage: 70, icon: <FaAws /> },
+        { name: "AWS", percentage: 60, icon: <FaAws /> },
       ],
     },
     {
       title: "Mobile & Other",
       skills: [
-        { name: "Flutter", percentage: 60, icon: <SiFlutter /> },
+        { name: "Flutter", percentage: 40, icon: <SiFlutter /> },
         { name: "MEAN Stack", percentage: 80, icon: <SiAngular /> },
         { name: "MERN Stack", percentage: 70, icon: <FaReact /> },
         { name: "DSA", percentage: 85, icon: <SiDatacamp /> },
+        {
+          name: "System Design",
+          percentage: 75,
+          icon: <AiOutlineCloudServer />,
+        },
         { name: "ML", percentage: 75, icon: <SiScikitlearn /> },
         { name: "DL", percentage: 90, icon: <SiTensorflow /> },
         { name: "Transformer", percentage: 70, icon: <SiOpenai /> },
