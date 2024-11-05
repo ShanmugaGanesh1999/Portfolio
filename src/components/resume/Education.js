@@ -23,7 +23,9 @@ const Education = () => {
             des={[
               "Working as a RA focusing on AI-driven database & query optimization under professor and PhD student",
               "Active member in programming and Quantum Computing clubs",
-              "Member of programming club, TA in High Performance Data & Computing and Analysis of Algorithms",
+              "Member of programming club",
+              "TA in CSDS 438 High Performance Data and Computing",
+              "TA in CSDS 410 Analysis of Algorithms",
               "Developed end-to-end website for inter-college poster & presentation competition: Intersection",
               "Specialist in database and debugging for Access services: meal plans, casecash, parking, Harold, SIS, T2",
               "Selected participant of Tech Side Hustle (Spring ‘24) in Entrepreneur Educational Consortium",
