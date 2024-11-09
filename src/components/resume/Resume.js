@@ -12,7 +12,7 @@ const Resume = () => {
   const handleDownload = () => {
     // Replace this URL with the actual path to your resume file
     const resumeUrl =
-      "https://drive.google.com/file/d/1R56Z0Bf7qloSGE4TLBhEayFS2JmMVBzS/view?usp=sharing";
+      "https://drive.google.com/file/d/1DIk_jM6M9wjX5DFwQwAaDD2RF5Kc4h23/view?usp=sharing";
     window.open(resumeUrl, "_blank");
   };
 

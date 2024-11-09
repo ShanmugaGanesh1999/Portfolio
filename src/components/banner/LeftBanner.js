@@ -34,10 +34,12 @@ const LeftBanner = () => {
           />
         </h2>
         <p className="text-base font-bodyFont leading-6 tracking-wide">
-          Experienced software enthusiast skilled in problem-solving with
-          creative solutions. Proven innovator adept at generating business
-          ideas and adapting to change. Passionate about contributing to dynamic
-          teams and open-source initiatives.
+          Dynamic software developer with a strong background in Java,
+          microservices, and Spring Framework. Proven track record in developing
+          high-performance enterprise applications and RESTful APIs. Skilled in
+          Cloud technologies, SQL, and NoSQL databases, with a strong analytical
+          mindset and experience in CI/CD processes. Adept at collaborating with
+          cross-functional teams to deliver quality solutions on time.
         </p>
       </div>
       <div className="flex flex-col xl:flex-row gap-6 lgl:gap-0 justify-between">
