@@ -21,14 +21,15 @@ const Education = () => {
             result="3.67/4"
             country="Cleveland - OH, USA"
             des={[
+              "(xLab initiative) Spearheaded AI-driven customer service innovations on the Eaton project by developing a generative AI-powered chatbot for call center training and implementing AI analysis of call transcripts, enhancing agent readiness and service strategies",
               "Working as a RA focusing on AI-driven database & query optimization under professor and PhD student",
+              "TA in CSDS 438 High Performance Data and Computing",
+              "Developed end-to-end website for inter-college poster & presentation competition: Intersection",
+              "TA in CSDS 410 Analysis of Algorithms",
+              "Specialist in database and debugging for Access services (meal plans, case cash-CWRU banking system, parking-parking system, Harold-Master search system, SIS-student information system, T2-payment system)",
+              "Selected participant of Tech Side Hustle (Spring ‘24) in Entrepreneur Educational Consortium",
               "Active member in programming and Quantum Computing clubs",
               "Member of programming club",
-              "TA in CSDS 438 High Performance Data and Computing",
-              "TA in CSDS 410 Analysis of Algorithms",
-              "Developed end-to-end website for inter-college poster & presentation competition: Intersection",
-              "Specialist in database and debugging for Access services: meal plans, casecash, parking, Harold, SIS, T2",
-              "Selected participant of Tech Side Hustle (Spring ‘24) in Entrepreneur Educational Consortium",
             ]}
           />
           <ResumeCard
@@ -78,9 +79,12 @@ const Education = () => {
             result="IND"
             country="Chennai - TN"
             des={[
-              "Improved Tax Configuration page with API Versioning, reducing compatibility issues by 62% and enhancing user experience. Implemented changes on both client and server sides for seamless integration",
-              "Developed a high-performance, non-blocking I/O validation rule system using multi-threading. This improved record validation during creation and updates, resulting in a 26% decrease in data discrepancies and increased overall system efficiency",
-              "Created Rollup Summary feature for automatic aggregation of related lists onto parent fields. This innovation reduced manual data manipulation by 80%, saving teams an average of 13.5 hours per week in data processing time",
+              "Revamped the 'Tax Configuration' page with client and server-side changes for API Versioning, reducing compatibility issues by 37%",
+              "Engineered a high-performance NIO-based 'Validation Rule' system, enhancing efficiency by 26% and reducing data validation discrepancies",
+              "Designed the 'Rollup Summary' feature using Kafka and Redis, automating data aggregation and reducing manual efforts by 80%, saving 13.5 hours per week",
+              "Revamped the 'Recent Items' feature in the CRM, enabling efficient storage and retrieval of the 20 most recently accessed records per user, and optimized database queries for faster and more efficient filtering",
+              "Utilized Kafka and Java for real-time data streaming and concurrent request handling, boosting performance by 20% and ensuring efficient communication between distributed systems",
+              "Enhanced user experience by revamping the UI with ReactJS and TypeScript, improving visualization of automation reports, real-time bug tracking, and code maintainability",
             ]}
           />
           <ResumeCard
@@ -89,8 +93,9 @@ const Education = () => {
             result="IND"
             country="Coimbatore - TN"
             des={[
-              "Developed and deployed cross-platform and web applications for multiple clients. These projects increased user engagement and boosted client revenue by an average of 15%, demonstrating the impact of effective software solutions on business performance",
-              "Engineered a classification neural network model to optimize lead assignment based on geographical regions. This innovation streamlined the sales process by automatically identifying the most suitable lead owner, improving response times and conversion rates",
+              "Developed and deployed cross-platform applications for multiple clients, resulting in a 12% revenue boost on average",
+              "Enhanced lead allocation accuracy with machine learning algorithms, utilizing data preprocessing and model optimization, resulting in a quantified process improvement of 18%",
+              "Coordinated cross-functional teams to streamline marketing and sales efforts in CRM, leading to a 10% increase in reach",
             ]}
           />
           <ResumeCard
