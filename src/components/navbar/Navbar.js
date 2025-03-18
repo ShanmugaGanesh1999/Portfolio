@@ -89,7 +89,7 @@ const Navbar = () => {
                     ariaLabel="Facebook"
                   />
                   <SocialLink
-                    href="https://www.instagram.com/_sg.uchiha"
+                    href="https://www.instagram.com/shanmuga_ganesh_/"
                     icon={<FaInstagram />}
                     ariaLabel="Instagram"
                   />

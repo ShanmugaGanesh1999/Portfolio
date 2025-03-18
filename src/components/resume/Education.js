@@ -18,7 +18,7 @@ const Education = () => {
           <ResumeCard
             title="MS in Computer Science"
             subTitle="Case Western Reserve University (2023 - 2025')"
-            result="3.67/4"
+            result="3.78/4"
             country="Cleveland - OH, USA"
             des={[
               "(xLab initiative) Spearheaded AI-driven customer service innovations on the Eaton project by developing a generative AI-powered chatbot for call center training and implementing AI analysis of call transcripts, enhancing agent readiness and service strategies",
