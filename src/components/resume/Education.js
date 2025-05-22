@@ -17,13 +17,14 @@ const Education = () => {
         <div className="mt-6 lgl:mt-14 w-full h-[1000px] border-l-[6px] border-l-black border-opacity-30 flex flex-col gap-10">
           <ResumeCard
             title="MS in Computer Science"
-            subTitle="Case Western Reserve University (2023 - 2025')"
+            subTitle="Case Western Reserve University (Aug 2023 - May 2025)"
             result="3.78/4"
             country="Cleveland - OH, USA"
             des={[
               "(xLab initiative) Spearheaded AI-driven customer service innovations on the Eaton project by developing a generative AI-powered chatbot for call center training and implementing AI analysis of call transcripts, enhancing agent readiness and service strategies",
               "Working as a RA focusing on AI-driven database & query optimization under professor and PhD student",
               "TA in CSDS 438 High Performance Data and Computing",
+              "TA in CSDS 341 Introduction to Database Systems",
               "Developed end-to-end website for inter-college poster & presentation competition: Intersection",
               "TA in CSDS 410 Analysis of Algorithms",
               "Specialist in database and debugging for Access services (meal plans, case cash-CWRU banking system, parking-parking system, Harold-Master search system, SIS-student information system, T2-payment system)",
@@ -34,7 +35,7 @@ const Education = () => {
           />
           <ResumeCard
             title="B.Tech in Information Technology"
-            subTitle="Anna University (2017 - 2021)"
+            subTitle="Anna University (Aug 2017 - Apr 2021)"
             result="8.62/10"
             country="Chennai - TN, IND"
             des={[
@@ -69,43 +70,51 @@ const Education = () => {
       </div>
       <div>
         <div className="py-6 lgl:py-12 font-titleFont flex flex-col gap-4">
-          <p className="text-sm text-designColor tracking-[4px]">2020 - 2023</p>
+          <p className="text-sm text-designColor tracking-[4px]">
+            2020 - Present
+          </p>
           <h2 className="text-3xl md:text-4xl font-bold">Job Experience</h2>
         </div>
         <div className="mt-6 lgl:mt-14 w-full h-[1000px] border-l-[6px] border-l-black border-opacity-30 flex flex-col gap-10">
           <ResumeCard
-            title="Member Technical Staff"
-            subTitle="Zoho Corporation - (2022 - 2023)"
+            title="Software Engineer (Full Stack Software Developer)"
+            subTitle="Northen Trust - (Jan 2024 - Present)"
+            result="USA"
+            country="Cleveland - OH"
+            des={[
+              "Led development of a Market Data Aggregation Platform, achieving 95% feature clarity per sprint while ensuring compliance and data governance",
+              "Built a Python backend using Django REST Framework, integrated with a React frontend, reducing response latency by 32% by optimizing query structures and reducing redundant calls",
+              "Engineered real-time API data streams using WebSockets and Celery, achieving a data ingestion throughput of 1.8M records/hour, significantly reducing external API timeout errors by 47%",
+              "Designed a PostgreSQL schema for multi-source aggregation with AES-256 encryption, improving data security and boosting query performance by 41% across 12 financial indices",
+              "Implemented role-based access controls (RBAC), reducing unauthorized access incidents by 40% and improving audit compliance",
+              "Developed 120+ automated tests using PyTest and React Testing Library, achieving 98.9% test coverage and cutting deployment rollback incidents by 78%",
+              "Deployed using AWS ECS Fargate, S3, and RDS with Terraform for IaC, achieving 99.98% uptime with auto-scaling, reducing DevOps overhead by 36%",
+            ]}
+          />
+          <ResumeCard
+            title="Member Technical Staff (Full Stack Software Developer)"
+            subTitle="Zoho Corporation - (Jan 2022 - Dec 2023)"
             result="IND"
             country="Chennai - TN"
             des={[
-              "Revamped the 'Tax Configuration' page with client and server-side changes for API Versioning, reducing compatibility issues by 37%",
-              "Engineered a high-performance NIO-based 'Validation Rule' system, enhancing efficiency by 26% and reducing data validation discrepancies",
-              "Designed the 'Rollup Summary' feature using Kafka and Redis, automating data aggregation and reducing manual efforts by 80%, saving 13.5 hours per week",
-              "Revamped the 'Recent Items' feature in the CRM, enabling efficient storage and retrieval of the 20 most recently accessed records per user, and optimized database queries for faster and more efficient filtering",
-              "Utilized Kafka and Java for real-time data streaming and concurrent request handling, boosting performance by 20% and ensuring efficient communication between distributed systems",
-              "Enhanced user experience by revamping the UI with ReactJS and TypeScript, improving visualization of automation reports, real-time bug tracking, and code maintainability",
+              "Enhanced Tax Configuration system with API versioning, reducing compatibility issues across 7 systems, lowering system downtime by 20 hours/month",
+              "Built an NIO-based validation system, enhancing data processing speed to 2.3M records/hour and reducing validation errors from 1,200 to 660 daily",
+              "Developed a Kafka/Redis-powered rollup summary, automating 6,500+ data aggregation tasks per week, saving 13.5 hours per record and reducing reporting delays by 3 hours per cycle",
+              "Optimized CRM's Recent Items storage, reducing database load by 55% and improving real-time access to 20+ records per user session",
+              "Enhanced UI with ReactJS/TypeScript, streamlining automation reports, reducing bug resolution time from 10 days to 7 days, and increasing user adoption by 28%",
+              "Implemented a Kafka/Java data pipeline, achieving 99.9% uptime and reducing message processing latency from 120ms to 77ms, increasing system throughput to 1.2M events/minute",
             ]}
           />
           <ResumeCard
-            title="Jr. Associate"
-            subTitle="Augusta Hitech Software Solutions - (2021 - 2021)"
+            title="Jr. Associate (Full Stack Software Developer)"
+            subTitle="Augusta Hitech Software Solutions - (Nov 2020 - Dec 2021)"
             result="IND"
             country="Coimbatore - TN"
             des={[
-              "Developed and deployed cross-platform applications for multiple clients, resulting in a 12% revenue boost on average",
-              "Enhanced lead allocation accuracy with machine learning algorithms, utilizing data preprocessing and model optimization, resulting in a quantified process improvement of 18%",
-              "Coordinated cross-functional teams to streamline marketing and sales efforts in CRM, leading to a 10% increase in reach",
-            ]}
-          />
-          <ResumeCard
-            title="Intern"
-            subTitle="Augusta Hitech Software Solutions - (2020 - 2021)"
-            result="IND"
-            country="Coimbatore - TN"
-            des={[
-              "Assisted in a comprehensive market analysis project, focusing on customer demographics in key regions. This research provided valuable insights for targeted marketing strategies and product development",
-              "Contributed to a strategic marketing initiative that significantly increased target audience engagement. Utilized data-driven approaches to identify effective communication channels and messaging, resulting in improved campaign performance",
+              "Developed cross-platform apps with Flutter and Angular, reducing deployment time by 16% by optimizing component reuse and API integration",
+              "Implemented ML-driven lead allocation using Python and scikit-learn, reducing manual errors by 22% and increasing sales efficiency by 20%",
+              "Enhanced CRM marketing/sales workflows, improving lead conversion from 5,500 to 8,800 annually, and increasing customer engagement by 32%",
+              "Aligned lead conversion workflows, increasing qualified lead retention by 60% and boosting sales revenue by $240,000 annually",
             ]}
           />
         </div>

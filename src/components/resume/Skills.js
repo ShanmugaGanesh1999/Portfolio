@@ -17,9 +17,6 @@ import {
   FaSeedling,
 } from "react-icons/fa";
 import {
-  SiFigma,
-  SiTailwindcss,
-  SiBootstrap,
   SiSpringboot,
   SiMysql,
   SiPostgresql,
@@ -27,19 +24,15 @@ import {
   SiRedis,
   SiTypescript,
   SiAngular,
-  SiFlutter,
-  SiExpress,
-  SiC,
   SiHibernate,
-  SiDatacamp,
   SiScikitlearn,
   SiTensorflow,
   SiOpenai,
+  SiExpress,
   SiEmberdotjs,
 } from "react-icons/si";
 import { MdOutlinePhotoCamera } from "react-icons/md";
 import { DiMongodb } from "react-icons/di";
-import { BsCalendarCheck } from "react-icons/bs";
 import { AiOutlineCloudServer } from "react-icons/ai";
 
 const Skills = () => {
@@ -54,71 +47,115 @@ const Skills = () => {
     {
       title: "Frontend Development",
       skills: [
-        { name: "HTML 5", percentage: 95, icon: <FaHtml5 /> },
-        { name: "CSS3", percentage: 80, icon: <FaCss3Alt /> },
+        { name: "React.js", percentage: 90, icon: <FaReact /> },
+        { name: "Angular", percentage: 80, icon: <SiAngular /> },
+        { name: "Ember.js", percentage: 70, icon: <SiEmberdotjs /> },
+        { name: "HTML5", percentage: 95, icon: <FaHtml5 /> },
+        { name: "CSS3", percentage: 85, icon: <FaCss3Alt /> },
         { name: "JavaScript", percentage: 90, icon: <FaJs /> },
-        { name: "React", percentage: 70, icon: <FaReact /> },
-        { name: "TypeScript", percentage: 90, icon: <SiTypescript /> },
-        { name: "Angular", percentage: 75, icon: <SiAngular /> },
-        { name: "EmberJs", percentage: 75, icon: <SiEmberdotjs /> },
-        { name: "Tailwind CSS", percentage: 35, icon: <SiTailwindcss /> },
-        { name: "Bootstrap", percentage: 70, icon: <SiBootstrap /> },
-        { name: "Figma", percentage: 35, icon: <SiFigma /> },
+        { name: "TypeScript", percentage: 85, icon: <SiTypescript /> },
       ],
     },
     {
-      title: "Backend Development",
+      title: "Backend & APIs",
       skills: [
-        { name: "Node.js", percentage: 80, icon: <FaNodeJs /> },
-        { name: "Express.js", percentage: 80, icon: <SiExpress /> },
-        { name: "Java", percentage: 85, icon: <FaJava /> },
-        { name: "Spring Boot", percentage: 80, icon: <SiSpringboot /> },
-        { name: "Python", percentage: 75, icon: <FaPython /> },
-        { name: "C", percentage: 95, icon: <SiC /> },
+        { name: "Java", percentage: 90, icon: <FaJava /> },
+        { name: "Spring Boot", percentage: 85, icon: <SiSpringboot /> },
         { name: "Hibernate", percentage: 80, icon: <SiHibernate /> },
+        { name: "Python", percentage: 80, icon: <FaPython /> },
+        { name: "FastAPI", percentage: 70, icon: <FaPython /> },
+        { name: "Node.js", percentage: 80, icon: <FaNodeJs /> },
+        { name: "REST APIs", percentage: 90, icon: <SiExpress /> },
+        { name: "GraphQL", percentage: 70, icon: <SiExpress /> },
+        { name: "JWT Auth", percentage: 80, icon: <SiExpress /> },
+        { name: "WebSockets", percentage: 70, icon: <SiExpress /> },
+        { name: "NIO/Concurrency", percentage: 75, icon: <FaJava /> },
       ],
     },
     {
-      title: "Database & Storage",
+      title: "Databases & Messaging",
       skills: [
-        { name: "MongoDB", percentage: 70, icon: <DiMongodb /> },
-        { name: "MySQL", percentage: 95, icon: <SiMysql /> },
         { name: "PostgreSQL", percentage: 85, icon: <SiPostgresql /> },
-        { name: "Redis", percentage: 90, icon: <SiRedis /> },
+        { name: "MySQL", percentage: 90, icon: <SiMysql /> },
+        { name: "MongoDB", percentage: 80, icon: <DiMongodb /> },
+        { name: "DynamoDB", percentage: 60, icon: <SiRedis /> },
+        { name: "Redis", percentage: 75, icon: <SiRedis /> },
+        { name: "Kafka", percentage: 70, icon: <SiApachekafka /> },
+        { name: "RabbitMQ", percentage: 65, icon: <SiApachekafka /> },
       ],
     },
     {
-      title: "DevOps & Cloud",
+      title: "Cloud & DevOps",
       skills: [
-        { name: "Git", percentage: 80, icon: <FaGitAlt /> },
-        { name: "GitHub", percentage: 60, icon: <FaGithub /> },
-        { name: "Docker", percentage: 75, icon: <FaDocker /> },
-        { name: "Kafka", percentage: 70, icon: <SiApachekafka /> },
+        {
+          name: "AWS (EC2, S3, RDS, Lambda, Lightsail)",
+          percentage: 75,
+          icon: <FaAws />,
+        },
+        { name: "Firebase", percentage: 60, icon: <FaReact /> },
+        { name: "Docker", percentage: 80, icon: <FaDocker /> },
+        { name: "GitHub Actions", percentage: 70, icon: <FaGithub /> },
+        { name: "CI/CD", percentage: 75, icon: <FaGithub /> },
+      ],
+    },
+    {
+      title: "Machine Learning & AI",
+      skills: [
+        { name: "scikit-learn", percentage: 70, icon: <SiScikitlearn /> },
+        { name: "BERT", percentage: 60, icon: <SiOpenai /> },
+        { name: "GPT", percentage: 65, icon: <SiOpenai /> },
+        { name: "RAG", percentage: 60, icon: <SiOpenai /> },
+        { name: "ML Personalization", percentage: 70, icon: <SiTensorflow /> },
+      ],
+    },
+    {
+      title: "Testing & Automation",
+      skills: [
+        { name: "PyTest", percentage: 70, icon: <FaPython /> },
+        { name: "React Testing Library", percentage: 75, icon: <FaReact /> },
+        { name: "JUnit", percentage: 80, icon: <FaJava /> },
+        { name: "Integration Testing", percentage: 75, icon: <FaJava /> },
+        {
+          name: "GitHub Actions Pipelines",
+          percentage: 70,
+          icon: <FaGithub />,
+        },
+      ],
+    },
+    {
+      title: "System Design & Architecture",
+      skills: [
         {
           name: "Microservices",
           percentage: 80,
           icon: <AiOutlineCloudServer />,
         },
-        { name: "AWS", percentage: 60, icon: <FaAws /> },
-      ],
-    },
-    {
-      title: "Mobile & Other",
-      skills: [
-        { name: "Flutter", percentage: 40, icon: <SiFlutter /> },
-        { name: "MEAN Stack", percentage: 80, icon: <SiAngular /> },
-        { name: "MERN Stack", percentage: 70, icon: <FaReact /> },
-        { name: "DSA", percentage: 85, icon: <SiDatacamp /> },
         {
-          name: "System Design",
+          name: "Distributed Systems",
           percentage: 75,
           icon: <AiOutlineCloudServer />,
         },
-        { name: "ML", percentage: 75, icon: <SiScikitlearn /> },
-        { name: "DL", percentage: 90, icon: <SiTensorflow /> },
-        { name: "Transformer", percentage: 70, icon: <SiOpenai /> },
-        { name: "LLM", percentage: 65, icon: <SiOpenai /> },
-        { name: "Scheduler", percentage: 70, icon: <BsCalendarCheck /> },
+        {
+          name: "Real-time Systems",
+          percentage: 70,
+          icon: <AiOutlineCloudServer />,
+        },
+        { name: "API Optimization", percentage: 75, icon: <SiExpress /> },
+        { name: "Performance Tuning", percentage: 70, icon: <SiExpress /> },
+      ],
+    },
+    {
+      title: "Tools & Practices",
+      skills: [
+        { name: "Git", percentage: 85, icon: <FaGitAlt /> },
+        { name: "Jira", percentage: 70, icon: <FaReact /> },
+        { name: "Zoho", percentage: 60, icon: <FaReact /> },
+        { name: "Agile (Scrum, Kanban)", percentage: 80, icon: <FaReact /> },
+        {
+          name: "Cross-functional Collaboration",
+          percentage: 85,
+          icon: <FaReact />,
+        },
       ],
     },
   ];

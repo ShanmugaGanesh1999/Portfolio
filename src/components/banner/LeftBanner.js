@@ -34,12 +34,14 @@ const LeftBanner = () => {
           />
         </h2>
         <p className="text-base font-bodyFont leading-6 tracking-wide">
-          Dynamic software developer with a strong background in Java,
-          microservices, and Spring Framework. Proven track record in developing
-          high-performance enterprise applications and RESTful APIs. Skilled in
-          Cloud technologies, SQL, and NoSQL databases, with a strong analytical
-          mindset and experience in CI/CD processes. Adept at collaborating with
-          cross-functional teams to deliver quality solutions on time.
+          Software Developer with 4+ years of expertise in building scalable
+          applications using Spring Boot and modern JavaScript frameworks.
+          Proficient in cloud-native development with AWS and Kubernetes, along
+          with crafting efficient data solutions using Kafka and Redis.
+          Specialized in scalable architecture, high-performance API design, and
+          streamlined CI/CD automation. Brings a solution-oriented approach to
+          transform complex business requirements into high-performance
+          software.
         </p>
       </div>
       <div className="flex flex-col xl:flex-row gap-6 lgl:gap-0 justify-between">
