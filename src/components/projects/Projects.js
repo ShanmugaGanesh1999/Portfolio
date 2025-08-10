@@ -165,13 +165,13 @@ const Projects = () => {
         </AnimatePresence>
         <button
           onClick={handlePrevPage}
-          className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-full text-3xl text-designColor hover:text-gray-300 transition-colors duration-300"
+          className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-full text-3xl text-designColor hover:text-gray-300 transition-colors duration-300 p-2 rounded-full bg-black bg-opacity-25 hover:bg-opacity-40"
         >
           <FaChevronLeft />
         </button>
         <button
           onClick={handleNextPage}
-          className="absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-full text-3xl text-designColor hover:text-gray-300 transition-colors duration-300"
+          className="absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-full text-3xl text-designColor hover:text-gray-300 transition-colors duration-300 p-2 rounded-full bg-black bg-opacity-25 hover:bg-opacity-40"
         >
           <FaChevronRight />
         </button>

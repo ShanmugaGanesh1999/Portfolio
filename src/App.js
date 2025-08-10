@@ -7,7 +7,7 @@ import FooterBottom from "./components/footer/FooterBottom";
 import Navbar from "./components/navbar/Navbar";
 import Projects from "./components/projects/Projects";
 import Resume from "./components/resume/Resume";
-// import Testimonial from "./components/tesimonial/Testimonial";
+import ScrollAnimation from "./components/animation/ScrollAnimation";
 
 function App() {
   return (
@@ -15,11 +15,18 @@ function App() {
       <Navbar />
       <div className="max-w-screen-xl mx-auto">
         <Banner />
-        <Features />
-        <Projects />
-        <Resume />
-        {/* <Testimonial /> */}
-        <Contact />
+        <ScrollAnimation>
+          <Features />
+        </ScrollAnimation>
+        <ScrollAnimation>
+          <Projects />
+        </ScrollAnimation>
+        <ScrollAnimation>
+          <Resume />
+        </ScrollAnimation>
+        <ScrollAnimation>
+          <Contact />
+        </ScrollAnimation>
         <Footer />
         <FooterBottom />
       </div>
