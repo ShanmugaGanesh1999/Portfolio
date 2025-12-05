@@ -34,8 +34,14 @@ const LeftBanner = () => {
           />
         </h2>
         <p className="text-base font-bodyFont leading-6 tracking-wide">
-          Results-driven Full Stack Developer with over 6 years of experience in
+          Results-driven Full Stack Developer with over 6 years of experience
           designing, developing, and deploying scalable web applications.
+          Proficient in Java, React, Python, and cloud infrastructure with a
+          strong foundation in backend engineering, API design, database
+          optimization, and real-time data processing. Proven track record of
+          building intuitive user interfaces, collaborating in Agile teams, and
+          delivering robust, secure, and efficient software solutions aligned
+          with business goals.
         </p>
       </div>
       <div className="flex flex-col xl:flex-row gap-6 lgl:gap-0 justify-between">

@@ -1,13 +1,15 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import Banner from "./components/banner/Banner";
-import Contact from "./components/contact/Contact";
-import Features from "./components/features/Features";
-import Footer from "./components/footer/Footer";
-import FooterBottom from "./components/footer/FooterBottom";
 import Navbar from "./components/navbar/Navbar";
-import Projects from "./components/projects/Projects";
-import Resume from "./components/resume/Resume";
 import ScrollAnimation from "./components/animation/ScrollAnimation";
+
+// Lazy load components for performance optimization
+const Contact = lazy(() => import("./components/contact/Contact"));
+const Features = lazy(() => import("./components/features/Features"));
+const Footer = lazy(() => import("./components/footer/Footer"));
+const FooterBottom = lazy(() => import("./components/footer/FooterBottom"));
+const Projects = lazy(() => import("./components/projects/Projects"));
+const Resume = lazy(() => import("./components/resume/Resume"));
 
 function App() {
   return (
@@ -15,20 +17,28 @@ function App() {
       <Navbar />
       <div className="max-w-screen-xl mx-auto">
         <Banner />
-        <ScrollAnimation>
-          <Features />
-        </ScrollAnimation>
-        <ScrollAnimation>
-          <Projects />
-        </ScrollAnimation>
-        <ScrollAnimation>
-          <Resume />
-        </ScrollAnimation>
-        <ScrollAnimation>
-          <Contact />
-        </ScrollAnimation>
-        <Footer />
-        <FooterBottom />
+        <Suspense
+          fallback={
+            <div className="w-full h-screen flex justify-center items-center text-designColor">
+              Loading...
+            </div>
+          }
+        >
+          <ScrollAnimation>
+            <Features />
+          </ScrollAnimation>
+          <ScrollAnimation>
+            <Projects />
+          </ScrollAnimation>
+          <ScrollAnimation>
+            <Resume />
+          </ScrollAnimation>
+          <ScrollAnimation>
+            <Contact />
+          </ScrollAnimation>
+          <Footer />
+          <FooterBottom />
+        </Suspense>
       </div>
     </div>
   );

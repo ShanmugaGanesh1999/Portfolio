@@ -21,8 +21,12 @@ const ScrollAnimation = ({ children }) => {
       initial="hidden"
       animate={controls}
       variants={{
-        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-        hidden: { opacity: 0, y: 50 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.7, ease: "easeOut" },
+        },
+        hidden: { opacity: 0, y: 75 },
       }}
     >
       {children}

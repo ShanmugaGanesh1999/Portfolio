@@ -3,7 +3,7 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      screens:{
+      screens: {
         xs: "320px",
         sm: "375px",
         sml: "500px",
@@ -21,7 +21,7 @@ module.exports = {
         bodyColor: "#1a1a1a",
         lightText: "#e6e6e6",
         boxBg: "linear-gradient(145deg, #1e2024, #23272b)",
-        designColor: "#00aaff",
+        designColor: "#ff014f",
       },
       boxShadow: {
         shadowOne: "10px 10px 19px #1c1e22, -10px -10px 19px #262a2e",

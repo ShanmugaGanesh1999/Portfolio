@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FaReact,
   FaHtml5,
@@ -15,6 +15,7 @@ import {
   FaChevronRight,
   FaAws,
   FaSeedling,
+  FaDatabase,
 } from "react-icons/fa";
 import {
   SiSpringboot,
@@ -28,16 +29,35 @@ import {
   SiScikitlearn,
   SiTensorflow,
   SiOpenai,
-  SiExpress,
   SiEmberdotjs,
   SiGo,
   SiFastapi,
   SiFirebase,
   SiRabbitmq,
+  SiNextdotjs,
+  SiFlutter,
+  SiGraphql,
+  SiJsonwebtokens,
+  SiOracle,
+  SiKubernetes,
+  SiHelm,
+  SiCelery,
+  SiJira,
+  SiSalesforce,
+  SiZoho,
+  SiPytest,
+  SiJunit5,
+  SiTestinglibrary,
+  SiReactivex,
 } from "react-icons/si";
-import { MdOutlinePhotoCamera } from "react-icons/md";
+import {
+  MdOutlinePhotoCamera,
+  MdArchitecture,
+  MdOutlineSecurity,
+} from "react-icons/md";
 import { DiMongodb } from "react-icons/di";
-import { AiOutlineCloudServer } from "react-icons/ai";
+import { AiOutlineCloudServer, AiOutlineApi } from "react-icons/ai";
+import { TbApi } from "react-icons/tb";
 
 const Skills = () => {
   const [currentSkillSet, setCurrentSkillSet] = useState(0);
@@ -63,39 +83,104 @@ const Skills = () => {
       ],
     },
     {
-      title: "Cloud & DevOps",
+      title: "Frontend Development",
       skills: [
-        {
-          name: "AWS (ECS, EC2, S3, RDS, Lambda, Lightsail)",
-          percentage: 80,
-          icon: <FaAws />,
-        },
-        { name: "Firebase", percentage: 70, icon: <SiFirebase /> },
-        { name: "Docker", percentage: 85, icon: <FaDocker /> },
-        { name: "GitHub Actions", percentage: 75, icon: <FaGithub /> },
-        { name: "CI/CD", percentage: 80, icon: <FaGithub /> },
+        { name: "React.js", percentage: 90, icon: <FaReact /> },
+        { name: "Next.js", percentage: 85, icon: <SiNextdotjs /> },
+        { name: "Angular", percentage: 75, icon: <SiAngular /> },
+        { name: "RxJs", percentage: 70, icon: <SiReactivex /> },
+        { name: "Ember.js", percentage: 65, icon: <SiEmberdotjs /> },
+        { name: "HTML5", percentage: 95, icon: <FaHtml5 /> },
+        { name: "CSS3", percentage: 90, icon: <FaCss3Alt /> },
+        { name: "React Native", percentage: 75, icon: <FaReact /> },
+        { name: "Flutter", percentage: 70, icon: <SiFlutter /> },
       ],
     },
     {
-      title: "Databases",
+      title: "Backend & APIs",
+      skills: [
+        { name: "REST APIs", percentage: 90, icon: <AiOutlineApi /> },
+        { name: "GraphQL", percentage: 80, icon: <SiGraphql /> },
+        { name: "OAuth", percentage: 75, icon: <MdOutlineSecurity /> },
+        {
+          name: "JWT Authentication",
+          percentage: 80,
+          icon: <SiJsonwebtokens />,
+        },
+        { name: "API Versioning", percentage: 85, icon: <TbApi /> },
+        { name: "WebSockets", percentage: 75, icon: <AiOutlineCloudServer /> },
+        { name: "NIO", percentage: 70, icon: <FaJava /> },
+        { name: "Threads/Concurrency", percentage: 75, icon: <FaJava /> },
+      ],
+    },
+    {
+      title: "Databases & Messaging",
       skills: [
         { name: "PostgreSQL", percentage: 85, icon: <SiPostgresql /> },
         { name: "MySQL", percentage: 90, icon: <SiMysql /> },
         { name: "MongoDB", percentage: 80, icon: <DiMongodb /> },
-        { name: "DynamoDB", percentage: 70, icon: <SiRedis /> },
+        { name: "DynamoDB", percentage: 70, icon: <FaAws /> },
         { name: "Redis", percentage: 75, icon: <SiRedis /> },
-        { name: "Kafka", percentage: 70, icon: <SiApachekafka /> },
-        { name: "RabbitMQ", percentage: 65, icon: <SiRabbitmq /> },
+        { name: "Kafka", percentage: 75, icon: <SiApachekafka /> },
+        { name: "RabbitMQ", percentage: 70, icon: <SiRabbitmq /> },
+        { name: "Oracle", percentage: 75, icon: <SiOracle /> },
+        { name: "SQL", percentage: 90, icon: <FaDatabase /> },
+        { name: "Kinesis", percentage: 70, icon: <FaAws /> },
+        { name: "Celery", percentage: 65, icon: <SiCelery /> },
       ],
     },
     {
-      title: "System Design",
+      title: "Cloud & DevOps",
       skills: [
         {
-          name: "Microservices",
+          name: "AWS (ECS, EC2, S3, RDS, Lambda)",
           percentage: 85,
-          icon: <AiOutlineCloudServer />,
+          icon: <FaAws />,
         },
+        { name: "Firebase", percentage: 70, icon: <SiFirebase /> },
+        { name: "Docker", percentage: 85, icon: <FaDocker /> },
+        { name: "Kubernetes", percentage: 75, icon: <SiKubernetes /> },
+        { name: "Helm", percentage: 70, icon: <SiHelm /> },
+        { name: "GitHub Actions", percentage: 80, icon: <FaGithub /> },
+        { name: "CI/CD", percentage: 80, icon: <FaGithub /> },
+      ],
+    },
+    {
+      title: "Machine Learning & AI",
+      skills: [
+        { name: "Scikit-learn", percentage: 75, icon: <SiScikitlearn /> },
+        { name: "BERT", percentage: 70, icon: <SiTensorflow /> },
+        { name: "GenAI/GPT", percentage: 80, icon: <SiOpenai /> },
+        { name: "RAG", percentage: 75, icon: <SiOpenai /> },
+        {
+          name: "ML-powered personalization",
+          percentage: 70,
+          icon: <SiScikitlearn />,
+        },
+      ],
+    },
+    {
+      title: "Testing & Automation",
+      skills: [
+        { name: "PyTest", percentage: 80, icon: <SiPytest /> },
+        {
+          name: "React Testing Library",
+          percentage: 75,
+          icon: <SiTestinglibrary />,
+        },
+        { name: "JUnit", percentage: 85, icon: <SiJunit5 /> },
+        { name: "Integration Testing", percentage: 80, icon: <FaSeedling /> },
+        {
+          name: "GitHub Actions pipelines",
+          percentage: 80,
+          icon: <FaGithub />,
+        },
+      ],
+    },
+    {
+      title: "System Design & Architecture",
+      skills: [
+        { name: "Microservices", percentage: 85, icon: <MdArchitecture /> },
         {
           name: "Distributed Systems",
           percentage: 80,
@@ -106,10 +191,26 @@ const Skills = () => {
           percentage: 75,
           icon: <AiOutlineCloudServer />,
         },
+        { name: "API Optimization", percentage: 80, icon: <TbApi /> },
         {
-          name: "API Optimization",
-          percentage: 80,
+          name: "Performance Tuning",
+          percentage: 75,
           icon: <AiOutlineCloudServer />,
+        },
+      ],
+    },
+    {
+      title: "Tools & Practices",
+      skills: [
+        { name: "Git", percentage: 90, icon: <FaGitAlt /> },
+        { name: "Jira", percentage: 85, icon: <SiJira /> },
+        { name: "Zoho", percentage: 70, icon: <SiZoho /> },
+        { name: "Salesforce", percentage: 65, icon: <SiSalesforce /> },
+        { name: "Agile (Scrum, Kanban)", percentage: 90, icon: <FaSeedling /> },
+        {
+          name: "Cross-functional collaboration",
+          percentage: 95,
+          icon: <FaSeedling />,
         },
       ],
     },
@@ -127,7 +228,7 @@ const Skills = () => {
             initial={{ x: "-100%", opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="h-full bg-gradient-to-r from-blue-600 via-pink-500 to-red-500 rounded-md relative"
+            className="h-full bg-gradient-to-r from-[#ff014f] via-pink-500 to-red-500 rounded-md relative"
             style={{ width: `${skill.percentage}%` }}
           >
             <span className="absolute -top-7 right-0">{skill.percentage}%</span>
@@ -148,7 +249,7 @@ const Skills = () => {
   };
 
   useEffect(() => {
-    const interval = setInterval(nextSkillSet, 5000);
+    const interval = setInterval(nextSkillSet, 8000);
     return () => clearInterval(interval);
   }, [nextSkillSet]);
 
@@ -165,7 +266,7 @@ const Skills = () => {
           </p>
           <h2 className="text-3xl md:text-4xl font-bold">Other Skills</h2>
         </div>
-        <div className='className="mt-14 w-full flex flex-col gap-6'>
+        <div className="mt-14 w-full flex flex-col gap-6">
           {renderSkills(otherSkills)}
         </div>
       </div>
@@ -198,16 +299,18 @@ const Skills = () => {
             <FaChevronRight />
           </motion.button>
         </div>
-        <motion.div
-          key={currentSkillSet}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
-          className="flex flex-col gap-6"
-        >
-          {renderSkills(skillSets[currentSkillSet].skills)}
-        </motion.div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSkillSet}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="flex flex-col gap-6"
+          >
+            {renderSkills(skillSets[currentSkillSet].skills)}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </motion.div>
   );
