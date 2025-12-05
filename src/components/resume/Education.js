@@ -77,44 +77,34 @@ const Education = () => {
         </div>
         <div className="mt-6 lgl:mt-14 w-full h-[1000px] border-l-[6px] border-l-black border-opacity-30 flex flex-col gap-10">
           <ResumeCard
-            title="Software Engineer (Full Stack Software Developer)"
-            subTitle="Northen Trust - (Jan 2024 - Present)"
+            title="Senior Software Engineer"
+            subTitle="Musk and Gale (Sep 2024 - Present)"
             result="USA"
             country="Cleveland - OH"
             des={[
-              "Led development of a Market Data Aggregation Platform, achieving 95% feature clarity per sprint while ensuring compliance and data governance",
-              "Built a Python backend using Django REST Framework, integrated with a React frontend, reducing response latency by 32% by optimizing query structures and reducing redundant calls",
-              "Engineered real-time API data streams using WebSockets and Celery, achieving a data ingestion throughput of 1.8M records/hour, significantly reducing external API timeout errors by 47%",
-              "Designed a PostgreSQL schema for multi-source aggregation with AES-256 encryption, improving data security and boosting query performance by 41% across 12 financial indices",
-              "Implemented role-based access controls (RBAC), reducing unauthorized access incidents by 40% and improving audit compliance",
-              "Developed 120+ automated tests using PyTest and React Testing Library, achieving 98.9% test coverage and cutting deployment rollback incidents by 78%",
-              "Deployed using AWS ECS Fargate, S3, and RDS with Terraform for IaC, achieving 99.98% uptime with auto-scaling, reducing DevOps overhead by 36%",
+              "Built a Python backend (Django REST Framework) and React frontend for a Market Data Aggregation Platform, reducing user response latency by 32%.",
+              "Engineered real-time API data streams using WebSockets and Celery, improving data ingestion throughput to 1.8M records per hour.",
+              "Deployed on AWS (ECS Fargate, Kubernetes, Helm) with S3 and RDS, achieving 99.98% uptime.",
             ]}
           />
           <ResumeCard
-            title="Member Technical Staff (Full Stack Software Developer)"
-            subTitle="Zoho Corporation - (Jan 2022 - Dec 2023)"
+            title="MTS (Full Stack Software Developer - CRM)"
+            subTitle="ZOHO Corporation (Jan 2022 - Dec 2023)"
             result="IND"
             country="Chennai - TN"
             des={[
-              "Enhanced Tax Configuration system with API versioning, reducing compatibility issues across 7 systems, lowering system downtime by 20 hours/month",
-              "Built an NIO-based validation system, enhancing data processing speed to 2.3M records/hour and reducing validation errors from 1,200 to 660 daily",
-              "Developed a Kafka/Redis-powered rollup summary, automating 6,500+ data aggregation tasks per week, saving 13.5 hours per record and reducing reporting delays by 3 hours per cycle",
-              "Optimized CRM's Recent Items storage, reducing database load by 55% and improving real-time access to 20+ records per user session",
-              "Enhanced UI with ReactJS/TypeScript, streamlining automation reports, reducing bug resolution time from 10 days to 7 days, and increasing user adoption by 28%",
-              "Implemented a Kafka/Java data pipeline, achieving 99.9% uptime and reducing message processing latency from 120ms to 77ms, increasing system throughput to 1.2M events/minute",
+              "Implemented a Kafka/Java data pipeline, reducing message processing latency from 120ms to 77ms and increasing system throughput to 1.2M events/minute.",
+              "Optimized CRM's Recent Items storage, reducing database load by 55%.",
             ]}
           />
           <ResumeCard
-            title="Jr. Associate (Full Stack Software Developer)"
-            subTitle="Augusta Hitech Software Solutions - (Nov 2020 - Dec 2021)"
+            title="Junior Associate"
+            subTitle="Augusta Hitech Software Solution (Nov 2018 - Dec 2021)"
             result="IND"
             country="Coimbatore - TN"
             des={[
-              "Developed cross-platform apps with Flutter and Angular, reducing deployment time by 16% by optimizing component reuse and API integration",
-              "Implemented ML-driven lead allocation using Python and scikit-learn, reducing manual errors by 22% and increasing sales efficiency by 20%",
-              "Enhanced CRM marketing/sales workflows, improving lead conversion from 5,500 to 8,800 annually, and increasing customer engagement by 32%",
-              "Aligned lead conversion workflows, increasing qualified lead retention by 60% and boosting sales revenue by $240,000 annually",
+              "Implemented ML-driven lead allocation using Python and scikit-learn, increasing sales efficiency by 20%.",
+              "Increased qualified lead retention by 60%, boosting sales revenue by $240,000 annually.",
             ]}
           />
         </div>

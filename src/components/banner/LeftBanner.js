@@ -6,8 +6,8 @@ import { SiLeetcode, SiJava, SiPython, SiJavascript } from "react-icons/si";
 const LeftBanner = () => {
   const [text] = useTypewriter({
     words: [
+      "Results-driven Full Stack Developer.",
       "Professional Coder.",
-      "Full Stack Developer.",
       "Backend Developer.",
     ],
     loop: true,
@@ -34,14 +34,8 @@ const LeftBanner = () => {
           />
         </h2>
         <p className="text-base font-bodyFont leading-6 tracking-wide">
-          Software Developer with 4+ years of expertise in building scalable
-          applications using Spring Boot and modern JavaScript frameworks.
-          Proficient in cloud-native development with AWS and Kubernetes, along
-          with crafting efficient data solutions using Kafka and Redis.
-          Specialized in scalable architecture, high-performance API design, and
-          streamlined CI/CD automation. Brings a solution-oriented approach to
-          transform complex business requirements into high-performance
-          software.
+          Results-driven Full Stack Developer with over 6 years of experience in
+          designing, developing, and deploying scalable web applications.
         </p>
       </div>
       <div className="flex flex-col xl:flex-row gap-6 lgl:gap-0 justify-between">
