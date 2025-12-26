@@ -15,7 +15,6 @@ import {
   FaChevronRight,
   FaAws,
   FaSeedling,
-  FaDatabase,
 } from "react-icons/fa";
 import {
   SiSpringboot,
@@ -30,31 +29,13 @@ import {
   SiTensorflow,
   SiOpenai,
   SiEmberdotjs,
-  SiGo,
   SiFastapi,
-  SiFirebase,
-  SiRabbitmq,
-  SiNextdotjs,
-  SiFlutter,
-  SiGraphql,
   SiJsonwebtokens,
-  SiOracle,
-  SiKubernetes,
-  SiHelm,
-  SiCelery,
   SiJira,
-  SiSalesforce,
   SiZoho,
-  SiPytest,
-  SiJunit5,
-  SiTestinglibrary,
-  SiReactivex,
+  SiRabbitmq,
 } from "react-icons/si";
-import {
-  MdOutlinePhotoCamera,
-  MdArchitecture,
-  MdOutlineSecurity,
-} from "react-icons/md";
+import { MdArchitecture } from "react-icons/md";
 import { DiMongodb } from "react-icons/di";
 import { AiOutlineCloudServer, AiOutlineApi } from "react-icons/ai";
 import { TbApi } from "react-icons/tb";
@@ -63,8 +44,16 @@ const Skills = () => {
   const [currentSkillSet, setCurrentSkillSet] = useState(0);
 
   const otherSkills = [
-    { name: "Photography", percentage: 60, icon: <MdOutlinePhotoCamera /> },
-    { name: "Gardening", percentage: 45, icon: <FaSeedling /> },
+    { name: "Git", percentage: 90, icon: <FaGitAlt /> },
+    { name: "Jira", percentage: 85, icon: <SiJira /> },
+    { name: "Zoho", percentage: 70, icon: <SiZoho /> },
+    { name: "Agile (Scrum, Kanban)", percentage: 90, icon: <FaSeedling /> },
+    {
+      name: "Cross-functional collaboration",
+      percentage: 95,
+      icon: <FaSeedling />,
+    },
+    { name: "Prompt Engineering", percentage: 75, icon: <SiOpenai /> },
   ];
 
   const skillSets = [
@@ -72,7 +61,6 @@ const Skills = () => {
       title: "Languages & Frameworks",
       skills: [
         { name: "Java", percentage: 90, icon: <FaJava /> },
-        { name: "Go", percentage: 80, icon: <SiGo /> },
         { name: "Python", percentage: 90, icon: <FaPython /> },
         { name: "JavaScript", percentage: 90, icon: <FaJs /> },
         { name: "TypeScript", percentage: 85, icon: <SiTypescript /> },
@@ -86,22 +74,16 @@ const Skills = () => {
       title: "Frontend Development",
       skills: [
         { name: "React.js", percentage: 90, icon: <FaReact /> },
-        { name: "Next.js", percentage: 85, icon: <SiNextdotjs /> },
-        { name: "Angular", percentage: 75, icon: <SiAngular /> },
-        { name: "RxJs", percentage: 70, icon: <SiReactivex /> },
+        { name: "Angular", percentage: 80, icon: <SiAngular /> },
         { name: "Ember.js", percentage: 65, icon: <SiEmberdotjs /> },
         { name: "HTML5", percentage: 95, icon: <FaHtml5 /> },
         { name: "CSS3", percentage: 90, icon: <FaCss3Alt /> },
-        { name: "React Native", percentage: 75, icon: <FaReact /> },
-        { name: "Flutter", percentage: 70, icon: <SiFlutter /> },
       ],
     },
     {
       title: "Backend & APIs",
       skills: [
         { name: "REST APIs", percentage: 90, icon: <AiOutlineApi /> },
-        { name: "GraphQL", percentage: 80, icon: <SiGraphql /> },
-        { name: "OAuth", percentage: 75, icon: <MdOutlineSecurity /> },
         {
           name: "JWT Authentication",
           percentage: 80,
@@ -123,24 +105,17 @@ const Skills = () => {
         { name: "Redis", percentage: 75, icon: <SiRedis /> },
         { name: "Kafka", percentage: 75, icon: <SiApachekafka /> },
         { name: "RabbitMQ", percentage: 70, icon: <SiRabbitmq /> },
-        { name: "Oracle", percentage: 75, icon: <SiOracle /> },
-        { name: "SQL", percentage: 90, icon: <FaDatabase /> },
-        { name: "Kinesis", percentage: 70, icon: <FaAws /> },
-        { name: "Celery", percentage: 65, icon: <SiCelery /> },
       ],
     },
     {
       title: "Cloud & DevOps",
       skills: [
         {
-          name: "AWS (ECS, EC2, S3, RDS, Lambda)",
+          name: "AWS (EC2, S3, RDS, Lambda, Lightsail)",
           percentage: 85,
           icon: <FaAws />,
         },
-        { name: "Firebase", percentage: 70, icon: <SiFirebase /> },
         { name: "Docker", percentage: 85, icon: <FaDocker /> },
-        { name: "Kubernetes", percentage: 75, icon: <SiKubernetes /> },
-        { name: "Helm", percentage: 70, icon: <SiHelm /> },
         { name: "GitHub Actions", percentage: 80, icon: <FaGithub /> },
         { name: "CI/CD", percentage: 80, icon: <FaGithub /> },
       ],
@@ -156,24 +131,6 @@ const Skills = () => {
           name: "ML-powered personalization",
           percentage: 70,
           icon: <SiScikitlearn />,
-        },
-      ],
-    },
-    {
-      title: "Testing & Automation",
-      skills: [
-        { name: "PyTest", percentage: 80, icon: <SiPytest /> },
-        {
-          name: "React Testing Library",
-          percentage: 75,
-          icon: <SiTestinglibrary />,
-        },
-        { name: "JUnit", percentage: 85, icon: <SiJunit5 /> },
-        { name: "Integration Testing", percentage: 80, icon: <FaSeedling /> },
-        {
-          name: "GitHub Actions pipelines",
-          percentage: 80,
-          icon: <FaGithub />,
         },
       ],
     },
@@ -196,21 +153,6 @@ const Skills = () => {
           name: "Performance Tuning",
           percentage: 75,
           icon: <AiOutlineCloudServer />,
-        },
-      ],
-    },
-    {
-      title: "Tools & Practices",
-      skills: [
-        { name: "Git", percentage: 90, icon: <FaGitAlt /> },
-        { name: "Jira", percentage: 85, icon: <SiJira /> },
-        { name: "Zoho", percentage: 70, icon: <SiZoho /> },
-        { name: "Salesforce", percentage: 65, icon: <SiSalesforce /> },
-        { name: "Agile (Scrum, Kanban)", percentage: 90, icon: <FaSeedling /> },
-        {
-          name: "Cross-functional collaboration",
-          percentage: 95,
-          icon: <FaSeedling />,
         },
       ],
     },
@@ -264,7 +206,7 @@ const Skills = () => {
           <p className="text-sm text-designColor tracking-[4px] uppercase">
             Features
           </p>
-          <h2 className="text-3xl md:text-4xl font-bold">Other Skills</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Tools & Practices</h2>
         </div>
         <div className="mt-14 w-full flex flex-col gap-6">
           {renderSkills(otherSkills)}
