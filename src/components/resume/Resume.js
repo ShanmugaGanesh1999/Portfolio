@@ -12,14 +12,14 @@ const Resume = () => {
   const handleDownload = () => {
     // Replace this URL with the actual path to your resume file
     const resumeUrl =
-      "https://drive.google.com/file/d/1V8FWohu_6AFkmR2FKw0oEonJho1mXg_h/view?usp=sharing";
+      "https://drive.google.com/file/d/1YTEEAngdw7WMTr64cPSFSldPt9hesnBt/view?usp=sharing";
     window.open(resumeUrl, "_blank");
   };
 
   return (
     <section id="resume" className="w-full py-20 border-b-[1px] border-b-black">
       <div className="flex justify-center items-center text-center">
-        <Title title="3+ YEARS OF EXPERIENCE" des="My Resume" />
+        <Title title="7+ YEARS OF EXPERIENCE" des="My Resume" />
       </div>
       <div>
         <ul className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
