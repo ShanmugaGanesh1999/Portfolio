@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkshanmuga_ganesh_portfolio=self.webpackChunkshanmuga_ganesh_portfolio||[]).push([[281],{6281:(e,s,a)=>{a.r(s),a.d(s,{default:()=>l});a(2791);var t=a(184);const l=()=>(0,t.jsx)("div",{className:"w-full py-10",children:(0,t.jsx)("p",{className:"text-center text-gray-500 text-base",children:"\xa9 2024. All rights reserved by Shanmuga Ganesh"})})}}]);
-//# sourceMappingURL=281.cb9425fd.chunk.js.map
