@@ -6,9 +6,10 @@ import { SiLeetcode, SiJava, SiPython, SiJavascript } from "react-icons/si";
 const LeftBanner = () => {
   const [text] = useTypewriter({
     words: [
-      "Experienced Full Stack Engineer.",
-      "Java / Spring Boot Backend Engineer.",
-      "Angular + TypeScript Frontend Engineer.",
+      "Results-driven Full Stack Developer.",
+      "Java + Spring Boot Backend Engineer.",
+      "React Frontend Developer.",
+      "Python Backend Engineer.",
     ],
     loop: true,
     typeSpeed: 20,
@@ -34,16 +35,13 @@ const LeftBanner = () => {
           />
         </h2>
         <p className="text-base font-bodyFont leading-6 tracking-wide">
-          Experienced Full Stack Engineer with 7+ years of delivering scalable,
-          enterprise-grade web applications. Strong expertise in Java, Spring
-          Boot, and RESTful API design, building secure and high-performance
-          backend services. Advanced proficiency in Angular 15+ and TypeScript,
-          developing modern, responsive, and maintainable user interfaces.
-          Hands-on experience with Angular standalone components, signals, lazy
-          loading, and modern routing patterns. Strong testing experience with
-          Jest, Karma, and Cypress, plus AWS and enterprise databases (Oracle,
-          MySQL, PostgreSQL). Comfortable in Agile/Scrum and known for
-          production-ready delivery with long-term maintainability.
+          Results-driven Full Stack Developer with 7+ years of experience
+          designing, developing, and deploying scalable web applications.
+          Proficient in Java, React, Python, and cloud infrastructure with a
+          strong foundation in backend engineering, API design, database
+          optimization, and real-time data processing. Proven track record of
+          collaborating in Agile teams and delivering secure, efficient software
+          aligned with business goals.
         </p>
       </div>
       <div className="flex flex-col xl:flex-row gap-6 lgl:gap-0 justify-between">

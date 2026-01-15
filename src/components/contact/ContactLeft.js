@@ -15,18 +15,18 @@ const ContactLeft = () => {
       </div>
       <div className="flex flex-col gap-4">
         <h3 className="text-3xl font-bold text-white">Shanmuga Ganesh</h3>
-        <p className="text-lg font-normal text-gray-400">Software Developer</p>
+        <p className="text-lg font-normal text-gray-400">Full Stack Developer</p>
         <p className="text-base text-gray-400 tracking-wide">
-          I am a software developer with a passion for creating innovative
-          solutions to complex problems. I have a strong foundation in computer
-          science and software engineering, and I am always looking for new
-          challenges and opportunities to learn and grow.
+          Results-driven Full Stack Developer with 7+ years of experience
+          building scalable web applications. Strong in backend engineering,
+          API design, database optimization, and real-time systems, with hands-
+          on expertise in Java, React, Python, and AWS.
         </p>
         <p className="text-base text-gray-400 flex items-center gap-2">
-          Phone: <span className="text-lightText">+1 (216)-466-6648</span>
+          Phone: <span className="text-lightText">+1 216-466-6648</span>
         </p>
         <p className="text-base text-gray-400 flex items-center gap-2">
-          Email: <span className="text-lightText">1999ganesh2@gmail.com</span>
+          Email: <span className="text-lightText">shanmugaganesh1999@gmail.com</span>
         </p>
         <p className="text-base text-gray-400 flex items-center gap-2">
           Location: <span className="text-lightText">Cleveland, Ohio</span>

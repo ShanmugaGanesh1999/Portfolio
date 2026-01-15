@@ -11,26 +11,17 @@ const Education = () => {
     >
       <div>
         <div className="py-6 lgl:py-12 font-titleFont flex flex-col gap-4">
-          <p className="text-sm text-designColor tracking-[4px]">2015 - 2025</p>
+          <p className="text-sm text-designColor tracking-[4px]">2017 - 2025</p>
           <h2 className="text-3xl md:text-4xl font-bold">Education Quality</h2>
         </div>
         <div className="mt-6 lgl:mt-14 w-full h-auto border-l-[6px] border-l-black border-opacity-30 flex flex-col gap-10">
           <ResumeCard
             title="MS in Computer Science"
             subTitle="Case Western Reserve University (Aug 2023 - May 2025)"
-            result="3.78/4"
+            result="3.78/4.0"
             country="Cleveland - OH, USA"
             des={[
-              "(xLab initiative) Spearheaded AI-driven customer service innovations on the Eaton project by developing a generative AI-powered chatbot for call center training and implementing AI analysis of call transcripts, enhancing agent readiness and service strategies",
-              "Working as a RA focusing on AI-driven database & query optimization under professor and PhD student",
-              "TA in CSDS 438 High Performance Data and Computing",
-              "TA in CSDS 341 Introduction to Database Systems",
-              "Developed end-to-end website for inter-college poster & presentation competition: Intersection",
-              "TA in CSDS 410 Analysis of Algorithms",
-              "Specialist in database and debugging for Access services (meal plans, case cash-CWRU banking system, parking-parking system, Harold-Master search system, SIS-student information system, T2-payment system)",
-              "Selected participant of Tech Side Hustle (Spring ‘24) in Entrepreneur Educational Consortium",
-              "Active member in programming and Quantum Computing clubs",
-              "Member of programming club",
+              "Master's in Computer Science (2025) with a 3.78/4.0 GPA.",
             ]}
           />
           <ResumeCard
@@ -75,44 +66,55 @@ const Education = () => {
           </p>
           <h2 className="text-3xl md:text-4xl font-bold">Job Experience</h2>
         </div>
-        <div className="mt-6 lgl:mt-14 w-full h-[1000px] border-l-[6px] border-l-black border-opacity-30 flex flex-col gap-10">
+        <div className="mt-6 lgl:mt-14 w-full h-auto border-l-[6px] border-l-black border-opacity-30 flex flex-col gap-10">
           <ResumeCard
-            title="Senior Software Engineer"
-            subTitle="Musk and Gale (Sep 2024 - Present)"
+            title="Software Engineer (Fintech)"
+            subTitle="Musk and Gale (Jun 2024 - Present)"
             result="USA"
             country="Cleveland - OH"
             des={[
-              "Collaborated in Agile Scrum sprints to deliver an enterprise Market Data Aggregation Platform; led stakeholder requirement grooming and backlog refinement, achieving 95% feature clarity per sprint. Ensured alignment with data governance, security, and audit-ready documentation.",
-              "Developed backend services using Java, Spring Boot, and REST APIs, integrating an Angular 8+ UI for interactive dashboards. Reduced user response latency by 32%, enabling real-time market visualization and dynamic filtering for 2,500+ daily users.",
-              "Engineered real-time ingestion microservices using Spring Boot, WebSockets, and asynchronous processing with Kafka. Integrated third-party providers and internal services, improving throughput to 1.8M records/hour and reducing external API timeout errors by 47%.",
-              "Designed and optimized PostgreSQL data models for multi-source aggregation; implemented encryption and role-based access control with Spring Security. Reduced unauthorized query risk and improved query performance by 41% across 12 financial indices.",
-              "Created 120+ automated tests using JUnit 5, Mockito, and UI test suites for Angular. Implemented CI/CD with Jenkins and GitHub Actions, cutting deployment rollback incidents by 78% and sustaining 98.9% test coverage for critical modules.",
-              "Deployed services on AWS using ECS Fargate, S3, RDS, and CloudWatch, with Terraform for IaC. Enabled autoscaling, reducing downtime to 3 seconds per spike and achieving 99.98% uptime, cutting DevOps overhead by 36%.",
+              "Led development of a Market Data Aggregation Platform, achieving 95% feature clarity per sprint while ensuring compliance and data governance.",
+              "Built a Python backend using Django REST Framework and integrated with a React frontend; reduced response latency by 32% by optimizing queries and eliminating redundant calls.",
+              "Engineered real-time API data streams using WebSockets and Celery, achieving 1.8M records/hour ingestion throughput and reducing external API timeout errors by 47%.",
+              "Designed a PostgreSQL schema for multi-source aggregation with AES-256 encryption, improving data security and boosting query performance by 41% across 12 financial indices.",
+              "Implemented role-based access controls (RBAC), reducing unauthorized access incidents by 40% and improving audit compliance.",
+              "Deployed using AWS ECS Fargate, S3, and RDS with Terraform for IaC; achieved 99.98% uptime with auto-scaling and reduced DevOps overhead by 36%.",
+            ]}
+          />
+          <ResumeCard
+            title="Access Services Specialist (Security Engineer)"
+            subTitle="Case Western Reserve University (Jan 2024 - May 2025)"
+            result="USA"
+            country="Cleveland - OH"
+            des={[
+              "Led migration of CWRU Access Services authentication to a centralized IAM platform implementing OAuth2 SSO with Spring Security and Java microservices on AWS; reduced duplicate logins by 60% and authentication tickets by 35%.",
+              "Engineered RBAC and attribute-based access policies for parking and campus services; cut manual entitlement reviews by 50% through Java-based policy engines and CI/CD configuration-as-code pipelines.",
+              "Developed secure Java/Spring Boot APIs using OAuth2 resource server patterns and input validation; achieved sub-200ms response times and 99.9% uptime by tuning Oracle queries, caching auth decisions, and using CloudWatch dashboards.",
             ]}
           />
           <ResumeCard
             title="MTS (Full Stack Software Developer - CRM)"
-            subTitle="ZOHO Corporation (Jan 2022 - Aug 2024)"
+            subTitle="ZOHO Corporation (Jan 2021 - Dec 2023)"
             result="IND"
-            country="Chennai - TN"
+            country="Chennai - IND"
             des={[
-              "Redesigned the Tax Configuration module with API versioning, backward compatibility, and microservices integration. Reduced downtime by 20 hours/month, shortened deployment time by 3 days/cycle, and supported 150,000 API requests daily across 7 connected systems.",
-              "Built a high-performance validation engine using Java NIO, multithreading, and optimized batching. Increased processing speed to 2.3M records/hour, reduced validation errors from 1,200 to 660 daily, improved ingestion from 8s to 6.9s/batch, saving 240 engineer-hours/month.",
-              "Developed a Kafka and Redis rollup service to automate aggregation workflows and reporting. Processed 6,500+ tasks/week, saving 13.5 hours/employee, reducing reporting delays by 3 hours/cycle, and lowering operational costs by $20k annually while improving accuracy.",
-              "Optimized CRM Recent Items persistence using PostgreSQL indexing, caching, and API tuning. Reduced database load from 11,000 to 4,950 concurrent queries, improved response time from 250ms to 150ms, and enabled real-time access to 20+ records per session.",
-              "Implemented a Java event-driven data pipeline using Kafka, improving distributed reliability and scalability. Achieved 99.9% uptime, reduced message latency from 120ms to 77ms, and increased throughput to 1.2M events/minute with resilient retry handling.",
-              "Enhanced enterprise UI using Angular and TypeScript with reusable components for automation reporting. Reduced bug resolution time from 10 days to 7 days, increased active users from 3,200 to 4,100, and cut debugging time by 5 hours/issue through improved logging and UX.",
+              "Enhanced Tax Configuration system with API versioning, reducing compatibility issues across 7 systems and lowering downtime by 20 hours/month.",
+              "Built an NIO-based validation system, increasing data processing speed to 2.3M records/hour and reducing validation errors from 1,200 to 660 daily.",
+              "Developed a Kafka/Redis-powered rollup summary, automating 6,500+ aggregation tasks/week and reducing reporting delays by 3 hours per cycle.",
+              "Optimized CRM Recent Items storage, reducing database load by 55% and improving real-time access to 20+ records per user session.",
+              "Implemented a Kafka/Java data pipeline, achieving 99.9% uptime and reducing message latency from 120ms to 77ms while increasing throughput to 1.2M events/minute.",
             ]}
           />
           <ResumeCard
-            title="Full Stack Software Developer"
-            subTitle="Augusta Hitech Software Solution (Nov 2018 - Dec 2021)"
+            title="Junior Associate (Full Stack Software Developer)"
+            subTitle="Augusta Hitech Software Solution (Nov 2018 - Dec 2020)"
             result="IND"
-            country="Coimbatore - TN"
+            country="Coimbatore - IND"
             des={[
-              "Delivered cross-platform solutions using Angular and Node.js with standardized REST integration. Reduced deployment time from 6 weeks to 5 weeks, lowered post-launch issues from 220 to 194, reduced maintenance by $15k/quarter, and increased revenue by $120k annually.",
-              "Implemented workflow optimization with Python and applied analytics models to improve allocation accuracy and throughput. Reduced manual errors from 450 to 351 monthly, accelerated conversion time from 5 days to 4.1 days, and increased qualified lead retention from 5,500 to 8,800 annually.",
-              "Streamlined CRM sales and marketing workflows using integrated REST APIs, data normalization, and process automation. Expanded reach to 180,000+ customers, reduced campaign execution from 4 days to 3 days/cycle, minimized silos across 5 business units, and increased ROI by $240k annually.",
+              "Developed cross-platform apps with Flutter and Angular, reducing deployment time by 16% by optimizing component reuse and API integration.",
+              "Implemented ML-driven lead allocation using Python and scikit-learn, reducing manual errors by 22% and increasing sales efficiency by 20%.",
+              "Enhanced CRM marketing/sales workflows, improving lead conversion from 5,500 to 8,800 annually and increasing customer engagement by 32%.",
+              "Aligned lead conversion workflows, increasing qualified lead retention by 60% and boosting sales revenue by $240,000 annually.",
             ]}
           />
         </div>
