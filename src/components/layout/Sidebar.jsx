@@ -4,6 +4,7 @@ import { NAV_ITEMS, PERSONAL } from "../../data/portfolioData";
 import { PREP_COURSES } from "../../prep/prepData";
 import useScrollSpy from "../../hooks/useScrollSpy";
 import useResizable from "../../hooks/useResizable";
+import { useTheme } from "../../hooks/useTheme";
 
 /**
  * FolderSection — A VS Code-style collapsible directory group.
@@ -155,6 +156,7 @@ export default function Sidebar({ activeProject, onOpenProject, onOpenPrepTab, o
   const sectionIds = ["hero", "about", "expertise", "experience", "work", "contact"];
   const activeSection = useScrollSpy(sectionIds);
   const { width, isResizing, startResize } = useResizable(256, 200, 500, onRequestClose, 120);
+  const { theme, toggle: toggleTheme } = useTheme();
 
   // Track session time
   const [sessionTime, setSessionTime] = useState(0);
@@ -200,7 +202,20 @@ export default function Sidebar({ activeProject, onOpenProject, onOpenPrepTab, o
     >
       {/* Explorer title */}
       <div className="p-4 border-b border-border shrink-0">
-        <div className="text-accent font-bold text-sm">EXPLORER</div>
+        <div className="flex items-center justify-between">
+          <div className="text-accent font-bold text-sm">EXPLORER</div>
+          <button
+            onClick={toggleTheme}
+            className="flex items-center justify-center w-7 h-7 rounded hover:bg-border/50 transition-colors group cursor-pointer"
+            title={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
+          >
+            <Icon
+              name={theme === "dark" ? "light_mode" : "dark_mode"}
+              size="text-[16px]"
+              className="text-comment group-hover:text-accent transition-colors"
+            />
+          </button>
+        </div>
       </div>
 
       {/* File tree — fills available space */}

@@ -1,20 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { DIAGRAM_NODES, DIAGRAM_EDGES, DATA_FLOWS } from "./validationData";
 import { renderNodeBackground } from "../utils/nodeShapes";
-
-const COLOR_HEX = {
-  accent: "#58a6ff",
-  success: "#3fb950",
-  keyword: "#ff7b72",
-  variable: "#ffa657",
-  func: "#d2a8ff",
-  string: "#a5d6ff",
-  comment: "#8b949e",
-  bg: "#0d1117",
-  sidebar: "#161b22",
-  border: "#30363d",
-  text: "#c9d1d9",
-};
+import { useThemeColors } from "../hooks/useTheme";
 
 function getNodeCenter(node) {
   return { x: node.x + 70, y: node.y + 28 };
@@ -25,6 +12,7 @@ function getNodeById(id) {
 }
 
 function EdgeLine({ edge, highlighted, dimmed }) {
+  const COLOR_HEX = useThemeColors();
   const from = getNodeById(edge.from);
   const to = getNodeById(edge.to);
   if (!from || !to) return null;
@@ -65,6 +53,7 @@ function EdgeLine({ edge, highlighted, dimmed }) {
 }
 
 function DiagramNode({ node, isSelected, isHighlighted, isDimmed, onClick }) {
+  const COLOR_HEX = useThemeColors();
   const fill = isSelected
     ? COLOR_HEX[node.color]
     : isHighlighted
@@ -136,6 +125,7 @@ function DiagramNode({ node, isSelected, isHighlighted, isDimmed, onClick }) {
 // ValidationDiagram — Interactive SVG
 // ──────────────────────────────────────
 export default function ValidationDiagram() {
+  const COLOR_HEX = useThemeColors();
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const [selectedNode, setSelectedNode] = useState(null);

@@ -52,17 +52,6 @@ const MODELS = {
     icon: "speed",
     description: "DeepSeek · Ultra budget",
   },
-  "gemini-flash": {
-    id: "gemini-flash",
-    name: "Gemini 2.0 Flash",
-    routerModel: "gemini-2.0-flash-exp",
-    provider: "google",
-    maxTokens: 500,
-    temperature: 0.3,
-    tier: "fast",
-    icon: "flash_on",
-    description: "Google · Super fast",
-  },
 };
 
 const DEFAULT_MODEL = "claude-haiku";

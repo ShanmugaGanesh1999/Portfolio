@@ -15,6 +15,23 @@
   --font-mono: 'Space Mono', monospace;
 }
 
+/* ═══════════════════════════════════════════════════
+   LIGHT THEME — VS Code Light+ inspired
+   ═══════════════════════════════════════════════════ */
+[data-theme="light"] {
+  --color-bg: #ffffff;
+  --color-sidebar: #f3f3f3;
+  --color-text: #1e1e1e;
+  --color-border: #d1d5db;
+  --color-keyword: #d32f2f;
+  --color-string: #0451a5;
+  --color-comment: #6a737d;
+  --color-func: #7c3aed;
+  --color-variable: #c2410c;
+  --color-success: #16a34a;
+  --color-accent: #0969da;
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) var(--color-bg);
@@ -23,6 +40,11 @@
 ::selection {
   background-color: rgba(88, 166, 255, 0.3);
   color: white;
+}
+
+[data-theme="light"] ::selection {
+  background-color: rgba(9, 105, 218, 0.25);
+  color: #1e1e1e;
 }
 
 body {
@@ -154,6 +176,9 @@ body {
   color: #ffffff;
   font-weight: 700;
 }
+[data-theme="light"] .md-strong {
+  color: #000000;
+}
 .md-em {
   color: var(--color-string);
   font-style: italic;
@@ -185,6 +210,9 @@ body {
   font-size: 0.85em;
   border: 1px solid var(--color-border);
 }
+[data-theme="light"] .md-inline-code {
+  background: rgba(175, 184, 193, 0.2);
+}
 
 /* ── Code blocks ─────────────────────────────── */
 .md-code-block {
@@ -193,6 +221,9 @@ body {
   border: 1px solid var(--color-border);
   background: #161b22;
   overflow: hidden;
+}
+[data-theme="light"] .md-code-block {
+  background: #f6f8fa;
 }
 .md-code-block > pre {
   margin: 0 !important;
@@ -226,6 +257,9 @@ body {
   background: rgba(88, 166, 255, 0.06);
   border-radius: 0 6px 6px 0;
   color: var(--color-comment);
+}
+[data-theme="light"] .md-blockquote {
+  background: rgba(9, 105, 218, 0.06);
 }
 .md-blockquote p {
   margin: 0.25rem 0;
@@ -290,6 +324,9 @@ body {
 .md-thead {
   background: rgba(88, 166, 255, 0.08);
 }
+[data-theme="light"] .md-thead {
+  background: rgba(9, 105, 218, 0.06);
+}
 .md-th {
   text-align: left;
   padding: 0.6rem 0.75rem;
@@ -308,6 +345,9 @@ body {
 }
 .md-tr:nth-child(even) .md-td {
   background: rgba(110, 118, 129, 0.04);
+}
+[data-theme="light"] .md-tr:nth-child(even) .md-td {
+  background: rgba(0, 0, 0, 0.02);
 }
 
 /* ── Horizontal rule ─────────────────────────── */
@@ -335,6 +375,25 @@ body {
 .md-checkbox-checked {
   background: var(--color-success);
   border-color: var(--color-success);
+}
+[data-theme="light"] .md-checkbox {
+  color: #ffffff;
+}
+
+/* ── Light-theme hover text fix ──────────────── */
+/* In dark mode hover:text-white brightens text;
+   in light mode we darken it instead so it stays visible. */
+[data-theme="light"] .hover\:text-white:hover {
+  color: var(--color-text) !important;
+}
+[data-theme="light"] .group:hover .group-hover\:text-white {
+  color: var(--color-text) !important;
+}
+[data-theme="light"] .hover\:decoration-white\/60:hover {
+  text-decoration-color: var(--color-text) !important;
+}
+[data-theme="light"] .md-link:hover {
+  color: #0550ae;
 }
 
 /* ── Images ──────────────────────────────────── */

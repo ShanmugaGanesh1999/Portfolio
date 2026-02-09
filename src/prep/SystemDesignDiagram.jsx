@@ -1,23 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useMemo, useId } from "react";
 import { parseMermaid } from "./parseMermaid";
 import { renderNodeBackground } from "../utils/nodeShapes";
-
-// ──────────────────────────────────────
-// Colour map — identical to InteractiveDiagram in projects/
-// ──────────────────────────────────────
-const C = {
-  accent:  "#58a6ff",
-  success: "#3fb950",
-  keyword: "#ff7b72",
-  variable:"#ffa657",
-  func:    "#d2a8ff",
-  string:  "#a5d6ff",
-  comment: "#8b949e",
-  bg:      "#0d1117",
-  sidebar: "#161b22",
-  border:  "#30363d",
-  text:    "#c9d1d9",
-};
+import { useThemeColors } from "../hooks/useTheme";
 
 const NODE_W = 155;
 const NODE_H = 56;
@@ -30,6 +14,7 @@ function centre(n) {
 // Edge — line + optional label
 // ──────────────────────────────────────────────────
 function Edge({ edge, from, to, highlighted, dimmed, mid }) {
+  const C = useThemeColors();
   if (!from || !to) return null;
   const a = centre(from);
   const b = centre(to);
@@ -82,6 +67,7 @@ function Edge({ edge, from, to, highlighted, dimmed, mid }) {
 // Node — clickable shape (rect, cylinder, stadium, etc.)
 // ──────────────────────────────────────────────────
 function Node({ node, selected, highlighted, dimmed, onClick }) {
+  const C = useThemeColors();
   const col  = C[node.color] || C.comment;
   const fill = selected ? col : highlighted ? col + "22" : C.sidebar;
   const strk = selected || highlighted ? col : C.border;
@@ -137,6 +123,7 @@ function Node({ node, selected, highlighted, dimmed, onClick }) {
 // SubgraphRegion — dashed box behind a group of nodes
 // ──────────────────────────────────────────────────
 function SubgraphRegion({ sg, nodes, dim }) {
+  const C = useThemeColors();
   const sgNodes = nodes.filter(n => sg.nodeIds.includes(n.id));
   if (!sgNodes.length) return null;
   const pad = 16;
@@ -168,6 +155,7 @@ function SubgraphRegion({ sg, nodes, dim }) {
 // SystemDesignDiagram — pan / zoom / click-inspect
 // ══════════════════════════════════════════════════
 export default function SystemDesignDiagram({ mermaidCode }) {
+  const C = useThemeColors();
   const { nodes, edges, subgraphs } = useMemo(
     () => parseMermaid(mermaidCode),
     [mermaidCode],
@@ -280,7 +268,7 @@ export default function SystemDesignDiagram({ mermaidCode }) {
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: "linear-gradient(#c9d1d9 1px,transparent 1px),linear-gradient(90deg,#c9d1d9 1px,transparent 1px)",
+            backgroundImage: `linear-gradient(${C.text} 1px,transparent 1px),linear-gradient(90deg,${C.text} 1px,transparent 1px)`,
             backgroundSize: "20px 20px",
           }}
         />

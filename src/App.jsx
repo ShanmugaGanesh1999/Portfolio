@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ThemeProvider } from "./hooks/useTheme";
 import { Layout } from "./components/layout";
 import {
   Hero,
@@ -51,7 +52,8 @@ export default function App() {
   };
 
   return (
-    <Layout activeProject={activeProject} onOpenProject={setActiveProject}>
+    <ThemeProvider>
+      <Layout activeProject={activeProject} onOpenProject={setActiveProject}>
       {prepCourse ? (
         <PrepPlatform
           course={prepCourse}
@@ -74,5 +76,6 @@ export default function App() {
         </>
       )}
     </Layout>
+    </ThemeProvider>
   );
 }
