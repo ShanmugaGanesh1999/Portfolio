@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://shanmugaganesh1999.github.io/Portfolio/sitemap.xml
+Sitemap: https://shanmugaganesh.dev/sitemap.xml
 
 # Crawl-delay (optional, adjust if needed)
 Crawl-delay: 1
