@@ -310,7 +310,7 @@ export default function MLLeadScoringProject({ onBack }) {
           >
             <DiagramView
               interactive={<MLLeadScoringDiagram />}
-              staticSrc="/ml_lead_scoring.png"
+              staticSrc="/lead_identification.png"
               staticAlt="ML Lead Scoring Architecture"
             />
           </Section>

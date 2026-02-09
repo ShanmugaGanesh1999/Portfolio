@@ -1,19 +1,79 @@
 // ============================================================
-// RAG CHAT SERVICE — OpenRouter + Claude Opus 4
+// RAG CHAT SERVICE — OpenRouter Multi-Model
 // ============================================================
 // Pipeline:
 //   1. Validate input & enforce rate limits (anti-exploitation)
 //   2. Score & retrieve the most relevant doc chunks from RAG_CHUNKS
 //   3. Build prompt = MASTER_SYSTEM_PROMPT + retrieved context
-//   4. Send to Claude Opus 4 via OpenRouter
+//   4. Send to selected model via OpenRouter
 //   5. Stream response back to the UI
 // ============================================================
 
 import { MASTER_SYSTEM_PROMPT, RAG_CHUNKS } from "../data/masterPrompt";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
-const MODEL = "anthropic/claude-opus-4";
+const GOOGLE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models";
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+const GOOGLE_API_KEY = "AIzaSyBt59VUZIIWQ3JGPhgQV2vr59pC0B9-eQo";
+
+// ─── Available Models (Fast & Cost-Effective Only) ───────────
+
+const MODELS = {
+  "gpt-4o-mini": {
+    id: "gpt-4o-mini",
+    name: "GPT-4o Mini",
+    routerModel: "openai/gpt-4o-mini",
+    provider: "openrouter",
+    maxTokens: 500,
+    temperature: 0.3,
+    tier: "fast",
+    icon: "bolt",
+    description: "OpenAI · Fast & affordable",
+  },
+  "claude-haiku": {
+    id: "claude-haiku",
+    name: "Claude 3.5 Haiku",
+    routerModel: "anthropic/claude-3.5-haiku",
+    provider: "openrouter",
+    maxTokens: 500,
+    temperature: 0.3,
+    tier: "fast",
+    icon: "electric_bolt",
+    description: "Anthropic · Lightning fast",
+  },
+  "deepseek-r1-distill": {
+    id: "deepseek-r1-distill",
+    name: "DeepSeek R1 Distill",
+    routerModel: "deepseek/deepseek-r1-distill-llama-70b",
+    provider: "openrouter",
+    maxTokens: 500,
+    temperature: 0.3,
+    tier: "fast",
+    icon: "speed",
+    description: "DeepSeek · Ultra budget",
+  },
+  "gemini-flash": {
+    id: "gemini-flash",
+    name: "Gemini 2.0 Flash",
+    routerModel: "gemini-2.0-flash-exp",
+    provider: "google",
+    maxTokens: 500,
+    temperature: 0.3,
+    tier: "fast",
+    icon: "flash_on",
+    description: "Google · Super fast",
+  },
+};
+
+const DEFAULT_MODEL = "claude-haiku";
+
+export function getAvailableModels() {
+  return Object.values(MODELS);
+}
+
+export function getDefaultModelId() {
+  return DEFAULT_MODEL;
+}
 
 // ─── Rate Limiting (client-side anti-exploitation) ───────────
 
@@ -174,48 +234,133 @@ function buildMessages(query, conversationHistory = []) {
   return [systemMessage, ...recentHistory, { role: "user", content: query }];
 }
 
-// ─── Chat API Call ───────────────────────────────────────────
+// ─── Google Gemini API Call ──────────────────────────────────
+
+async function callGoogleAPI(messages, modelConfig, onChunk, signal) {
+  const url = `${GOOGLE_API_URL}/${modelConfig.routerModel}:streamGenerateContent?key=${GOOGLE_API_KEY}`;
+  
+  // Convert messages to Google format
+  const contents = messages
+    .filter(m => m.role !== "system")
+    .map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }]
+    }));
+
+  // Add system instruction
+  const systemMessage = messages.find(m => m.role === "system");
+  
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      contents,
+      systemInstruction: systemMessage ? {
+        parts: [{ text: systemMessage.content }]
+      } : undefined,
+      generationConfig: {
+        maxOutputTokens: modelConfig.maxTokens,
+        temperature: modelConfig.temperature,
+      },
+    }),
+    signal,
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Google API error: ${response.status}`);
+  }
+
+  if (onChunk) {
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = "";
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      
+      // Google sends JSON objects separated by newlines
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || "";
+
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        try {
+          const parsed = JSON.parse(line);
+          const content = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (content) {
+            fullText += content;
+            onChunk(content);
+          }
+        } catch {
+          // Skip malformed chunks
+        }
+      }
+    }
+    return fullText;
+  }
+
+  const data = await response.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Google API.";
+}
+
+// ─── Chat API Call (Router) ──────────────────────────────────
 
 /**
- * Send a query to Claude Opus 4 via OpenRouter with streaming.
+ * Send a query to selected model (OpenRouter or Google API).
  * @param {string} query - User's question
  * @param {Array} conversationHistory - Previous messages [{role, content}]
  * @param {function} onChunk - Callback for each streamed text chunk
  * @param {AbortSignal} signal - Optional abort signal
+ * @param {string} modelId - Model ID key from MODELS config
  * @returns {Promise<string>} Full response text
  */
 export async function chatQuery(
   query,
   conversationHistory = [],
   onChunk = null,
-  signal = null
+  signal = null,
+  modelId = DEFAULT_MODEL,
 ) {
   // Guard: validate & rate-limit before hitting the API
   validateInput(query);
   checkRateLimit();
 
-  if (!API_KEY) {
+  const modelConfig = MODELS[modelId] || MODELS[DEFAULT_MODEL];
+  const messages = buildMessages(query, conversationHistory);
+
+  // Route to appropriate provider
+  if (modelConfig.provider === "google") {
+    return callGoogleAPI(messages, modelConfig, onChunk, signal);
+  }
+
+  // OpenRouter path
+  if (!OPENROUTER_API_KEY) {
     throw new Error(
       "OpenRouter API key not configured. Add VITE_OPENROUTER_API_KEY to your .env file."
     );
   }
 
-  const messages = buildMessages(query, conversationHistory);
-
   const response = await fetch(OPENROUTER_API_URL, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${API_KEY}`,
+      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
       "HTTP-Referer": window.location.origin,
       "X-Title": "Shanmuga Ganesh Portfolio",
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: modelConfig.routerModel,
       messages,
       stream: !!onChunk,
-      max_tokens: 500,
-      temperature: 0.3,
+      max_tokens: modelConfig.maxTokens,
+      temperature: modelConfig.temperature,
     }),
     signal,
   });

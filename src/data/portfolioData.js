@@ -116,7 +116,7 @@ export const EXPERIENCE = [
     location: "Coimbatore, India",
     description: [
       { text: "Implemented ML-driven lead allocation using Python & scikit-learn, reducing manual errors by 22%", projectId: "ml-lead-scoring", linkText: "ML-driven lead allocation" },
-      { text: "Built backend APIs and data pipelines powering CRM workflows", projectId: "ml-lead-scoring", linkText: "backend APIs and data pipelines" },
+      "Built backend APIs and data pipelines powering CRM workflows",
       "Improved lead conversion from 5,500 to 8,800 annually (+60% increase)",
       "Generated $240,000 additional annual revenue through automation",
     ],

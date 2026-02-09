@@ -1,6 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { chatQuery, getSuggestedQuestions } from "../../services/chatService";
+import { chatQuery, getSuggestedQuestions, getAvailableModels, getDefaultModelId } from "../../services/chatService";
 import { Icon } from "../ui";
+
+// ─── Timestamp Formatter ─────────────────────────────────────
+
+function formatTimestamp(ts) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+}
 
 // ─── Message Bubble ──────────────────────────────────────────
 
@@ -9,40 +16,52 @@ function ChatMessage({ message }) {
   const isError = message.role === "error";
 
   return (
-    <div className={`flex gap-3 ${isUser ? "justify-end" : ""} animate-fade-in-up`}>
-      {/* Avatar - only for assistant */}
-      {!isUser && (
+    <div className={`flex flex-col gap-1 ${isUser ? "items-end" : "items-start"} animate-fade-in-up`}>
+      <div className={`flex gap-3 ${isUser ? "justify-end" : ""} w-full`}>
+        {/* Avatar - only for assistant */}
+        {!isUser && (
+          <div
+            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+              isError
+                ? "bg-keyword/15 text-keyword"
+                : "bg-success/15 text-success"
+            }`}
+          >
+            <Icon name={isError ? "error" : "smart_toy"} size="text-[16px]" />
+          </div>
+        )}
+
+        {/* Message body */}
         <div
-          className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-            isError
-              ? "bg-keyword/15 text-keyword"
-              : "bg-success/15 text-success"
+          className={`max-w-[85%] text-[13px] leading-[1.6] ${
+            isUser
+              ? "bg-accent/10 border border-accent/20 rounded-2xl rounded-tr-md px-4 py-3 text-text"
+              : isError
+              ? "bg-keyword/5 border border-keyword/15 rounded-2xl rounded-tl-md px-4 py-3 text-keyword"
+              : "text-text"
           }`}
         >
-          <Icon name={isError ? "error" : "smart_toy"} size="text-[16px]" />
+          {message.isStreaming && !message.content ? (
+            <span className="inline-flex gap-1.5 items-center text-comment py-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" style={{ animationDelay: "150ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" style={{ animationDelay: "300ms" }} />
+            </span>
+          ) : (
+            <MarkdownRenderer content={message.content} />
+          )}
+        </div>
+      </div>
+
+      {/* Timestamp */}
+      {message.timestamp && (
+        <div className={`text-[10px] text-comment/50 ${isUser ? "pr-1" : "pl-11"} select-none`}>
+          {formatTimestamp(message.timestamp)}
+          {!isUser && message.model && !message.isStreaming && (
+            <span className="ml-1.5 text-comment/40">· {message.model}</span>
+          )}
         </div>
       )}
-
-      {/* Message body */}
-      <div
-        className={`max-w-[85%] text-[13px] leading-[1.6] ${
-          isUser
-            ? "bg-accent/10 border border-accent/20 rounded-2xl rounded-tr-md px-4 py-3 text-text"
-            : isError
-            ? "bg-keyword/5 border border-keyword/15 rounded-2xl rounded-tl-md px-4 py-3 text-keyword"
-            : "text-text"
-        }`}
-      >
-        {message.isStreaming && !message.content ? (
-          <span className="inline-flex gap-1.5 items-center text-comment py-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-            <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" style={{ animationDelay: "150ms" }} />
-            <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" style={{ animationDelay: "300ms" }} />
-          </span>
-        ) : (
-          <MarkdownRenderer content={message.content} />
-        )}
-      </div>
     </div>
   );
 }
@@ -79,17 +98,91 @@ function MarkdownRenderer({ content }) {
   return <div className="space-y-0">{parts}</div>;
 }
 
+// ─── Model Switcher ──────────────────────────────────────────
+
+function ModelSwitcher({ selectedModel, onModelChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const models = getAvailableModels();
+  const current = models.find((m) => m.id === selectedModel) || models[0];
+
+  const tierColors = {
+    fast: "text-success",
+  };
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] bg-border/30 hover:bg-border/60 text-comment hover:text-text transition-all cursor-pointer border border-transparent hover:border-border/50"
+        title="Switch model"
+      >
+        <Icon name={current.icon} size="text-[13px]" className={tierColors[current.tier]} />
+        <span className="max-w-[90px] truncate">{current.name}</span>
+        <Icon name={isOpen ? "expand_less" : "expand_more"} size="text-[14px]" className="text-comment/60" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 bottom-full mb-1.5 w-56 bg-sidebar border border-border rounded-lg shadow-xl shadow-black/30 z-50 overflow-hidden animate-fade-in-up" style={{ animationDuration: "150ms" }}>
+          <div className="px-3 py-2 border-b border-border/50">
+            <div className="text-[10px] font-bold text-comment uppercase tracking-widest">Select Model</div>
+          </div>
+          {models.map((model) => (
+            <button
+              key={model.id}
+              onClick={() => {
+                onModelChange(model.id);
+                setIsOpen(false);
+              }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-border/30 transition-colors cursor-pointer ${
+                model.id === selectedModel ? "bg-accent/8 border-l-2 border-l-accent" : "border-l-2 border-l-transparent"
+              }`}
+            >
+              <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${
+                model.id === selectedModel ? "bg-accent/15" : "bg-border/40"
+              }`}>
+                <Icon name={model.icon} size="text-[15px]" className={tierColors[model.tier]} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className={`text-[12px] font-medium ${model.id === selectedModel ? "text-accent" : "text-text"}`}>
+                  {model.name}
+                </div>
+                <div className="text-[10px] text-comment/60 truncate">{model.description}</div>
+              </div>
+              {model.id === selectedModel && (
+                <Icon name="check_circle" size="text-[14px]" className="text-accent shrink-0" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Chat Panel ─────────────────────────────────────────
 
 export default function CopilotChat({ isOpen, onClose }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState(getDefaultModelId);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const abortRef = useRef(null);
 
   const suggestions = getSuggestedQuestions();
+  const models = getAvailableModels();
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -110,9 +203,11 @@ export default function CopilotChat({ isOpen, onClose }) {
 
     setInput("");
 
+    const now = Date.now();
+    const currentModel = models.find((m) => m.id === selectedModel) || models[0];
     // Add user message
-    const userMsg = { role: "user", content: userMessage, id: Date.now() };
-    const assistantMsg = { role: "assistant", content: "", id: Date.now() + 1, isStreaming: true };
+    const userMsg = { role: "user", content: userMessage, id: now, timestamp: now };
+    const assistantMsg = { role: "assistant", content: "", id: now + 1, isStreaming: true, timestamp: now, model: currentModel.name };
 
     setMessages(prev => [...prev, userMsg, assistantMsg]);
     setIsLoading(true);
@@ -132,17 +227,22 @@ export default function CopilotChat({ isOpen, onClose }) {
         userMessage,
         history,
         (chunk) => {
-          // Update the streaming message
+          // FIX: Create new object instead of mutating to prevent
+          // React 18 StrictMode double-invocation from duplicating text
           setMessages(prev => {
             const updated = [...prev];
             const last = updated[updated.length - 1];
             if (last.isStreaming) {
-              last.content += chunk;
+              updated[updated.length - 1] = {
+                ...last,
+                content: last.content + chunk,
+              };
             }
-            return [...updated];
+            return updated;
           });
         },
         controller.signal,
+        selectedModel,
       );
 
       // Mark streaming complete
@@ -150,9 +250,9 @@ export default function CopilotChat({ isOpen, onClose }) {
         const updated = [...prev];
         const last = updated[updated.length - 1];
         if (last.isStreaming) {
-          last.isStreaming = false;
+          updated[updated.length - 1] = { ...last, isStreaming: false, timestamp: Date.now() };
         }
-        return [...updated];
+        return updated;
       });
     } catch (err) {
       if (err.name === "AbortError") return;
@@ -164,6 +264,7 @@ export default function CopilotChat({ isOpen, onClose }) {
           role: "error",
           content: err.message || "Something went wrong. Please try again.",
           id: Date.now(),
+          timestamp: Date.now(),
         };
         return updated;
       });
@@ -171,7 +272,7 @@ export default function CopilotChat({ isOpen, onClose }) {
       setIsLoading(false);
       abortRef.current = null;
     }
-  }, [isLoading, messages]);
+  }, [isLoading, messages, selectedModel, models]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -198,7 +299,7 @@ export default function CopilotChat({ isOpen, onClose }) {
         <div className="w-7 h-7 rounded-lg bg-success/15 flex items-center justify-center">
           <Icon name="smart_toy" size="text-[16px]" className="text-success" />
         </div>
-        <div>
+        <div className="flex-1 min-w-0">
           <div className="text-[14px] font-bold text-text">Copilot</div>
           <div className="text-[10px] text-comment uppercase tracking-wide">Ask about Shanmuga</div>
         </div>
@@ -287,6 +388,12 @@ export default function CopilotChat({ isOpen, onClose }) {
           onSubmit={handleSubmit}
           className="px-4 py-3 border-t border-border bg-sidebar shrink-0"
         >
+          {/* Model Selector */}
+          <div className="mb-2.5 flex items-center justify-between">
+            <div className="text-[10px] text-comment/60 font-medium">AI Model</div>
+            <ModelSwitcher selectedModel={selectedModel} onModelChange={setSelectedModel} />
+          </div>
+          
           <div className="flex items-end gap-2.5 bg-bg border border-border rounded-lg px-3 py-2.5 focus-within:border-accent/50 transition-colors">
             <Icon name="edit" size="text-[16px]" className="text-comment shrink-0 mb-0.5" />
             <textarea
@@ -320,7 +427,7 @@ export default function CopilotChat({ isOpen, onClose }) {
             </button>
           </div>
           <p className="text-[9px] text-comment/40 mt-2 text-center leading-relaxed">
-            Powered by Claude · Responses based on portfolio docs
+            Responses based on portfolio docs
           </p>
         </form>
       </div>
