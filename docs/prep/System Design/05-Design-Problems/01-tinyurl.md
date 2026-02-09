@@ -471,9 +471,3 @@ Scalability:
 ├── Multi-region for global availability
 ├── Shard by short_code for database
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design Twitter](./02-twitter.md)

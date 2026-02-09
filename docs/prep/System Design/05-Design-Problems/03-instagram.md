@@ -591,9 +591,3 @@ Storage:
 ├── Redis: Cache, sessions, stories
 ├── Elasticsearch: Search
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design WhatsApp](./04-whatsapp.md)

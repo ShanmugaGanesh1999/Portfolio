@@ -550,9 +550,3 @@ DON'T log:
 6. **Log levels** - INFO+ in production
 7. **Never log** passwords, tokens, PII
 8. **Alert on patterns** not individual logs
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Distributed Monitoring](./14-distributed-monitoring.md)

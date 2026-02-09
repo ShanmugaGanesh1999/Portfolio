@@ -393,9 +393,3 @@ Creates complete audit trail
 5. **Ordering via keys** - Same key = same partition
 6. **Kafka for replay** - Event sourcing, audit trails
 7. **SNS+SQS for AWS** - Managed, reliable combination
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Rate Limiter](./10-rate-limiter.md)

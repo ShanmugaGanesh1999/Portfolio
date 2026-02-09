@@ -485,9 +485,3 @@ class DistributedCounter:
 2. **Mention analytics**: Click tracking, geographic data, referrer
 3. **Consider expiration**: TTL handling, cleanup jobs
 4. **Security**: Private URLs, access control, abuse prevention
-
----
-
-## 📚 Navigation
-
-← [Rate Limiter](./06-rate-limiter.md) | [Home](./README.md) | [Twitter](./08-twitter.md) →

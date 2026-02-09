@@ -400,9 +400,3 @@ Safety Features:
 ├── Manual gates for production
 ├── Audit trail for all changes
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design ChatGPT](./16-chatgpt.md)

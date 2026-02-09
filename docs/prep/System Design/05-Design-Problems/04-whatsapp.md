@@ -623,9 +623,3 @@ Scale:
 ├── ~5000 gateway servers
 ├── Multi-DC for availability
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design YouTube](./05-youtube.md)

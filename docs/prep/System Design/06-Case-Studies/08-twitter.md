@@ -535,9 +535,3 @@ class SnowflakeIDGenerator:
 2. **Mention Snowflake IDs**: Time-sorted, distributed, no coordination
 3. **Discuss cache warming**: Pre-compute timelines for active users
 4. **Consider ranking**: Chronological vs algorithmic timeline
-
----
-
-## 📚 Navigation
-
-← [TinyURL](./07-tinyurl.md) | [Home](./README.md) | [Discord](./09-discord.md) →

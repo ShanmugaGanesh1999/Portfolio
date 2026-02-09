@@ -114,8 +114,3 @@ Level Order:                 1, 2, 3, 4, 5
 - [ ] Understand top-down vs bottom-up
 - [ ] Practice path problems
 - [ ] Complete 15+ tree problems
-
----
-
-## ➡️ Next Week
-[Week 10: Graphs](../Week-10-Graphs/)

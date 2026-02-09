@@ -362,7 +362,3 @@ def rabin_karp(text: str, pattern: str) -> int:
 3. **Use ASCII values** for character math and counting
 4. **Two pointers** work great for palindrome and comparison problems
 5. **Character frequency** can use array (26 letters) or hash map
-
----
-
-## ➡️ Next: [HashMap Implementation](../02-HashMap-Implementation/hashmap_explained.md)

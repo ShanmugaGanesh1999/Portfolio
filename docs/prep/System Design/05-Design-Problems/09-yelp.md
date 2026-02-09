@@ -317,9 +317,3 @@ Scale:
 ├── CDN for global photo delivery
 ├── Read replicas for review reads
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design Typeahead](./10-typeahead.md)

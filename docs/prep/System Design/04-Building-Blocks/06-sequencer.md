@@ -368,9 +368,3 @@ Solutions:
 5. **Embed machine ID** - Avoid coordination
 6. **Consider security** - Don't leak information via IDs
 7. **Match ID to use case** - Sortability, size, readability
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Distributed Cache](./07-distributed-cache.md)

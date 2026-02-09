@@ -273,7 +273,3 @@ class MyStack:
 3. **BFS uses queue** - essential for graph/tree level traversal
 4. **Deque (double-ended)** is more flexible than simple queue
 5. **Monotonic deque** solves sliding window max/min problems
-
----
-
-## ➡️ Next: [Queue Implementation](./queue.py)

@@ -564,9 +564,3 @@ Returns:
 5. **Separate from DB** - search is eventually consistent
 6. **CDC for sync** - keeps search updated reliably
 7. **Elasticsearch** is the go-to for most use cases
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Distributed Logging](./13-distributed-logging.md)

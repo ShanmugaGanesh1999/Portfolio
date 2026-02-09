@@ -608,9 +608,3 @@ class ConnectionManager:
 2. **Discuss gateway clustering**: How to route messages across gateways
 3. **Mention presence challenges**: Heartbeats, status propagation
 4. **Voice is separate**: SFU architecture, WebRTC signaling
-
----
-
-## 📚 Navigation
-
-← [Twitter](./08-twitter.md) | [Home](./README.md) | [YouTube](./10-youtube.md) →

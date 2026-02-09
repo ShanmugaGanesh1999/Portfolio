@@ -270,7 +270,3 @@ def subarray_sum(nums, k):
 3. **Use defaultdict** to avoid KeyError
 4. **Common patterns**: frequency counting, complement finding, grouping
 5. **Keys must be hashable** (immutable): strings, numbers, tuples
-
----
-
-## ➡️ Next: [HashMap Implementation from Scratch](./hashmap.py)

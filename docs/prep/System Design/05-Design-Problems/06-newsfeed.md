@@ -511,9 +511,3 @@ Scale:
 ├── Real-time updates for active users
 ├── A/B testing for continuous improvement
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design Uber](./07-uber.md)

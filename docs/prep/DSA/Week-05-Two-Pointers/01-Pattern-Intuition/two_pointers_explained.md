@@ -500,7 +500,3 @@ def detect_cycle(head):
 3. **Sort first** if order doesn't matter (enables two pointers)
 4. **Skip duplicates** when unique results required
 5. **Two pointers reduces O(n²) to O(n)** for many problems
-
----
-
-## ➡️ Next: [Two Pointers Problems](../02-Problems/)

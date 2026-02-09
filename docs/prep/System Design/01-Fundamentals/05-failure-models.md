@@ -454,9 +454,3 @@ def get_recommendations(user_id):
 4. **Isolate failures** - Bulkheads, circuit breakers
 5. **Recover gracefully** - Fallbacks, retries, degraded modes
 6. **Test failure scenarios** - Chaos engineering, fault injection
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Non-Functional Requirements](../02-Non-Functional-Requirements/README.md)

@@ -335,7 +335,3 @@ print(interval_intersection(first, second))
 3. **Sweep line** for counting concurrent events
 4. **Two pointers** for comparing two interval lists
 5. **Min heap** tracks earliest ending time
-
----
-
-## ➡️ Next: [Week 9 - Trees](../../Week-09-Trees/)

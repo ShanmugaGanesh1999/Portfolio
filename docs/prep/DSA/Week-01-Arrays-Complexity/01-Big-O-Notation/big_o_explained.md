@@ -522,7 +522,3 @@ def has_duplicate(arr):
 4. **Space complexity includes** call stack for recursion
 5. **O(n²) or worse is usually a red flag** - look for optimization
 6. **O(n log n) is often the best** for comparison-based sorting
-
----
-
-## ➡️ Next: [Array Basics & Implementation](../02-Array-Implementation/array_basics.md)

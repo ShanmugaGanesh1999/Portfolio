@@ -314,7 +314,3 @@ print(region_sum(prefix, 1, 1, 2, 2))  # 5+6+8+9 = 28
 3. **The key formula**: `sum(i, j) = prefix[j] - prefix[i-1]`
 4. **Can extend to 2D** for matrix range sum queries
 5. **Look for prefix sum** when problem involves range sums
-
----
-
-## ➡️ Next: [Cyclic Sort Pattern](../04-Cyclic-Sort/cyclic_sort.md)

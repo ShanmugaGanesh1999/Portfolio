@@ -382,9 +382,3 @@ def check_rate_limit_with_fallback(client_id, resource):
 2. **Discuss client identification**: IP can be shared (NAT), API keys are more accurate
 3. **Mention response headers**: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `Retry-After`
 4. **Consider rate limit by tiers**: Free vs Premium users have different limits
-
----
-
-## 📚 Navigation
-
-← [System Failures](./05-system-failures.md) | [Home](./README.md) | [TinyURL](./07-tinyurl.md) →

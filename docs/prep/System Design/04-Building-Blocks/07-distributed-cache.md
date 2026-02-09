@@ -435,9 +435,3 @@ Need: ~300MB cache minimum
 5. **Cache null values** - Prevent penetration attacks
 6. **Redis is versatile** - More than just caching
 7. **80/20 rule** - Cache hot 20% to serve 80% traffic
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Message Queues](./08-message-queues.md)

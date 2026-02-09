@@ -112,8 +112,3 @@ By the end of this week, you should be able to:
 - [ ] Master knapsack pattern
 - [ ] Solve string DP problems
 - [ ] Complete 15+ DP problems
-
----
-
-## ➡️ Next Week
-[Week 12: Advanced Patterns & Revision](../Week-12-Advanced-Revision/)

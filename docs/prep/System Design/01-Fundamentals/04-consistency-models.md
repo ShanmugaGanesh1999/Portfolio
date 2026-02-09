@@ -363,9 +363,3 @@ def write(key, value):
 3. **Understand CAP** - Know what you're giving up
 4. **Consider hybrid** - Different consistency for different data
 5. **Application logic matters** - Weak consistency needs careful handling
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Failure Models](./05-failure-models.md)

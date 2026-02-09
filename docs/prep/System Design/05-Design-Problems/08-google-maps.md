@@ -246,9 +246,3 @@ Scale:
 ├── 1-2 minute traffic updates
 ├── Global coverage
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design Yelp](./09-yelp.md)

@@ -858,11 +858,3 @@ Use this for any system design interview:
    □ 1 SPOF identified with mitigation
    □ 1 CAP/consistency trade-off explained
 ```
-
----
-
-## 📖 Next Steps
-
-→ Apply this format to [Design Problems](../05-Design-Problems/README.md)
-
-→ Return to [Estimation README](./README.md)

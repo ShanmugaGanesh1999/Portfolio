@@ -337,9 +337,3 @@ Availability = (30 × 24) / (30 × 24 + 1) = 720/721 = 99.86%
 4. **Monitor proactively** - Detect issues before users do
 5. **Graceful degradation** - Partial service is better than none
 6. **Consider cost** - Higher availability = higher cost
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Reliability](./02-reliability.md)

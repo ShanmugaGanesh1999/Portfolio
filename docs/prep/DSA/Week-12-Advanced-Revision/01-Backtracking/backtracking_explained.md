@@ -347,7 +347,3 @@ def exist(board: list[list[str]], word: str) -> bool:
 3. **Use sets** for efficient constraint checking
 4. **Start index** prevents revisiting in combinations
 5. **Pruning** can significantly improve performance
-
----
-
-## ➡️ Next: [Heap / Priority Queue](../02-Heap/)

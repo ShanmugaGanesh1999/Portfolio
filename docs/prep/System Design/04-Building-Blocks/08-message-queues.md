@@ -430,9 +430,3 @@ Solution:
 5. **Handle poison messages** - DLQ + monitoring
 6. **Partition for ordering** - Same key = same partition
 7. **Monitor consumer lag** - Early warning for problems
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Pub-Sub](./09-pub-sub.md)

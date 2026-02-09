@@ -340,9 +340,3 @@ with tracer.start_span("get_user") as span:
 3. **Handle failures** - Timeouts, retries, circuit breakers
 4. **Design for idempotency** - Retries shouldn't cause problems
 5. **Monitor everything** - Distributed tracing is essential
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Consistency Models](./04-consistency-models.md)

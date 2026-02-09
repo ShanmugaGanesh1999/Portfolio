@@ -510,9 +510,3 @@ Solutions:
 5. **Rate limit at API Gateway** for centralized control
 6. **Different limits** for different endpoints/tiers
 7. **Use atomic operations** to prevent race conditions
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Blob Store](./11-blob-store.md)

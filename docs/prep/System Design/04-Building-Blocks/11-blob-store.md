@@ -480,9 +480,3 @@ Other systems may vary - check docs!
 6. **Direct upload** with signed URLs saves bandwidth
 7. **Storage classes** for cost optimization
 8. **Metadata in database**, files in blob store
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Distributed Search](./12-distributed-search.md)

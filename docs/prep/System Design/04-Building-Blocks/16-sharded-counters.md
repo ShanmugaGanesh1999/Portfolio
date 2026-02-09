@@ -472,9 +472,3 @@ Solutions:
 6. **Approximate is OK** for display ("1.2M likes")
 7. **Redis INCR** for simple, fast sharding
 8. **Combine with caching** for read optimization
-
----
-
-## 📖 Next Steps
-
-Building Blocks complete! Continue to [Design Problems](../05-Design-Problems/README.md)

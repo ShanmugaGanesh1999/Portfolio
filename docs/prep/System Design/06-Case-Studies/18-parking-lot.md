@@ -740,9 +740,3 @@ class Payment:
 2. **Discuss vehicle-spot fitting logic**: Compact car in large spot
 3. **Handle edge cases**: What if payment fails? Power outage?
 4. **Consider multi-lot scaling**: SaaS model for many lots
-
----
-
-## 📚 Navigation
-
-← [Tinder](./17-tinder.md) | [Home](./README.md) | [Hotstar](./19-hotstar.md) →

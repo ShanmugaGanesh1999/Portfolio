@@ -376,9 +376,3 @@ Scale:
 ├── Petabytes of content stored
 ├── Distributed across data centers
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design Google Docs](./12-google-docs.md)

@@ -668,9 +668,3 @@ class AdaptiveBitrateManager:
 2. **Explain ABR**: Client selects quality based on bandwidth
 3. **Discuss segment size trade-off**: Latency vs efficiency
 4. **Mention multi-CDN**: Critical for global scale
-
----
-
-## 📚 Navigation
-
-← [Parking Lot](./18-parking-lot.md) | [Home](./README.md) | [Google Docs](./20-google-docs.md) →

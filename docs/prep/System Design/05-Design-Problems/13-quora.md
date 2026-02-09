@@ -393,9 +393,3 @@ Ranking:
 ├── Personalization based on follows
 ├── Diversity rules in feed
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design Payment System](./14-payment-system.md)

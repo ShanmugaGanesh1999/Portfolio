@@ -179,9 +179,3 @@ Before moving on, make sure you can answer:
 2. Why is system design important for senior roles?
 3. What are the main components of a typical web application?
 4. What's the difference between latency and throughput?
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Abstractions in System Design](./02-abstractions.md)

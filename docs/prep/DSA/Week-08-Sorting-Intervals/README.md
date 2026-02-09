@@ -90,8 +90,3 @@ By the end of this week, you should be able to:
 - [ ] Understand interval merging
 - [ ] Learn sweep line technique
 - [ ] Complete 8+ interval problems
-
----
-
-## ➡️ Next Week
-[Week 9: Trees & BST](../Week-09-Trees/)

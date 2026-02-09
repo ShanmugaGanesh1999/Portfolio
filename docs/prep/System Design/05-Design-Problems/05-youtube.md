@@ -616,9 +616,3 @@ Scale:
 ├── 200+ CDN edge locations
 ├── Seconds to start playback
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design Newsfeed](./06-newsfeed.md)

@@ -652,9 +652,3 @@ DON'T:
    - Canary deployments
    - Feature flags
    - Rollback plans
-
----
-
-## 📚 Navigation
-
-← [Ticketmaster](./04-ticketmaster.md) | [Home](./README.md) | [Rate Limiter](./06-rate-limiter.md) →

@@ -422,9 +422,3 @@ Prevention:
 5. **Make operations idempotent** - Safe to retry
 6. **Test failure scenarios** - Don't wait for production to find bugs
 7. **Monitor data quality** - Detect silent failures
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Scalability](./03-scalability.md)

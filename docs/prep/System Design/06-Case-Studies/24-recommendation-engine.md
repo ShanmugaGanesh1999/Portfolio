@@ -848,9 +848,3 @@ class VectorDatabase:
 2. **Explain two-tower**: User and item towers for embeddings
 3. **Discuss cold start**: New users and new items
 4. **Mention A/B testing**: How to safely deploy new models
-
----
-
-## 📚 Navigation
-
-← [Zoom](./23-zoom.md) | [Home](./README.md)

@@ -634,9 +634,3 @@ class DesirabilityScore:
 2. **Explain two-phase matching**: Both must like for match
 3. **Discuss recommendation caching**: Batch + real-time filter
 4. **Mention fairness**: Show all users, not just popular ones
-
----
-
-## 📚 Navigation
-
-← [Gmail](./16-gmail.md) | [Home](./README.md) | [Parking Lot](./18-parking-lot.md) →

@@ -410,7 +410,3 @@ print(matrix)  # [[1, 0, 0], [0, 0, 0], [0, 0, 0]]
 4. **List comprehensions** - write clean, Pythonic code
 5. **Be careful with shallow copies** - especially with nested lists
 6. **Use `enumerate`** when you need both index and value
-
----
-
-## ➡️ Next: [Dynamic Array Implementation](./dynamic_array.py)

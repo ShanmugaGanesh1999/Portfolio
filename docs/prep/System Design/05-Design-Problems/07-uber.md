@@ -652,9 +652,3 @@ Scale:
 ├── 5M concurrent drivers
 ├── Sub-second matching
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design Google Maps](./08-google-maps.md)

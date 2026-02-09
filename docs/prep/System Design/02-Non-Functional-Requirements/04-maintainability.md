@@ -434,9 +434,3 @@ When designing a system:
 5. **Test thoroughly** - Enables confident changes
 6. **Automate operations** - Reduce human error
 7. **Plan for handoffs** - Others will maintain your code
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Fault Tolerance](./05-fault-tolerance.md)

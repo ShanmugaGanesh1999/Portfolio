@@ -818,9 +818,3 @@ class QualityMonitor:
 2. **Explain ICE/STUN/TURN**: NAT traversal is key
 3. **Discuss P2P vs relay**: 70% P2P, 30% TURN
 4. **Mention E2E encryption**: SRTP with DTLS key exchange
-
----
-
-## 📚 Navigation
-
-← [Uber](./21-uber.md) | [Home](./README.md) | [Zoom](./23-zoom.md) →

@@ -426,11 +426,3 @@ Always clarify units!
 4. **Peak matters** - Design for 3-5x average load
 5. **Replication multiplies** - Always factor in redundancy
 6. **Round generously** - These are estimates, not exact
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Interview-Ready Examples](./03-interview-examples.md)
-
-→ Then proceed to [Building Blocks](../04-Building-Blocks/README.md)

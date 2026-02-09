@@ -719,9 +719,3 @@ class TokenBudgetManager:
 2. **Explain paged attention**: Shows deep understanding
 3. **Discuss cost optimization**: $100M+ GPU costs are real
 4. **Mention streaming**: SSE for progressive token delivery
-
----
-
-## 📚 Navigation
-
-← [Netflix](./02-netflix.md) | [Home](./README.md) | [Ticketmaster](./04-ticketmaster.md) →

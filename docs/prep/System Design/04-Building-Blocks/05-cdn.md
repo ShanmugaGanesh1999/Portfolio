@@ -387,9 +387,3 @@ Solutions:
 5. **Cache invalidation is hard** - Use versioned URLs
 6. **Essential for global services** - Required at scale
 7. **More than caching** - Edge compute, DDoS protection
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Sequencer](./06-sequencer.md)

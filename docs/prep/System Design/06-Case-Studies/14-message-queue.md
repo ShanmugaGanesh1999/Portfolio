@@ -630,9 +630,3 @@ class ConsumerGroupCoordinator:
 2. **Discuss ISR**: How leader tracks in-sync replicas
 3. **Mention log compaction**: Keep latest value per key
 4. **High watermark**: Consumer only sees committed messages
-
----
-
-## 📚 Navigation
-
-← [Key-Value Store](./13-key-value-store.md) | [Home](./README.md) | [WhatsApp](./15-whatsapp.md) →

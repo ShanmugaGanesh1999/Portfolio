@@ -581,9 +581,3 @@ class ABRController:
 2. **Explain adaptive bitrate**: DASH/HLS, quality switching
 3. **Discuss CDN architecture**: Edge caching, origin shield
 4. **Mention video deduplication**: Content fingerprinting to save storage
-
----
-
-## 📚 Navigation
-
-← [Discord](./09-discord.md) | [Home](./README.md) | [Google Drive](./11-google-drive.md) →

@@ -273,9 +273,3 @@ else:
 3. **Abstractions leak** - Be prepared to understand the layer below
 4. **Use proven abstractions** - Don't reinvent unless necessary
 5. **Layer appropriately** - Too many layers add overhead
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Network Abstractions: RPC](./03-network-abstractions-rpc.md)

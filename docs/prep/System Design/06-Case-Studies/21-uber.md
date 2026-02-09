@@ -800,9 +800,3 @@ class SurgePricingService:
 2. **Discuss matching algorithm**: Not just closest, consider rating/ETA
 3. **Handle driver concurrency**: Two riders can't get same driver
 4. **Mention surge pricing**: Supply/demand balancing
-
----
-
-## 📚 Navigation
-
-← [Google Docs](./20-google-docs.md) | [Home](./README.md) | [WhatsApp Calling](./22-whatsapp-calling.md) →

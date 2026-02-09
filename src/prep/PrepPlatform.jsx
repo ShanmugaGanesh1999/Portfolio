@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -6,6 +6,57 @@ import rehypeRaw from "rehype-raw";
 import "highlight.js/styles/github-dark-dimmed.min.css";
 import { Icon } from "../components/ui";
 import SystemDesignDiagram from "./SystemDesignDiagram";
+
+// ──────────────────────────────────────────────────
+// Flatten a course's file tree into an ordered list
+// of { filePath, label, sectionLabel } for prev/next nav
+// ──────────────────────────────────────────────────
+function flattenCourseFiles(course) {
+  if (!course) return [];
+  const list = [];
+
+  // Root files (README, CHEATSHEET)
+  for (const rf of course.rootFiles || []) {
+    list.push({ filePath: rf.file, label: rf.label, sectionLabel: course.title });
+  }
+
+  // Sections
+  for (const section of course.sections || []) {
+    // Regular files
+    if (section.files) {
+      for (const f of section.files) {
+        list.push({
+          filePath: `${section.folder}/${f.file}`,
+          label: f.label,
+          sectionLabel: section.label,
+        });
+      }
+    }
+
+    // Subsections (e.g., Problems in DSA)
+    if (section.subsections) {
+      for (const sub of section.subsections) {
+        list.push({
+          filePath: `${section.folder}/${sub.folder}/${sub.indexFile}`,
+          label: sub.label,
+          sectionLabel: section.label,
+        });
+      }
+    }
+  }
+
+  return list;
+}
+
+// ──────────────────────────────────────────────────
+// Strip in-markdown navigation sections that are
+// now handled by the UI prev/next buttons
+// ──────────────────────────────────────────────────
+const NAV_SECTION_RE = /\n---\s*\n+## (?:📖 Next Steps|📚 Navigation|➡️ Next)[\s\S]*$/;
+
+function stripNavSection(md) {
+  return md.replace(NAV_SECTION_RE, "\n");
+}
 
 // ──────────────────────────────────────────────────
 // Mermaid extraction — split raw markdown into
@@ -211,9 +262,31 @@ export default function PrepPlatform({ course, filePath, onBack, onNavigate }) {
   const [error, setError] = useState(null);
   const contentRef = useRef(null);
 
+  // ── Flatten course files & compute prev/next ──
+  const flatFiles = useMemo(() => flattenCourseFiles(course), [course]);
+  const currentIndex = useMemo(
+    () => flatFiles.findIndex((f) => f.filePath === filePath),
+    [flatFiles, filePath]
+  );
+  const prevFile = currentIndex > 0 ? flatFiles[currentIndex - 1] : null;
+  const nextFile = currentIndex < flatFiles.length - 1 ? flatFiles[currentIndex + 1] : null;
+
+  // Navigate to prev/next, scroll to top
+  const goTo = useCallback(
+    (target) => {
+      if (!target) return;
+      onNavigate?.(course.id, target.filePath);
+      // Scroll to top after navigation
+      requestAnimationFrame(() => {
+        const main = document.querySelector("main");
+        if (main) main.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    },
+    [course, onNavigate]
+  );
+
   // Scroll to top helper function
   const scrollToTop = () => {
-    // Find the scrollable parent (main element)
     const main = document.querySelector('main');
     if (main) {
       main.scrollTo({ top: 0, behavior: 'smooth' });
@@ -247,7 +320,7 @@ export default function PrepPlatform({ course, filePath, onBack, onNavigate }) {
       })
       .then((text) => {
         if (!cancelled) {
-          setMarkdown(text);
+          setMarkdown(stripNavSection(text));
           setLoading(false);
         }
       })
@@ -361,22 +434,72 @@ export default function PrepPlatform({ course, filePath, onBack, onNavigate }) {
             <MarkdownWithDiagrams markdown={markdown} />
           </article>
 
-          {/* Bottom navigation */}
-          <div className="mt-12 pt-6 border-t border-border flex items-center justify-between">
-            <button
-              onClick={onBack}
-              className="text-xs text-comment hover:text-accent transition-colors flex items-center gap-1"
-            >
-              <Icon name="arrow_back" size="text-[14px]" />
-              Back to portfolio
-            </button>
-            <button
-              onClick={scrollToTop}
-              className="text-xs text-comment hover:text-accent transition-colors flex items-center gap-1"
-            >
-              Top
-              <Icon name="arrow_upward" size="text-[14px]" />
-            </button>
+          {/* ── Prev / Next Navigation ── */}
+          <div className="mt-12 pt-6 border-t border-border/40">
+            <div className="flex items-stretch justify-between gap-3">
+              {/* Prev button */}
+              {prevFile ? (
+                <button
+                  onClick={() => goTo(prevFile)}
+                  className="group flex-1 max-w-[48%] flex flex-col items-start gap-1 px-4 py-3 rounded-lg border border-border/40 hover:border-accent/50 hover:bg-accent/5 transition-all text-left"
+                >
+                  <span className="text-[10px] uppercase tracking-wider text-comment group-hover:text-accent transition-colors flex items-center gap-1">
+                    <Icon name="arrow_back" size="text-[12px]" />
+                    Previous
+                  </span>
+                  <span className="text-xs font-medium text-text/80 group-hover:text-accent transition-colors line-clamp-1">
+                    {prevFile.label}
+                  </span>
+                  <span className="text-[10px] text-comment/60 line-clamp-1">
+                    {prevFile.sectionLabel}
+                  </span>
+                </button>
+              ) : (
+                <div className="flex-1" />
+              )}
+
+              {/* Next button */}
+              {nextFile ? (
+                <button
+                  onClick={() => goTo(nextFile)}
+                  className="group flex-1 max-w-[48%] flex flex-col items-end gap-1 px-4 py-3 rounded-lg border border-border/40 hover:border-accent/50 hover:bg-accent/5 transition-all text-right"
+                >
+                  <span className="text-[10px] uppercase tracking-wider text-comment group-hover:text-accent transition-colors flex items-center gap-1">
+                    Next
+                    <Icon name="arrow_forward" size="text-[12px]" />
+                  </span>
+                  <span className="text-xs font-medium text-text/80 group-hover:text-accent transition-colors line-clamp-1">
+                    {nextFile.label}
+                  </span>
+                  <span className="text-[10px] text-comment/60 line-clamp-1">
+                    {nextFile.sectionLabel}
+                  </span>
+                </button>
+              ) : (
+                <div className="flex-1" />
+              )}
+            </div>
+
+            {/* Back to portfolio + scroll top */}
+            <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/20">
+              <button
+                onClick={onBack}
+                className="text-[10px] text-comment hover:text-accent transition-colors flex items-center gap-1"
+              >
+                <Icon name="arrow_back" size="text-[12px]" />
+                Back to portfolio
+              </button>
+              <span className="text-[10px] text-comment/40">
+                {currentIndex >= 0 ? `${currentIndex + 1} / ${flatFiles.length}` : ""}
+              </span>
+              <button
+                onClick={scrollToTop}
+                className="text-[10px] text-comment hover:text-accent transition-colors flex items-center gap-1"
+              >
+                Top
+                <Icon name="arrow_upward" size="text-[12px]" />
+              </button>
+            </div>
           </div>
         </div>
       )}

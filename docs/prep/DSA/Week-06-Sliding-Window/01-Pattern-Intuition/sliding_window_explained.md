@@ -432,7 +432,3 @@ def total_fruit(fruits: list[int]) -> int:
 3. **Find shortest**: Shrink while condition satisfied
 4. **Use hash map** for character/element counting
 5. **Monotonic deque** for sliding window max/min
-
----
-
-## ➡️ Next: [Sliding Window Problems](../02-Problems/)

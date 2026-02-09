@@ -440,9 +440,3 @@ Scale based on:
 5. **Shard when necessary** - But it adds complexity
 6. **Async for spikes** - Queue work, process later
 7. **Monitor and measure** - Can't improve what you don't measure
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Maintainability](./04-maintainability.md)

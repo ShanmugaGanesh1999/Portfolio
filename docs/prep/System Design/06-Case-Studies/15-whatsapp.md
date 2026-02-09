@@ -576,9 +576,3 @@ class E2EEncryption:
 2. **Explain E2E encryption at high level**: Signal Protocol
 3. **Discuss offline message queue**: Redis list with push fallback
 4. **Mention media handling**: Pre-signed S3 URLs, CDN caching
-
----
-
-## 📚 Navigation
-
-← [Message Queue](./14-message-queue.md) | [Home](./README.md) | [Gmail](./16-gmail.md) →

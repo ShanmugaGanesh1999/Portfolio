@@ -351,7 +351,3 @@ Where m = word length, n = number of words, k = results
 3. **Mark word endings** explicitly
 4. **Combine with DFS** for word search problems
 5. **Space can be optimized** with compressed tries
-
----
-
-## ➡️ Next: [Interview Preparation](../06-Interview-Prep/)

@@ -298,7 +298,3 @@ for amount in range(1, target + 1):
 3. **Loop order matters** for combinations vs permutations
 4. **Space optimization**: 1D array when only previous row needed
 5. **Transform problems**: Many problems reduce to knapsack
-
----
-
-## ➡️ Next: [String DP](../05-String-DP/)

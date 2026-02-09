@@ -299,11 +299,3 @@ That seems reasonable for this scale."
 8. **Redis: 100K RPS**
 9. **MySQL: 5-10K RPS**
 10. **Web server: 1-10K RPS**
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Resource Estimation Examples](./02-resource-estimation-examples.md)
-
-→ See [Interview-Ready Examples](./03-interview-examples.md) for full 45-min format

@@ -623,9 +623,3 @@ class DeltaSyncService:
 2. **Explain deduplication**: Content-addressable storage saves 30-50% space
 3. **Discuss conflict resolution**: Version vectors, last-writer-wins
 4. **Mention offline support**: Local cache, sync queue
-
----
-
-## 📚 Navigation
-
-← [YouTube](./10-youtube.md) | [Home](./README.md) | [Google Maps](./12-google-maps.md) →

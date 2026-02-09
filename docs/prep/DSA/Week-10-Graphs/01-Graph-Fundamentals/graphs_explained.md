@@ -451,7 +451,3 @@ def grid_bfs(grid, start_r, start_c):
 | Level-order traversal | BFS |
 | Connected components | DFS or BFS |
 | Check bipartite | BFS or DFS |
-
----
-
-## ➡️ Next: [Topological Sort & Union Find](../03-Algorithms/)

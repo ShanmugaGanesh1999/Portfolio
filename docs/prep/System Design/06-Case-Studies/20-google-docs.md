@@ -727,9 +727,3 @@ class PresenceService:
 2. **Explain transform function**: Insert vs insert, insert vs delete
 3. **Discuss revision numbering**: How server orders operations
 4. **Mention local-first**: Client applies immediately, syncs later
-
----
-
-## 📚 Navigation
-
-← [Hotstar](./19-hotstar.md) | [Home](./README.md) | [Uber](./21-uber.md) →

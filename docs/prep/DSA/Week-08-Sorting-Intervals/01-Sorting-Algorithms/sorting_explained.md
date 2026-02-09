@@ -360,7 +360,3 @@ print(nums)  # [0, 0, 1, 1, 2, 2]
 
 3. **Why use Merge Sort for external sorting?**
    - Sequential access pattern is ideal for disk I/O
-
----
-
-## ➡️ Next: [Interval Patterns](../02-Interval-Patterns/)

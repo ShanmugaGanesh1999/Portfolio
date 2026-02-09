@@ -558,9 +558,3 @@ Trade-offs:
 ├── Eventual consistency acceptable
 ├── Approximate counts for display
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design Instagram](./03-instagram.md)

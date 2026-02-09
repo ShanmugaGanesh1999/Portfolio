@@ -319,9 +319,3 @@ Mitigations:
 4. **Use for load balancing** - Geographic, weighted, latency-based
 5. **Plan for failures** - DNS can be a SPOF
 6. **Propagation takes time** - Changes aren't instant
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Load Balancers](./02-load-balancers.md)

@@ -456,7 +456,3 @@ def is_valid(num):
 3. **Perfect for bounded range problems**
 4. **After sorting, wrong positions reveal missing/duplicate**
 5. **Handle edge cases**: out-of-range numbers, duplicates
-
----
-
-## ➡️ Next: [Week 1 Problems](../05-Problems/)

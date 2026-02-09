@@ -373,9 +373,3 @@ Challenges:
 ├── Cursor position mapping after transforms
 ├── Large document performance
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design Quora](./13-quora.md)

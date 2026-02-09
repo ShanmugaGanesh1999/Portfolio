@@ -145,9 +145,3 @@ D - Distinctive Features
 ### Transactions
 - Payment System: Consistency
 - Uber: Booking/payment
-
----
-
-## 📖 Next Steps
-
-Start with [TinyURL](./01-tinyurl.md) - the classic entry-level problem.

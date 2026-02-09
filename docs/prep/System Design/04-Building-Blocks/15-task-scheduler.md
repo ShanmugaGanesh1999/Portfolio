@@ -562,9 +562,3 @@ extract >> transform >> load
 6. **Celery/Bull** for application-level scheduling
 7. **Airflow** for complex DAG workflows
 8. **Kubernetes CronJobs** for container workloads
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Sharded Counters](./16-sharded-counters.md)

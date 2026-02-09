@@ -658,9 +658,3 @@ class DiscoverWeeklyPipeline:
 2. **Discuss bitrate adaptation**: Quality switching based on network
 3. **Explain recommendation pipeline**: Batch + real-time hybrid
 4. **Mention offline mode**: Download and sync strategy
-
----
-
-## 📚 Navigation
-
-[Home](./README.md) | [Netflix](./02-netflix.md) →

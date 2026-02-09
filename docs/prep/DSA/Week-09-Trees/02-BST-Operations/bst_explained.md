@@ -416,7 +416,3 @@ def delete_node(root: TreeNode, key: int) -> TreeNode:
 3. **LCA in BST** is O(H), simpler than binary tree
 4. **Use iterative** for production (avoids stack overflow)
 5. **Consider self-balancing BSTs** (AVL, Red-Black) for guaranteed O(log n)
-
----
-
-## ➡️ Next: [Tree Patterns](../03-Tree-Patterns/)

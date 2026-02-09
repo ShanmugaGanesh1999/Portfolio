@@ -408,9 +408,3 @@ def get_session(session_id):
 5. **Limited queries** - Only key-based lookups
 6. **Redis is versatile** - Data structures, pub/sub, persistence
 7. **Consider memory** - In-memory stores need enough RAM
-
----
-
-## 📖 Next Steps
-
-→ Continue to [CDN](./05-cdn.md)

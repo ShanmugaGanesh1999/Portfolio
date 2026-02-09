@@ -633,9 +633,3 @@ class CompactionManager:
 2. **Explain LSM tree**: Write-optimized storage engine
 3. **Discuss vector clocks**: Conflict resolution mechanism
 4. **Mention hinted handoff**: Availability during failures
-
----
-
-## 📚 Navigation
-
-← [Google Maps](./12-google-maps.md) | [Home](./README.md) | [Message Queue](./14-message-queue.md) →

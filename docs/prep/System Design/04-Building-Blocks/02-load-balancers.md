@@ -437,9 +437,3 @@ Questions to consider:
 5. **Choose the right algorithm** - Usually least-connections
 6. **Terminate SSL at LB** - Offload from application servers
 7. **Think stateless** - Avoid sticky sessions when possible
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Databases](./03-databases.md)

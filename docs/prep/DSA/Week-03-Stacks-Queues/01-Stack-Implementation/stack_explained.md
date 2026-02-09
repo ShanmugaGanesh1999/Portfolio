@@ -256,7 +256,3 @@ def daily_temperatures(temperatures: list) -> list:
 3. **Use for**: matching pairs, reversing, expression evaluation
 4. **Monotonic stack** solves "next greater/smaller" problems
 5. **Python list** works great as a stack
-
----
-
-## ➡️ Next: [Stack Implementation](./stack.py)

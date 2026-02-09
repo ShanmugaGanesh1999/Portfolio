@@ -805,9 +805,3 @@ class BotDetectionService:
 2. **Explain atomic locking**: Redis SETNX + TTL
 3. **Discuss bot mitigation**: Real-world challenge
 4. **Mention fairness**: Random assignment in pre-queue
-
----
-
-## 📚 Navigation
-
-← [ChatGPT](./03-chatgpt.md) | [Home](./README.md) | [System Failures](./05-system-failures.md) →

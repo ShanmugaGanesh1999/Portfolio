@@ -585,9 +585,3 @@ Avoid high cardinality:
 6. **Alert on symptoms** (high latency) not causes (CPU)
 7. **Avoid high cardinality** labels
 8. **Dashboards** for different audiences
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Task Scheduler](./15-task-scheduler.md)

@@ -420,9 +420,3 @@ Critical Properties:
 ├── Reconciliation for consistency
 ├── Audit logging for compliance
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design Deployment System](./15-deployment-system.md)

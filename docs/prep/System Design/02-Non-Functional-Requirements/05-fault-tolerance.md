@@ -452,9 +452,3 @@ Hidden SPOFs:
 5. **Isolate failures** - Prevent cascade with bulkheads
 6. **Test failures** - Chaos engineering in production
 7. **Automate recovery** - Manual intervention is slow
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Estimation](../03-Estimation/README.md)

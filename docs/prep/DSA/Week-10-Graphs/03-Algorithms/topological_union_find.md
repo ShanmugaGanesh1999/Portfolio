@@ -412,7 +412,3 @@ def num_islands_uf(grid: list[list[str]]) -> int:
 2. **Path compression** flattens tree
 3. **Union by rank** keeps tree balanced
 4. **Perfect for** dynamic connectivity queries
-
----
-
-## ➡️ Next: [Week 11 - Dynamic Programming](../../Week-11-Dynamic-Programming/)

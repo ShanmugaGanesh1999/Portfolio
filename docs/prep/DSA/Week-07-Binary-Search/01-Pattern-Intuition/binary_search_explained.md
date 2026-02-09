@@ -465,7 +465,3 @@ def search_matrix(matrix: list[list[int]], target: int) -> bool:
 3. **Always use `left + (right - left) // 2`** to avoid overflow
 4. **Binary search on answer space** when searching for optimal value
 5. **One half is always sorted** in rotated arrays
-
----
-
-## ➡️ Next: [Binary Search Problems](../02-Problems/)

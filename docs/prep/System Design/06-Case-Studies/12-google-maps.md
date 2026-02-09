@@ -605,9 +605,3 @@ class ETAPredictor:
 2. **Discuss tile pyramid**: Pre-rendering at zoom levels
 3. **Mention Contraction Hierarchies**: Key to fast long-distance routing
 4. **Traffic aggregation**: How GPS probes become traffic data
-
----
-
-## 📚 Navigation
-
-← [Google Drive](./11-google-drive.md) | [Home](./README.md) | [Key-Value Store](./13-key-value-store.md) →

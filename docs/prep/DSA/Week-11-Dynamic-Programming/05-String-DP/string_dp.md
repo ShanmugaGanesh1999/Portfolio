@@ -355,7 +355,3 @@ def is_match_wildcard(s: str, p: str) -> bool:
 3. **Edit Distance** models many real-world problems
 4. **Interval DP** for palindrome problems
 5. **Base cases** are crucial - empty strings, single chars
-
----
-
-## ➡️ Next: [Week 12 - Advanced Patterns](../../Week-12-Advanced-Revision/)

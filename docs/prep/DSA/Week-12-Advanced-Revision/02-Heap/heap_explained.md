@@ -367,7 +367,3 @@ def least_interval(tasks: list[str], n: int) -> int:
 3. **Two heaps** for median problems
 4. **Heapify is O(n)**, individual pushes are O(n log n)
 5. **Priority queue** = heap with (priority, value) tuples
-
----
-
-## ➡️ Next: [Greedy Algorithms](../03-Greedy/)

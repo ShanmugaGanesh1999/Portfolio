@@ -605,9 +605,3 @@ class SpamDetector:
 2. **Explain threading**: Reference/In-Reply-To headers
 3. **Discuss search trade-offs**: Real-time vs batch indexing
 4. **Mention attachment handling**: Dedup, virus scanning
-
----
-
-## 📚 Navigation
-
-← [WhatsApp](./15-whatsapp.md) | [Home](./README.md) | [Tinder](./17-tinder.md) →

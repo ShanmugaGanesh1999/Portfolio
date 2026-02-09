@@ -841,9 +841,3 @@ class BreakoutRoomManager:
 2. **Discuss simulcast**: Multiple quality layers
 3. **Explain active speaker detection**: Audio-based switching
 4. **Mention bandwidth adaptation**: Quality reduction strategies
-
----
-
-## 📚 Navigation
-
-← [WhatsApp Calling](./22-whatsapp-calling.md) | [Home](./README.md) | [Recommendation Engine](./24-recommendation-engine.md) →

@@ -127,8 +127,3 @@ def upper_bound(arr, target):
 - [ ] Practice rotated array problems
 - [ ] Master binary search on answer space
 - [ ] Complete 10+ problems
-
----
-
-## ➡️ Next Week
-[Week 8: Sorting & Intervals](../Week-08-Sorting-Intervals/)

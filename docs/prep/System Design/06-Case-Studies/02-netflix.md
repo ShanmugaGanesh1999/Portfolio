@@ -699,9 +699,3 @@ class AdaptiveBitrateSwitcher:
 2. **Explain per-shot encoding**: Huge bandwidth savings
 3. **Discuss ABR**: Client-side quality adaptation
 4. **Mention chaos engineering**: Netflix invented it!
-
----
-
-## 📚 Navigation
-
-← [Spotify](./01-spotify.md) | [Home](./README.md) | [ChatGPT](./03-chatgpt.md) →

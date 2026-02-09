@@ -120,8 +120,3 @@ graph = {
 - [ ] Learn topological sort
 - [ ] Implement Union Find
 - [ ] Complete 12+ graph problems
-
----
-
-## ➡️ Next Week
-[Week 11: Dynamic Programming](../Week-11-Dynamic-Programming/)

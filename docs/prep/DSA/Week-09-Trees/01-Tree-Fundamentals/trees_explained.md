@@ -401,7 +401,3 @@ def is_balanced(root):
 | Level Order | O(n) | O(n) |
 
 Where n = nodes, h = height (log n for balanced, n for skewed)
-
----
-
-## ➡️ Next: [BST Operations](../02-BST-Operations/)

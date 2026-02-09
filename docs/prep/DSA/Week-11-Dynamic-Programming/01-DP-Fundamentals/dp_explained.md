@@ -350,7 +350,3 @@ def min_path_sum(grid: list[list[int]]) -> int:
 3. **Start with brute force**, then memoize
 4. **Optimize space** by analyzing dependencies
 5. **Practice patterns** - most problems are variations
-
----
-
-## ➡️ Next: [Knapsack Patterns](../04-Knapsack-Pattern/)

@@ -455,9 +455,3 @@ Scale Challenges:
 ├── Cold starts for model loading
 ├── Handling traffic spikes
 ```
-
----
-
-## 📖 Next Steps
-
-→ Return to [Design Problems README](./README.md)

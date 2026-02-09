@@ -349,9 +349,3 @@ Performance:
 ├── Hourly trie updates
 ├── Local caching for popular prefixes
 ```
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Design Web Crawler](./11-web-crawler.md)

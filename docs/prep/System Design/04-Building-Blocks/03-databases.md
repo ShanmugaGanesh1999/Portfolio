@@ -473,9 +473,3 @@ Cons:
 5. **Sharding for write scaling** - But adds complexity
 6. **Indexes speed up reads** - But slow down writes
 7. **Consider multiple databases** - Right tool for each job
-
----
-
-## 📖 Next Steps
-
-→ Continue to [Key-Value Stores](./04-key-value-stores.md)
