@@ -1,9 +1,11 @@
 import { useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
+import PrepTabBar from "./PrepTabBar";
 import StatusBar from "./StatusBar";
 import CopilotChat from "../chat/CopilotChat";
-import { Icon } from "../ui";
+import { Icon, ResizeHandle } from "../ui";
+import useResizableRight from "../../hooks/useResizableRight";
 
 /**
  * Layout — Main application shell (header + sidebar + content + statusbar)
@@ -12,6 +14,17 @@ import { Icon } from "../ui";
 export default function Layout({ children, activeProject, onOpenProject }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [prepTabCourse, setPrepTabCourse] = useState(null);
+  const { width: chatWidth, isResizing, startResize } = useResizableRight(420, 320, 800);
+
+  // Parse prep routes to extract course ID
+  const parsePrepRoute = (id) => {
+    if (!id?.startsWith("prep:")) return null;
+    const [, courseId, ...rest] = id.split(":");
+    return { courseId, filePath: rest.join(":") };
+  };
+
+  const activePrep = parsePrepRoute(activeProject);
 
   return (
     <div className="h-screen flex flex-col">
@@ -59,24 +72,48 @@ export default function Layout({ children, activeProject, onOpenProject }) {
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0 fixed md:relative z-50 md:z-auto transition-transform duration-200`}
         >
-          <Sidebar activeProject={activeProject} onOpenProject={(id) => {
-            onOpenProject?.(id);
-            setSidebarOpen(false);
-          }} />
+          <Sidebar 
+            activeProject={activeProject} 
+            onOpenProject={(id) => {
+              onOpenProject?.(id);
+              setSidebarOpen(false);
+            }}
+            onOpenPrepTab={(courseId) => {
+              setPrepTabCourse(courseId);
+              setSidebarOpen(false);
+            }}
+          />
         </div>
 
-        <main className="flex-1 overflow-y-auto p-6 space-y-12 scroll-smooth">
+        {/* Prep Tab Bar — shows folder contents when a prep course is selected */}
+        {prepTabCourse && (
+          <PrepTabBar
+            courseId={prepTabCourse}
+            activePath={activePrep?.filePath}
+            onNavigate={(courseId, filePath) => {
+              onOpenProject?.(`prep:${courseId}:${filePath}`);
+            }}
+            onClose={() => setPrepTabCourse(null)}
+          />
+        )}
+
+
+        <main className={`flex-1 overflow-y-auto scroll-smooth ${
+          activePrep ? 'px-6 pb-6' : 'p-6 space-y-12'
+        }`}>
           {children}
         </main>
 
         {/* Copilot Panel - part of layout structure on desktop, overlay on mobile */}
-        <div
-          className={`transition-all duration-300 ease-out overflow-hidden border-l border-border md:relative fixed top-0 right-0 bottom-0 z-50 ${
-            chatOpen ? 'w-full md:w-[420px]' : 'w-0'
-          }`}
-        >
-          <CopilotChat isOpen={chatOpen} onClose={() => setChatOpen(false)} />
-        </div>
+        {chatOpen && (
+          <div
+            className="transition-all duration-300 ease-out overflow-hidden border-l-2 border-accent/30 md:relative fixed top-0 right-0 bottom-0 z-50 shadow-2xl shadow-black/50"
+            style={{ width: window.innerWidth >= 768 ? `${chatWidth}px` : '100%' }}
+          >
+            <ResizeHandle onMouseDown={startResize} side="left" />
+            <CopilotChat isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+          </div>
+        )}
       </div>
       <StatusBar onToggleChat={() => setChatOpen(!chatOpen)} chatOpen={chatOpen} />
     </div>

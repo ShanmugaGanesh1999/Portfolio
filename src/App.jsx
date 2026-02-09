@@ -17,14 +17,28 @@ import RecentItemsProject from "./projects/RecentItemsProject";
 import MarketDataProject from "./projects/MarketDataProject";
 import AccessMgmtProject from "./projects/AccessMgmtProject";
 import MLLeadScoringProject from "./projects/MLLeadScoringProject";
+import PrepPlatform from "./prep/PrepPlatform";
+import { PREP_COURSES } from "./prep/prepData";
 
 /**
  * App — Root component assembling all portfolio sections within the IDE layout.
  * Explorer sidebar always visible. Content area switches between portfolio
- * sections and project detail views — identical to VS Code tab behavior.
+ * sections, project detail views, and prep reader — identical to VS Code tab behavior.
  */
 export default function App() {
   const [activeProject, setActiveProject] = useState(null);
+
+  // Parse prep file routes: "prep:dsa:Week-01/README.md" → { courseId, filePath }
+  const parsePrepRoute = (id) => {
+    if (!id?.startsWith("prep:")) return null;
+    const [, courseId, ...rest] = id.split(":");
+    return { courseId, filePath: rest.join(":") };
+  };
+
+  const prepRoute = parsePrepRoute(activeProject);
+  const prepCourse = prepRoute
+    ? PREP_COURSES.find((c) => c.id === prepRoute.courseId)
+    : null;
 
   const projectContent = {
     "rollup-summary": <RollupSummaryProject onBack={() => setActiveProject(null)} />,
@@ -38,7 +52,14 @@ export default function App() {
 
   return (
     <Layout activeProject={activeProject} onOpenProject={setActiveProject}>
-      {activeProject && projectContent[activeProject] ? (
+      {prepCourse ? (
+        <PrepPlatform
+          course={prepCourse}
+          filePath={prepRoute.filePath}
+          onBack={() => setActiveProject(null)}
+          onNavigate={(courseId, filePath) => setActiveProject(`prep:${courseId}:${filePath}`)}
+        />
+      ) : activeProject && projectContent[activeProject] ? (
         projectContent[activeProject]
       ) : (
         <>

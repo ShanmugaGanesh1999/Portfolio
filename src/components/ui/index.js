@@ -6,3 +6,4 @@ export { default as Badge } from "./Badge";
 export { default as ActionCard } from "./ActionCard";
 export { default as SectionLabel } from "./SectionLabel";
 export { default as ProgressBar } from "./ProgressBar";
+export { default as ResizeHandle } from "./ResizeHandle";
