@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { Icon } from "../ui";
 import { PREP_COURSES } from "../../prep/prepData";
 
@@ -32,13 +33,27 @@ export default function MobileNav({
   onOpenPrepTab,
 }) {
   const [prepOpen, setPrepOpen] = useState(false);
-  const prepRef = useRef(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
+  const prepBtnRef = useRef(null);
+  const dropdownRef = useRef(null);
+
+  // Compute fixed position from button rect when opening
+  const openDropdown = useCallback(() => {
+    if (prepBtnRef.current) {
+      const r = prepBtnRef.current.getBoundingClientRect();
+      setDropdownPos({ top: r.bottom + 1, left: Math.max(4, r.left) });
+    }
+    setPrepOpen((v) => !v);
+  }, []);
 
   // Close prep dropdown on outside click
   useEffect(() => {
     if (!prepOpen) return;
     const handleClick = (e) => {
-      if (prepRef.current && !prepRef.current.contains(e.target)) {
+      if (
+        prepBtnRef.current && !prepBtnRef.current.contains(e.target) &&
+        dropdownRef.current && !dropdownRef.current.contains(e.target)
+      ) {
         setPrepOpen(false);
       }
     };
@@ -110,9 +125,10 @@ export default function MobileNav({
             })}
 
             {/* ── Prep Dropdown ── */}
-            <div className="relative" ref={prepRef}>
+            <div className="relative">
               <button
-                onClick={() => setPrepOpen(!prepOpen)}
+                ref={prepBtnRef}
+                onClick={openDropdown}
                 className={`flex items-center gap-1.5 px-3 h-10 text-[11px] font-medium whitespace-nowrap border-b-2 transition-all ${
                   active === "prep"
                     ? "border-success text-success bg-success/5"
@@ -127,9 +143,13 @@ export default function MobileNav({
                 />
               </button>
 
-              {/* Dropdown menu */}
-              {prepOpen && (
-                <div className="absolute top-full left-0 mt-px bg-sidebar border border-border rounded-md shadow-xl shadow-black/40 z-50 min-w-[180px] py-1 animate-fade-in-up" style={{ animationDuration: "0.15s" }}>
+              {/* Dropdown rendered via portal with fixed positioning to escape overflow clip */}
+              {prepOpen && createPortal(
+                <div
+                  ref={dropdownRef}
+                  className="fixed bg-sidebar border border-border rounded-md shadow-xl shadow-black/40 z-[9999] min-w-[180px] py-1 animate-fade-in-up"
+                  style={{ top: dropdownPos.top, left: dropdownPos.left, animationDuration: "0.15s" }}
+                >
                   {PREP_COURSES.map((course) => {
                     const isActive = activeProject?.startsWith(`prep:${course.id}`);
                     return (
@@ -150,7 +170,8 @@ export default function MobileNav({
                       </button>
                     );
                   })}
-                </div>
+                </div>,
+                document.body
               )}
             </div>
           </div>

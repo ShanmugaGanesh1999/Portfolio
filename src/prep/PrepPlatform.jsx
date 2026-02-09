@@ -1,10 +1,36 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from "rehype-raw";
 import "highlight.js/styles/github-dark-dimmed.min.css";
 import { Icon } from "../components/ui";
+import SystemDesignDiagram from "./SystemDesignDiagram";
+
+// ──────────────────────────────────────────────────
+// Mermaid extraction — split raw markdown into
+// alternating text-chunks and mermaid-code strings
+// BEFORE passing to ReactMarkdown / rehype-highlight.
+// ──────────────────────────────────────────────────
+const MERMAID_FENCE = /```mermaid\s*\n([\s\S]*?)```/g;
+
+function splitMermaid(md) {
+  const parts = [];     // { type: 'md' | 'mermaid', content: string }
+  let lastIndex = 0;
+  let m;
+  MERMAID_FENCE.lastIndex = 0;
+  while ((m = MERMAID_FENCE.exec(md)) !== null) {
+    if (m.index > lastIndex) {
+      parts.push({ type: "md", content: md.slice(lastIndex, m.index) });
+    }
+    parts.push({ type: "mermaid", content: m[1] });
+    lastIndex = m.index + m[0].length;
+  }
+  if (lastIndex < md.length) {
+    parts.push({ type: "md", content: md.slice(lastIndex) });
+  }
+  return parts;
+}
 
 // ──────────────────────────────────────────────────
 // Markdown custom components — terminal-themed rendering
@@ -128,6 +154,36 @@ const mdComponents = {
     return <input type={type} checked={checked} {...props} />;
   },
 };
+
+// ──────────────────────────────────────────────────
+// MarkdownWithDiagrams — renders markdown with mermaid
+// blocks replaced by interactive diagrams
+// ──────────────────────────────────────────────────
+function MarkdownWithDiagrams({ markdown }) {
+  const parts = useMemo(() => splitMermaid(markdown), [markdown]);
+
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.type === "mermaid" ? (
+          <SystemDesignDiagram key={`m-${i}`} mermaidCode={part.content} />
+        ) : (
+          <ReactMarkdown
+            key={`md-${i}`}
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[
+              rehypeRaw,
+              [rehypeHighlight, { detect: true, ignoreMissing: true }],
+            ]}
+            components={mdComponents}
+          >
+            {part.content}
+          </ReactMarkdown>
+        )
+      )}
+    </>
+  );
+}
 
 // ──────────────────────────────────────────────────
 // Loading skeleton
@@ -300,15 +356,9 @@ export default function PrepPlatform({ course, filePath, onBack, onNavigate }) {
             </div>
           </div>
 
-          {/* Rendered markdown */}
+          {/* Rendered markdown — mermaid blocks extracted and rendered separately */}
           <article className="md-root">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeRaw, [rehypeHighlight, { detect: true, ignoreMissing: true }]]}
-              components={mdComponents}
-            >
-              {markdown}
-            </ReactMarkdown>
+            <MarkdownWithDiagrams markdown={markdown} />
           </article>
 
           {/* Bottom navigation */}
