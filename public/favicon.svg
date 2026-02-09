@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect width="256" height="256" fill="#0d1117" rx="24"/>
+  <text x="128" y="165" font-family="Space Mono, monospace" font-size="120" font-weight="700" fill="#58a6ff" text-anchor="middle">SG</text>
+  <rect x="20" y="20" width="216" height="216" fill="none" stroke="#58a6ff" stroke-width="3" rx="20" opacity="0.3"/>
+</svg>

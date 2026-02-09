@@ -2,6 +2,7 @@ import { useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import StatusBar from "./StatusBar";
+import CopilotChat from "../chat/CopilotChat";
 import { Icon } from "../ui";
 
 /**
@@ -10,6 +11,7 @@ import { Icon } from "../ui";
  */
 export default function Layout({ children, activeProject, onOpenProject }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   return (
     <div className="h-screen flex flex-col">
@@ -17,12 +19,31 @@ export default function Layout({ children, activeProject, onOpenProject }) {
       <div className="flex flex-1 overflow-hidden">
         {/* Mobile sidebar toggle */}
         <button
-          className="md:hidden fixed bottom-8 right-4 z-50 bg-accent text-bg w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+          className="md:hidden fixed bottom-8 left-4 z-50 bg-accent text-bg w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
           onClick={() => setSidebarOpen(!sidebarOpen)}
           aria-label="Toggle navigation"
         >
           <Icon name={sidebarOpen ? "close" : "menu"} size="text-xl" />
         </button>
+
+        {/* Mobile Copilot FAB */}
+        {!chatOpen && (
+          <button
+            className="md:hidden fixed bottom-8 right-4 z-50 bg-success text-bg w-12 h-12 rounded-full flex items-center justify-center shadow-lg shadow-success/30 animate-fade-in-up"
+            onClick={() => setChatOpen(true)}
+            aria-label="Open Copilot Chat"
+          >
+            <Icon name="smart_toy" size="text-xl" />
+          </button>
+        )}
+
+        {/* Mobile chat backdrop */}
+        {chatOpen && (
+          <div
+            className="md:hidden fixed inset-0 bg-black/50 z-40"
+            onClick={() => setChatOpen(false)}
+          />
+        )}
 
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
@@ -47,8 +68,17 @@ export default function Layout({ children, activeProject, onOpenProject }) {
         <main className="flex-1 overflow-y-auto p-6 space-y-12 scroll-smooth">
           {children}
         </main>
+
+        {/* Copilot Panel - part of layout structure on desktop, overlay on mobile */}
+        <div
+          className={`transition-all duration-300 ease-out overflow-hidden border-l border-border md:relative fixed top-0 right-0 bottom-0 z-50 ${
+            chatOpen ? 'w-full md:w-[420px]' : 'w-0'
+          }`}
+        >
+          <CopilotChat isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+        </div>
       </div>
-      <StatusBar />
+      <StatusBar onToggleChat={() => setChatOpen(!chatOpen)} chatOpen={chatOpen} />
     </div>
   );
 }
