@@ -79,7 +79,7 @@ graph TD
     subgraph Data Layer
         PG[(PostgreSQL<br/>Events/Users)]
         REDIS[(Redis Cluster<br/>Inventory/Locks)]
-        KAFKA[Kafka<br/>Order Events]
+        KAFKA{{Kafka<br/>Order Events}}
         ES[(Elasticsearch<br/>Search)]
     end
     

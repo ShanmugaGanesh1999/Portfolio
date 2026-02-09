@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect, useMemo, useId } from "react";
 import { parseMermaid } from "./parseMermaid";
+import { renderNodeBackground } from "../utils/nodeShapes";
 
 // ──────────────────────────────────────
 // Colour map — identical to InteractiveDiagram in projects/
@@ -78,7 +79,7 @@ function Edge({ edge, from, to, highlighted, dimmed, mid }) {
 }
 
 // ──────────────────────────────────────────────────
-// Node — clickable rectangle
+// Node — clickable shape (rect, cylinder, stadium, etc.)
 // ──────────────────────────────────────────────────
 function Node({ node, selected, highlighted, dimmed, onClick }) {
   const col  = C[node.color] || C.comment;
@@ -96,11 +97,13 @@ function Node({ node, selected, highlighted, dimmed, onClick }) {
       style={{ cursor: "pointer", transition: "opacity .3s" }}
       opacity={op}
     >
-      <rect
-        x={node.x} y={node.y} width={NODE_W} height={NODE_H}
-        rx={6} fill={fill} stroke={strk}
-        strokeWidth={selected ? 2 : 1}
-      />
+      {renderNodeBackground({
+        shape: node.shape || "rect",
+        x: node.x, y: node.y,
+        w: NODE_W, h: NODE_H,
+        fill, stroke: strk,
+        sw: selected ? 2 : 1,
+      })}
       {selected && (
         <rect
           x={node.x - 3} y={node.y - 3}

@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { DIAGRAM_NODES, DIAGRAM_EDGES, DATA_FLOWS } from "./accessMgmtData";
+import { renderNodeBackground } from "../utils/nodeShapes";
 
 // ──────────────────────────────────────
 // Color map → Tailwind CSS variable hex
@@ -96,17 +97,13 @@ function DiagramNode({ node, isSelected, isHighlighted, isDimmed, onClick }) {
       style={{ cursor: "pointer", transition: "opacity 0.3s" }}
       opacity={opacity}
     >
-      <rect
-        x={node.x}
-        y={node.y}
-        width={140}
-        height={56}
-        rx={6}
-        ry={6}
-        fill={fill}
-        stroke={stroke}
-        strokeWidth={isSelected ? 2 : 1}
-      />
+      {renderNodeBackground({
+        shape: node.shape || "rect",
+        x: node.x, y: node.y,
+        w: 140, h: 56,
+        fill, stroke,
+        sw: isSelected ? 2 : 1,
+      })}
       {isSelected && (
         <rect
           x={node.x - 3}

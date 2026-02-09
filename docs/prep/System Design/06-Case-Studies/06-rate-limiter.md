@@ -45,9 +45,9 @@ Storage (per user counter):
 ```mermaid
 graph TD
     subgraph Client Layer
-        C1[Mobile App]
-        C2[Web App]
-        C3[API Client]
+        C1([Mobile App])
+        C2([Web App])
+        C3([API Client])
     end
     
     subgraph Edge Layer
@@ -56,14 +56,14 @@ graph TD
     end
     
     subgraph Rate Limiter Cluster
-        RS1[Redis Cluster<br/>Node 1]
-        RS2[Redis Cluster<br/>Node 2]
-        RS3[Redis Cluster<br/>Node 3]
+        RS1[(Redis Cluster<br/>Node 1)]
+        RS2[(Redis Cluster<br/>Node 2)]
+        RS3[(Redis Cluster<br/>Node 3)]
     end
     
     subgraph Configuration
-        RC[Rules Config<br/>PostgreSQL]
-        CACHE[Local Cache<br/>Rules TTL: 60s]
+        RC[(Rules Config<br/>PostgreSQL)]
+        CACHE[(Local Cache<br/>Rules TTL: 60s)]
     end
     
     subgraph Backend

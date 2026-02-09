@@ -6,8 +6,13 @@
 //   A --> B           standard directed edge
 //   A -->|label| B    labelled edge
 //   A <-->|label| B   bidirectional edge
-//   A[Label]          square node
-//   A[(Label)]        cylinder / DB node
+//   A[Label]          rectangle node          → shape: "rect"
+//   A[(Label)]        cylinder / DB node       → shape: "cyl"
+//   A([Label])        stadium / pill node      → shape: "stadium"
+//   A[[Label]]        subroutine / framed rect → shape: "fr-rect"
+//   A{{Label}}        hexagon → horiz cylinder → shape: "das"
+//   A>Label]          flag → lined cylinder    → shape: "lin-cyl"
+//   A((Label))        circle node              → shape: "circle"
 //   A[Label<br/>Sub]  multi-line label
 //   subgraph Name … end
 //   Nested subgraph … end (flattened)
@@ -124,31 +129,61 @@ function addToCurrentSubgraph(stack, id) {
 // ──────────────────────────────────────
 function ensureNode(map, id) {
   if (!map.has(id)) {
-    map.set(id, { id, label: id, sublabel: "", color: DEFAULT_COLOR });
+    map.set(id, { id, label: id, sublabel: "", shape: "rect", color: DEFAULT_COLOR });
   }
 }
 
 // ──────────────────────────────────────
 // Parse a standalone node definition:
-//   API[API Gateway]
-//   PG[(PostgreSQL<br/>Users)]
-//   INF1[Inference Node 1<br/>8x A100]
+//   API[API Gateway]          → rect
+//   PG[(PostgreSQL<br/>Users)] → cyl
+//   C([Mobile App])           → stadium
+//   W[[Worker]]               → fr-rect
+//   K{{Kafka}}                → das
+//   S3>S3 Storage]            → lin-cyl
+//   X((Circle))               → circle
 // ──────────────────────────────────────
 function tryParseNode(line) {
   // Match ID followed by bracket group — greedy to the end of line
-  const m = line.match(/^([A-Za-z_]\w*)\s*([\[\(\{][\[\(\{]?.+[\]\)\}][\]\)\}]?)\s*$/);
+  // Supports: [  [(  ([  [[  {{  >  ((  as opening delimiters
+  const m = line.match(/^([A-Za-z_]\w*)\s*([\[\(\{>][\[\(\{]?.+[\]\)\}][\]\)\}]?)\s*$/);
   if (!m) return null;
   return extractNodeLabel(m[1], m[2]);
 }
 
 /**
  * Given an id and a bracket expression like "[API Gateway]" or "[(DB<br/>Users)]",
- * return { id, label, sublabel, color }.
+ * return { id, label, sublabel, shape, color }.
+ *
+ * Shape detection from bracket pattern:
+ *   [(…)]  → cyl       (vertical cylinder — databases, caches)
+ *   ([…])  → stadium   (pill — clients, mobile)
+ *   [[…]]  → fr-rect   (framed rectangle — workers, async)
+ *   {{…}}  → das       (horizontal cylinder — Kafka, MQ)
+ *   >…]    → lin-cyl   (lined cylinder — S3, storage)
+ *   ((…))  → circle
+ *   […]    → rect      (default — services, APIs)
  */
 function extractNodeLabel(id, bracketExpr) {
-  // Strip outermost brackets
+  // ── Detect shape from outermost brackets ──
+  let shape = "rect";
+  if (bracketExpr.startsWith("[(") && bracketExpr.endsWith(")]")) {
+    shape = "cyl";
+  } else if (bracketExpr.startsWith("([") && bracketExpr.endsWith("])")) {
+    shape = "stadium";
+  } else if (bracketExpr.startsWith("[[") && bracketExpr.endsWith("]]")) {
+    shape = "fr-rect";
+  } else if (bracketExpr.startsWith("{{") && bracketExpr.endsWith("}}")) {
+    shape = "das";
+  } else if (bracketExpr.startsWith(">") && bracketExpr.endsWith("]")) {
+    shape = "lin-cyl";
+  } else if (bracketExpr.startsWith("((") && bracketExpr.endsWith("))")) {
+    shape = "circle";
+  }
+
+  // Strip outermost brackets (including > for flag shape)
   let inner = bracketExpr
-    .replace(/^[\[\(\{]+/, "")
+    .replace(/^[\[\(\{>]+/, "")
     .replace(/[\]\)\}]+$/, "")
     .trim();
 
@@ -157,6 +192,7 @@ function extractNodeLabel(id, bracketExpr) {
     id,
     label: parts[0].trim(),
     sublabel: parts.length > 1 ? parts.slice(1).join(" ").trim() : "",
+    shape,
     color: DEFAULT_COLOR,
   };
 }
@@ -203,8 +239,9 @@ function tryParseEdges(line) {
 
     // ── Try node (with optional inline def) ──
     // Must match ID, then optionally bracket-content
+    // Supports: [  [(  ([  [[  {{  >  ((  as opening delimiters
     const nodeMatch = line.slice(pos).match(
-      /^([A-Za-z_]\w*)([\[\(\{][\[\(\{]?(?:[^\]\)\}]|<br\s*\/?>)*[\]\)\}][\]\)\}]?)?/
+      /^([A-Za-z_]\w*)([\[\(\{>][\[\(\{]?(?:[^\]\)\}]|<br\s*\/?>)*[\]\)\}][\]\)\}]?)?/
     );
     if (nodeMatch && nodeMatch[0].length > 0) {
       tokens.push({ type: "node", id: nodeMatch[1] });

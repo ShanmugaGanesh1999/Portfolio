@@ -49,9 +49,9 @@ Bandwidth:
 ```mermaid
 graph TD
     subgraph Clients
-        C1[Browser 1<br/>Editor]
-        C2[Browser 2<br/>Editor]
-        C3[Mobile App]
+        C1([Browser 1<br/>Editor])
+        C2([Browser 2<br/>Editor])
+        C3([Mobile App])
     end
     
     subgraph Edge
@@ -74,7 +74,7 @@ graph TD
     subgraph Data Layer
         PG[(PostgreSQL<br/>Metadata)]
         REDIS[(Redis Cluster<br/>Presence/Sessions)]
-        GCS[Cloud Storage<br/>Documents]
+        GCS>Cloud Storage<br/>Documents]
         SPANNER[(Spanner<br/>Operations Log)]
     end
     

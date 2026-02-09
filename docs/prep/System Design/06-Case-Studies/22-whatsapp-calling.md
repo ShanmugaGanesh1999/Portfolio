@@ -50,8 +50,8 @@ Total Bandwidth:
 ```mermaid
 graph TD
     subgraph Clients
-        C1[Caller<br/>iOS/Android]
-        C2[Callee<br/>iOS/Android]
+        C1([Caller<br/>iOS/Android])
+        C2([Callee<br/>iOS/Android])
     end
     
     subgraph Signaling
@@ -78,7 +78,7 @@ graph TD
     subgraph Data Layer
         REDIS[(Redis<br/>Call State)]
         PG[(PostgreSQL<br/>Call History)]
-        KAFKA[Kafka<br/>Events/Analytics]
+        KAFKA{{Kafka<br/>Events/Analytics}}
     end
     
     C1 <-->|WebSocket| WS

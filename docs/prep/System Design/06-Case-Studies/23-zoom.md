@@ -54,9 +54,9 @@ Server Resources:
 ```mermaid
 graph TD
     subgraph Clients
-        WEB[Web Browser<br/>WebRTC]
-        DESKTOP[Desktop App<br/>Native SDK]
-        MOBILE[Mobile App<br/>iOS/Android]
+        WEB([Web Browser<br/>WebRTC])
+        DESKTOP([Desktop App<br/>Native SDK])
+        MOBILE([Mobile App<br/>iOS/Android])
     end
     
     subgraph Edge Network
@@ -85,8 +85,8 @@ graph TD
     subgraph Data Layer
         PG[(PostgreSQL<br/>Users/Meetings)]
         REDIS[(Redis<br/>Session State)]
-        S3[S3<br/>Recordings]
-        KAFKA[Kafka<br/>Events]
+        S3>S3<br/>Recordings]
+        KAFKA{{Kafka<br/>Events}}
     end
     
     WEB --> LB

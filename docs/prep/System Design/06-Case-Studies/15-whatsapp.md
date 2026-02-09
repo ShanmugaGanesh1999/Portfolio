@@ -49,9 +49,9 @@ Connections:
 ```mermaid
 graph TD
     subgraph Clients
-        C1[iOS App]
-        C2[Android App]
-        C3[Web App]
+        C1([iOS App])
+        C2([Android App])
+        C3([Web App])
     end
     
     subgraph Edge Layer
@@ -67,14 +67,14 @@ graph TD
     end
     
     subgraph Message Queue
-        KAFKA[Kafka<br/>Message Events]
+        KAFKA{{Kafka<br/>Message Events}}
     end
     
     subgraph Data Stores
         CASSANDRA[(Cassandra<br/>Messages)]
         REDIS[(Redis Cluster<br/>Sessions/Presence)]
         MYSQL[(MySQL<br/>Users/Groups)]
-        S3[S3<br/>Media Storage]
+        S3>S3<br/>Media Storage]
     end
     
     subgraph CDN

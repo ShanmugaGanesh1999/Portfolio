@@ -58,9 +58,9 @@ Fan-out calculation:
 ```mermaid
 graph TD
     subgraph Clients
-        C1[iOS App]
-        C2[Android App]
-        C3[Web App]
+        C1([iOS App])
+        C2([Android App])
+        C3([Web App])
     end
     
     subgraph Edge
@@ -82,17 +82,17 @@ graph TD
     end
     
     subgraph Message Queue
-        KAFKA[Apache Kafka<br/>Tweet Events]
+        KAFKA{{Apache Kafka<br/>Tweet Events}}
     end
     
     subgraph Fan-out Workers
-        FW1[Fan-out Worker 1]
-        FW2[Fan-out Worker 2]
-        FW3[Fan-out Worker 3]
+        FW1[[Fan-out Worker 1]]
+        FW2[[Fan-out Worker 2]]
+        FW3[[Fan-out Worker 3]]
     end
     
     subgraph Data Stores
-        REDIS[Redis Cluster<br/>Timeline Cache]
+        REDIS[(Redis Cluster<br/>Timeline Cache)]
         TWEETS[(Cassandra<br/>Tweet Store)]
         USERS[(PostgreSQL<br/>User Store)]
         GRAPH[(Neo4j<br/>Social Graph)]
@@ -100,7 +100,7 @@ graph TD
     end
     
     subgraph Media
-        S3[S3 Bucket<br/>Media Storage]
+        S3>S3 Bucket<br/>Media Storage]
     end
     
     C1 --> CDN

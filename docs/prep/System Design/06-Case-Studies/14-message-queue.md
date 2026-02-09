@@ -48,9 +48,9 @@ Partitions:
 ```mermaid
 graph TD
     subgraph Producers
-        P1[Producer 1]
-        P2[Producer 2]
-        P3[Producer 3]
+        P1([Producer 1])
+        P2([Producer 2])
+        P3([Producer 3])
     end
     
     subgraph Broker Cluster
@@ -66,8 +66,8 @@ graph TD
     end
     
     subgraph Storage
-        LOG1[Segment Log Files]
-        LOG2[Index Files]
+        LOG1>Segment Log Files]
+        LOG2>Index Files]
     end
     
     subgraph Consumer Groups

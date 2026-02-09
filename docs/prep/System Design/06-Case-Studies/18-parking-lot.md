@@ -50,14 +50,14 @@ For Multi-Lot SaaS:
 ```mermaid
 graph TD
     subgraph Entry/Exit Hardware
-        GATE_IN[Entry Gate<br/>License Plate Reader]
-        GATE_OUT[Exit Gate<br/>License Plate Reader]
-        DISPLAY[Availability Display]
+        GATE_IN([Entry Gate<br/>License Plate Reader])
+        GATE_OUT([Exit Gate<br/>License Plate Reader])
+        DISPLAY([Availability Display])
     end
     
     subgraph API Layer
         API[API Gateway]
-        ADMIN[Admin Dashboard]
+        ADMIN([Admin Dashboard])
     end
     
     subgraph Services

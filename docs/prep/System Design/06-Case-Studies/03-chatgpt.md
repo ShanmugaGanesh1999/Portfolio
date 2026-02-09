@@ -54,9 +54,9 @@ Cost:
 ```mermaid
 graph TD
     subgraph Clients
-        WEB[Web App]
-        API_CLIENT[API Clients]
-        MOBILE[Mobile Apps]
+        WEB([Web App])
+        API_CLIENT([API Clients])
+        MOBILE([Mobile Apps])
     end
     
     subgraph Edge Layer
@@ -87,11 +87,11 @@ graph TD
         REDIS[(Redis<br/>Session/Rate Limit)]
         PG[(PostgreSQL<br/>Users/Billing)]
         MONGO[(MongoDB<br/>Conversations)]
-        S3[S3<br/>File Uploads]
+        S3>S3<br/>File Uploads]
     end
     
     subgraph ML Infrastructure
-        MODEL_STORE[Model Store<br/>Weights]
+        MODEL_STORE>Model Store<br/>Weights]
         TRITON[Triton Server]
         KV_CACHE[KV Cache<br/>Distributed]
     end

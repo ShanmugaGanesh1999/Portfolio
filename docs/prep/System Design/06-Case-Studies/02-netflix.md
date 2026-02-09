@@ -50,9 +50,9 @@ Encoding (new content):
 ```mermaid
 graph TD
     subgraph Clients
-        TV[Smart TV]
-        MOBILE[Mobile Apps]
-        WEB[Web Browser]
+        TV([Smart TV])
+        MOBILE([Mobile Apps])
+        WEB([Web Browser])
     end
     
     subgraph Edge / CDN
@@ -73,12 +73,12 @@ graph TD
         MYSQL[(MySQL<br/>Billing)]
         ES[(Elasticsearch<br/>Search)]
         EVS[(EVCache<br/>Distributed Cache)]
-        S3[S3<br/>Video Files]
+        S3>S3<br/>Video Files]
     end
     
     subgraph Content Pipeline
         INGEST[Content Ingest]
-        ENCODE[Encoding Pipeline<br/>Shot-based Encoding]
+        ENCODE[[Encoding Pipeline<br/>Shot-based Encoding]]
         QC[Quality Control]
     end
     

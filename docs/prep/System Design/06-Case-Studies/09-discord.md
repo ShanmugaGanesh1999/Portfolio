@@ -57,9 +57,9 @@ WebSocket connections:
 ```mermaid
 graph TD
     subgraph Clients
-        C1[Desktop App]
-        C2[Mobile App]
-        C3[Web App]
+        C1([Desktop App])
+        C2([Mobile App])
+        C3([Web App])
     end
     
     subgraph Edge Layer
@@ -69,13 +69,13 @@ graph TD
     
     subgraph Presence
         PS[Presence Service]
-        PSREDIS[Redis Cluster<br/>User Status]
+        PSREDIS[(Redis Cluster<br/>User Status)]
     end
     
     subgraph Messaging
         MS[Message Service]
-        KAFKA[Kafka<br/>Message Events]
-        FANOUT[Fanout Service]
+        KAFKA{{Kafka<br/>Message Events}}
+        FANOUT[[Fanout Service]]
     end
     
     subgraph Voice
@@ -87,7 +87,7 @@ graph TD
         SCYLLA[(ScyllaDB<br/>Messages)]
         PG[(PostgreSQL<br/>Servers/Users)]
         REDIS[(Redis<br/>Pub/Sub)]
-        S3[S3<br/>Attachments]
+        S3>S3<br/>Attachments]
     end
     
     subgraph CDN

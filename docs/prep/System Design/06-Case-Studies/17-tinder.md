@@ -48,8 +48,8 @@ Storage:
 ```mermaid
 graph TD
     subgraph Clients
-        C1[iOS App]
-        C2[Android App]
+        C1([iOS App])
+        C2([Android App])
     end
     
     subgraph Edge
@@ -76,12 +76,12 @@ graph TD
         MONGO[(MongoDB<br/>Recommendations)]
         CASSANDRA[(Cassandra<br/>Messages)]
         ES[(Elasticsearch<br/>Geo Search)]
-        S3[S3<br/>Photos]
+        S3>S3<br/>Photos]
     end
     
     subgraph ML Pipeline
         REC[Recommendation<br/>Engine]
-        SPARK[Spark<br/>Batch Processing]
+        SPARK[[Spark<br/>Batch Processing]]
     end
     
     C1 --> CDN

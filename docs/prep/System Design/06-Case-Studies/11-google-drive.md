@@ -49,9 +49,9 @@ Sync notifications:
 ```mermaid
 graph TD
     subgraph Clients
-        C1[Desktop Client]
-        C2[Mobile App]
-        C3[Web App]
+        C1([Desktop Client])
+        C2([Mobile App])
+        C3([Web App])
     end
     
     subgraph Edge Layer
@@ -69,7 +69,7 @@ graph TD
     subgraph Block Storage
         CHUNK[Chunking Service]
         DEDUP[Deduplication Service]
-        S3[S3<br/>Block Storage]
+        S3>S3<br/>Block Storage]
     end
     
     subgraph Metadata
@@ -78,7 +78,7 @@ graph TD
     end
     
     subgraph Message Queue
-        KAFKA[Kafka<br/>Sync Events]
+        KAFKA{{Kafka<br/>Sync Events}}
     end
     
     subgraph Indexing

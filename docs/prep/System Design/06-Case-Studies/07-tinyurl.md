@@ -52,9 +52,9 @@ Unique URLs needed:
 ```mermaid
 graph TD
     subgraph Clients
-        C1[Browser]
-        C2[Mobile App]
-        C3[API Client]
+        C1([Browser])
+        C2([Mobile App])
+        C3([API Client])
     end
     
     subgraph Edge Layer
@@ -74,12 +74,12 @@ graph TD
     end
     
     subgraph Data Tier
-        CACHE[Redis Cluster<br/>Hot URLs]
+        CACHE[(Redis Cluster<br/>Hot URLs)]
         DB[(Cassandra<br/>URL Mappings)]
     end
     
     subgraph Analytics
-        KAFKA[Kafka]
+        KAFKA{{Kafka}}
         ANALYTICS[Analytics Service]
         CLICKHOUSE[(ClickHouse)]
     end

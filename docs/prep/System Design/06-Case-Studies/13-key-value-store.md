@@ -51,9 +51,9 @@ Memory (for hot data):
 ```mermaid
 graph TD
     subgraph Clients
-        C1[Client 1]
-        C2[Client 2]
-        C3[Client 3]
+        C1([Client 1])
+        C2([Client 2])
+        C3([Client 3])
     end
     
     subgraph Coordinator Layer
@@ -72,10 +72,10 @@ graph TD
     end
     
     subgraph Per Node
-        MEM[MemTable<br/>In-Memory]
-        WAL[Write-Ahead Log]
-        SST1[SSTable L0]
-        SST2[SSTable L1]
+        MEM[(MemTable<br/>In-Memory)]
+        WAL>Write-Ahead Log]
+        SST1>SSTable L0]
+        SST2>SSTable L1]
         BLOOM[Bloom Filter]
     end
     

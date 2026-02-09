@@ -60,7 +60,7 @@ graph TD
     end
     
     subgraph Transcoding
-        TRANS[Transcoding Farm<br/>AWS Elemental]
+        TRANS[[Transcoding Farm<br/>AWS Elemental]]
         PACK[Packaging Service<br/>HLS/DASH Segmenter]
     end
     
@@ -75,9 +75,9 @@ graph TD
     end
     
     subgraph Clients
-        WEB[Web Player<br/>hls.js]
-        MOBILE[Mobile Apps<br/>ExoPlayer/AVPlayer]
-        TV[Smart TV<br/>Native Players]
+        WEB([Web Player<br/>hls.js])
+        MOBILE([Mobile Apps<br/>ExoPlayer/AVPlayer])
+        TV([Smart TV<br/>Native Players])
     end
     
     subgraph Supporting Services

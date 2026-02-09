@@ -49,9 +49,9 @@ Storage:
 ```mermaid
 graph TD
     subgraph Data Collection
-        APP[User Apps]
-        KAFKA[Kafka<br/>Event Stream]
-        FLINK[Flink<br/>Real-time Features]
+        APP([User Apps])
+        KAFKA{{Kafka<br/>Event Stream}}
+        FLINK[[Flink<br/>Real-time Features]]
     end
     
     subgraph Feature Store
@@ -60,8 +60,8 @@ graph TD
     end
     
     subgraph Model Training
-        SPARK[Spark<br/>Batch Training]
-        GPU[GPU Cluster<br/>Deep Learning]
+        SPARK[[Spark<br/>Batch Training]]
+        GPU[[GPU Cluster<br/>Deep Learning]]
         MLFLOW[MLflow<br/>Model Registry]
     end
     

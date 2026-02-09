@@ -50,9 +50,9 @@ Bandwidth:
 ```mermaid
 graph TD
     subgraph Clients
-        WEB[Web Player]
-        MOBILE[Mobile Apps]
-        DESKTOP[Desktop App]
+        WEB([Web Player])
+        MOBILE([Mobile Apps])
+        DESKTOP([Desktop App])
     end
     
     subgraph Edge
@@ -78,12 +78,12 @@ graph TD
         CASSANDRA[(Cassandra<br/>Listening History)]
         ES[(Elasticsearch<br/>Search)]
         REDIS[(Redis<br/>Session/Cache)]
-        S3[S3<br/>Audio Files]
+        S3>S3<br/>Audio Files]
     end
     
     subgraph ML Pipeline
-        SPARK[Spark<br/>Batch Processing]
-        KAFKA[Kafka<br/>Events]
+        SPARK[[Spark<br/>Batch Processing]]
+        KAFKA{{Kafka<br/>Events}}
         ML[ML Models<br/>Recommendations]
     end
     

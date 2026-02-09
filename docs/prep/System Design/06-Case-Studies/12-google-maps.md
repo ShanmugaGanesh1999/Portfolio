@@ -51,9 +51,9 @@ Road Network:
 ```mermaid
 graph TD
     subgraph Clients
-        C1[Mobile App]
-        C2[Web App]
-        C3[Car Display]
+        C1([Mobile App])
+        C2([Web App])
+        C3([Car Display])
     end
     
     subgraph Edge
@@ -72,7 +72,7 @@ graph TD
     subgraph Tile Generation
         TG[Tile Generator]
         MAPDATA[(PostGIS<br/>Map Data)]
-        TILES[S3<br/>Pre-rendered Tiles]
+        TILES>S3<br/>Pre-rendered Tiles]
     end
     
     subgraph Routing Engine

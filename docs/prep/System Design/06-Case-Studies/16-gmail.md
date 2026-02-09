@@ -45,9 +45,9 @@ Storage:
 ```mermaid
 graph TD
     subgraph Clients
-        C1[Web Client]
-        C2[Mobile App]
-        C3[Desktop Client]
+        C1([Web Client])
+        C2([Mobile App])
+        C3([Desktop Client])
     end
     
     subgraph Edge
@@ -71,11 +71,11 @@ graph TD
         BIGTABLE[(Bigtable<br/>Email Storage)]
         ES[(Elasticsearch<br/>Search Index)]
         MYSQL[(MySQL<br/>User Settings)]
-        GCS[Cloud Storage<br/>Attachments]
+        GCS>Cloud Storage<br/>Attachments]
     end
     
     subgraph Message Queue
-        PUBSUB[Pub/Sub<br/>Email Events]
+        PUBSUB{{Pub/Sub<br/>Email Events}}
     end
     
     C1 --> LB

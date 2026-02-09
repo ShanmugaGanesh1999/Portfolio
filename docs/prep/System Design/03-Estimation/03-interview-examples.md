@@ -60,7 +60,7 @@ Storage (5 years):
 
 ```mermaid
 graph TD
-    Client["Client (Browser/App)"] --> CDN["CDN (CloudFront)"]
+    Client(["Client (Browser/App)"]) --> CDN["CDN (CloudFront)"]
     CDN --> LB["Load Balancer (AWS ALB)"]
     
     LB --> API["API Gateway (Kong)"]
@@ -69,15 +69,15 @@ graph TD
     API --> ReadService["Redirect Service"]
     
     WriteService --> KeyGen["Key Generation Service"]
-    WriteService --> DB["PostgreSQL (Primary)"]
+    WriteService --> DB[("PostgreSQL (Primary)")]
     
-    KeyGen --> KeyDB["Redis (Pre-generated Keys)"]
+    KeyGen --> KeyDB[("Redis (Pre-generated Keys)")]
     
-    ReadService --> Cache["Redis Cluster (URL Cache)"]
-    Cache -->|Cache Miss| DBReplica["PostgreSQL (Read Replica)"]
+    ReadService --> Cache[("Redis Cluster (URL Cache)")]
+    Cache -->|Cache Miss| DBReplica[("PostgreSQL (Read Replica)")]
     
-    ReadService --> Analytics["Kafka (Click Events)"]
-    Analytics --> ClickHouse["ClickHouse (Analytics)"]
+    ReadService --> Analytics{{"Kafka (Click Events)"}}
+    Analytics --> ClickHouse[("ClickHouse (Analytics)")]
     
     DB --> DBReplica
 ```
@@ -291,20 +291,20 @@ Storage per user:
 
 ```mermaid
 graph TD
-    Client["Client"] --> LB["Load Balancer (AWS ALB)"]
+    Client(["Client"]) --> LB["Load Balancer (AWS ALB)"]
     LB --> API["API Gateway (Kong)"]
     
     API --> RateLimiter["Rate Limiter Middleware"]
     
-    RateLimiter --> RedisCluster["Redis Cluster (Rate Limit State)"]
+    RateLimiter --> RedisCluster[("Redis Cluster (Rate Limit State)")]
     
     RateLimiter -->|Allowed| AppService["Application Services"]
     RateLimiter -->|Blocked| RejectionHandler["429 Too Many Requests"]
     
-    AppService --> Database["PostgreSQL"]
+    AppService --> Database[("PostgreSQL")]
     
     ConfigService["Config Service"] --> RedisCluster
-    ConfigService --> RulesDB["PostgreSQL (Rate Limit Rules)"]
+    ConfigService --> RulesDB[("PostgreSQL (Rate Limit Rules)")]
     
     subgraph "Rate Limit Rules"
         RulesDB
@@ -573,26 +573,26 @@ graph TD
     Producer["Producer Services"] --> API["Notification API (REST)"]
     
     API --> Validator["Validation Service"]
-    Validator --> PreferenceDB["Redis (User Preferences Cache)"]
+    Validator --> PreferenceDB[("Redis (User Preferences Cache)")]
     
-    Validator --> Kafka["Kafka (notification-events)"]
+    Validator --> Kafka{{"Kafka (notification-events)"}}
     
     Kafka --> Router["Notification Router"]
     
-    Router --> PushQueue["Kafka (push-notifications)"]
-    Router --> EmailQueue["Kafka (email-notifications)"]
-    Router --> SMSQueue["Kafka (sms-notifications)"]
+    Router --> PushQueue{{"Kafka (push-notifications)"}}
+    Router --> EmailQueue{{"Kafka (email-notifications)"}}
+    Router --> SMSQueue{{"Kafka (sms-notifications)"}}
     
-    PushQueue --> PushWorker["Push Workers (FCM/APNs)"]
-    EmailQueue --> EmailWorker["Email Workers (SendGrid)"]
-    SMSQueue --> SMSWorker["SMS Workers (Twilio)"]
+    PushQueue --> PushWorker[["Push Workers (FCM/APNs)"]]
+    EmailQueue --> EmailWorker[["Email Workers (SendGrid)"]]
+    SMSQueue --> SMSWorker[["SMS Workers (Twilio)"]]
     
     PushWorker --> FCM["Firebase Cloud Messaging"]
     PushWorker --> APNs["Apple Push Notification"]
     EmailWorker --> SendGrid["SendGrid API"]
     SMSWorker --> Twilio["Twilio API"]
     
-    PushWorker --> StatusDB["Cassandra (Delivery Status)"]
+    PushWorker --> StatusDB[("Cassandra (Delivery Status)")]
     EmailWorker --> StatusDB
     SMSWorker --> StatusDB
     

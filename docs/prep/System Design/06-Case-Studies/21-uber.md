@@ -50,8 +50,8 @@ Storage:
 ```mermaid
 graph TD
     subgraph Clients
-        RIDER[Rider App]
-        DRIVER[Driver App]
+        RIDER([Rider App])
+        DRIVER([Driver App])
     end
     
     subgraph Edge
@@ -77,9 +77,9 @@ graph TD
     
     subgraph Data Stores
         PG[(PostgreSQL<br/>Users/Rides)]
-        KAFKA[Kafka<br/>Events]
+        KAFKA{{Kafka<br/>Events}}
         ES[(Elasticsearch<br/>Search/Analytics)]
-        S3[S3<br/>Trip Data]
+        S3>S3<br/>Trip Data]
     end
     
     subgraph Maps

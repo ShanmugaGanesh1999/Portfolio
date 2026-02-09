@@ -51,9 +51,9 @@ Bandwidth:
 ```mermaid
 graph TD
     subgraph Clients
-        C1[Mobile App]
-        C2[Smart TV]
-        C3[Web Browser]
+        C1([Mobile App])
+        C2([Smart TV])
+        C3([Web Browser])
     end
     
     subgraph Edge Layer
@@ -70,10 +70,10 @@ graph TD
     
     subgraph Upload Pipeline
         UPLOAD[Upload Service]
-        S3RAW[S3 Raw Videos]
-        SQS[SQS Queue]
-        TRANSCODE[Transcoding Workers<br/>FFmpeg on EC2/Lambda]
-        S3PROC[S3 Processed Videos]
+        S3RAW>S3 Raw Videos]
+        SQS{{SQS Queue}}
+        TRANSCODE[[Transcoding Workers<br/>FFmpeg on EC2/Lambda]]
+        S3PROC>S3 Processed Videos]
     end
     
     subgraph Data Stores
@@ -84,8 +84,8 @@ graph TD
     end
     
     subgraph Analytics
-        KAFKA[Kafka<br/>View Events]
-        SPARK[Spark<br/>Analytics]
+        KAFKA{{Kafka<br/>View Events}}
+        SPARK[[Spark<br/>Analytics]]
         WAREHOUSE[(BigQuery<br/>Data Warehouse)]
     end
     
