@@ -47,8 +47,8 @@ export default function Certifications() {
     <section className="space-y-4">
       <Prompt command="cat credentials.log" />
 
-      <div className="border border-border rounded-md bg-sidebar/20 p-4">
-        <div className="flex flex-wrap gap-4">
+      <div className="border border-border rounded-md bg-sidebar/20 p-3 sm:p-4">
+        <div className="flex flex-wrap gap-2 sm:gap-4">
           {CERTIFICATIONS.map((cert) => (
             <CertBadge key={cert.name} {...cert} />
           ))}

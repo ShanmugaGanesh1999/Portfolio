@@ -344,3 +344,94 @@ body {
   margin: 1rem 0;
   border: 1px solid var(--color-border);
 }
+
+/* ═══════════════════════════════════════════════════
+   MOBILE RESPONSIVE — Global media queries
+   ═══════════════════════════════════════════════════ */
+
+/* Ensure all elements respect box-sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Prevent horizontal overflow at the root level */
+html, body {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ── Small screens (≤ 640px) ────────────────── */
+@media (max-width: 640px) {
+  /* Scale down markdown headings on mobile */
+  .md-h1 {
+    font-size: 1.35rem;
+    margin: 1.25rem 0 0.75rem;
+  }
+  .md-h2 {
+    font-size: 1.1rem;
+    margin: 1.25rem 0 0.5rem;
+  }
+  .md-h3 {
+    font-size: 0.95rem;
+    margin: 1rem 0 0.4rem;
+  }
+
+  /* Tighten markdown spacing */
+  .md-root {
+    font-size: 0.8125rem;
+    line-height: 1.65;
+  }
+
+  /* Smaller code blocks on mobile */
+  .md-code-block code,
+  .md-code-block pre code,
+  .md-block-code {
+    font-size: 0.75rem;
+    padding: 0.75rem;
+  }
+  .md-code-block .hljs {
+    padding: 0.75rem;
+  }
+
+  /* Compact blockquotes */
+  .md-blockquote {
+    padding: 0.35rem 0.75rem;
+    margin: 0.75rem 0;
+  }
+
+  /* Compact tables */
+  .md-th {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  .md-td {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  /* Ensure tables scroll properly */
+  .md-table-wrap {
+    margin: 0.75rem 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Smoother touch scrolling everywhere */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hide scrollbar on mobile for cleaner look */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+/* ── Scrollbar-none utility (mobile nav) ── */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

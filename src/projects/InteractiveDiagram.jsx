@@ -248,7 +248,7 @@ export default function InteractiveDiagram() {
     <div className="space-y-3">
       {/* Controls bar */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-1 border border-border rounded-md overflow-hidden">
+        <div className="flex items-center gap-1 border border-border rounded-md overflow-hidden shrink-0">
           <button
             onClick={zoomOut}
             className="px-2 py-1 text-xs text-comment hover:text-white hover:bg-border/50 transition-colors"
@@ -275,7 +275,7 @@ export default function InteractiveDiagram() {
           </button>
         </div>
 
-        <div className="flex items-center gap-1 ml-auto">
+        <div className="flex items-center gap-1 flex-wrap sm:flex-nowrap sm:ml-auto">
           {Object.entries(DATA_FLOWS).map(([key, flow]) => (
             <button
               key={key}
@@ -309,7 +309,7 @@ export default function InteractiveDiagram() {
         ref={containerRef}
         className="border border-border rounded-md bg-sidebar/30 overflow-hidden relative"
         style={{
-          height: "420px",
+          height: typeof window !== 'undefined' && window.innerWidth < 640 ? "280px" : "420px",
           cursor: isPanning ? "grabbing" : "grab",
           touchAction: "none",
         }}

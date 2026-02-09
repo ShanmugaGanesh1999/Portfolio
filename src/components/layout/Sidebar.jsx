@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Icon, ResizeHandle } from "../ui";
 import { NAV_ITEMS, PERSONAL } from "../../data/portfolioData";
 import { PREP_COURSES } from "../../prep/prepData";
@@ -156,6 +156,29 @@ export default function Sidebar({ activeProject, onOpenProject, onOpenPrepTab, o
   const activeSection = useScrollSpy(sectionIds);
   const { width, isResizing, startResize } = useResizable(256, 200, 500, onRequestClose, 120);
 
+  // Track session time
+  const [sessionTime, setSessionTime] = useState(0);
+  
+  useEffect(() => {
+    const startTime = Date.now();
+    const timer = setInterval(() => {
+      setSessionTime(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
+  
+  // Format session time as "Xh Ym Zs" or "Xm Ys" or "Xs"
+  const formatSessionTime = (seconds) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    
+    if (h > 0) return `${h}h ${m}m ${s}s`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  };
+
   // Group nav items by their section key
   const sections = NAV_ITEMS.reduce((acc, item) => {
     if (!acc[item.section]) acc[item.section] = [];
@@ -172,8 +195,8 @@ export default function Sidebar({ activeProject, onOpenProject, onOpenPrepTab, o
 
   return (
     <aside 
-      className="border-r border-border bg-sidebar overflow-y-auto hidden md:flex flex-col shrink-0 h-full relative"
-      style={{ width: `${width}px` }}
+      className="border-r border-border bg-sidebar overflow-y-auto flex flex-col shrink-0 h-full relative"
+      style={{ width: typeof window !== 'undefined' && window.innerWidth >= 768 ? `${width}px` : '280px' }}
     >
       {/* Explorer title */}
       <div className="p-4 border-b border-border shrink-0">
@@ -260,13 +283,13 @@ export default function Sidebar({ activeProject, onOpenProject, onOpenPrepTab, o
       {/* Status indicator — always at bottom */}
       <div className="shrink-0 p-4 border-t border-border bg-sidebar">
         <div className="text-[10px] text-success flex items-center gap-2">
+          <Icon name="schedule" size="text-[12px]" className="text-success" />
+          Session: {formatSessionTime(sessionTime)}
+        </div>
+      </div>
 
       {/* Resize handle */}
       <ResizeHandle onMouseDown={startResize} side="right" />
-          <span className="w-2 h-2 rounded-full bg-success animate-pulse-glow" />
-          SYSTEM_ONLINE
-        </div>
-      </div>
     </aside>
   );
 }

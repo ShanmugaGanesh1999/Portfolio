@@ -19,7 +19,7 @@
 
 ## Summary
 
-Backend / Full Stack Engineer with 7+ years of experience specializing in **Backend Systems**, **Distributed Architecture**, and **Cloud Infrastructure**. Focused on architecting robust backend systems & scalable full-stack platforms with Java, Python, Spring Boot & AWS.
+Backend / Full Stack Engineer with 7+ years of experience specializing in **Backend Systems**, **Distributed Architecture**, and **Cloud**. Focused on architecting robust backend systems & scalable full-stack platforms with Java, Python, Spring Boot & AWS.
 
 > 7+ years Backend & Full Stack experience. Open to full-time opportunities.
 

@@ -273,7 +273,7 @@ export default function RecentItemsDiagram() {
           </button>
         </div>
 
-        <div className="flex items-center gap-1 ml-auto">
+        <div className="flex items-center gap-1 flex-wrap sm:flex-nowrap sm:ml-auto">
           {Object.entries(DATA_FLOWS).map(([key, flow]) => (
             <button
               key={key}
@@ -307,7 +307,7 @@ export default function RecentItemsDiagram() {
         ref={containerRef}
         className="border border-border rounded-md bg-sidebar/30 overflow-hidden relative"
         style={{
-          height: "480px",
+          height: typeof window !== "undefined" && window.innerWidth < 640 ? "300px" : "480px",
           cursor: isPanning ? "grabbing" : "grab",
           touchAction: "none",
         }}

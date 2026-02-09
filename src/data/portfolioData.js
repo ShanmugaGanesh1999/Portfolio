@@ -7,7 +7,7 @@
 export const PERSONAL = {
   name: "SHANMUGA GANESH",
   role: "Backend / Full Stack Engineer",
-  specialty: ["Backend Systems", "Distributed Architecture", "Cloud Infrastructure"],
+  specialty: ["Backend Systems", "Distributed Architecture", "Cloud"],
   focus: "Architecting robust backend systems & scalable full-stack platforms with Java, Python, Spring Boot & AWS",
   email: import.meta.env.VITE_EMAIL || "shanmugaganesh1999@gmail.com",
   phone: import.meta.env.VITE_PHONE || "(216) 466-6648",

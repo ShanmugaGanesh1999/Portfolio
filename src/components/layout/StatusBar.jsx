@@ -5,13 +5,13 @@ import { Icon } from "../ui";
  */
 export default function StatusBar({ onToggleChat, chatOpen }) {
   return (
-    <footer className="h-6 bg-accent text-bg px-3 flex items-center justify-between text-[10px] font-bold shrink-0">
-      <div className="flex gap-4">
+    <footer className="h-6 bg-accent text-bg px-2 sm:px-3 flex items-center justify-between text-[10px] font-bold shrink-0">
+      <div className="flex gap-2 sm:gap-4">
         <span>MASTER</span>
         <span className="hidden sm:inline">+ 14,302 lines</span>
         <span>UTF-8</span>
       </div>
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-2 sm:gap-4 items-center">
         <span>LF</span>
         <span className="hidden sm:inline">Python/Shell</span>
         <span>0:0:1</span>

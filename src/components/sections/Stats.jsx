@@ -20,9 +20,9 @@ function StatCard({ label, value, unit, color }) {
   };
 
   return (
-    <TerminalWindow className={`p-3 ${borderColors[color] || ""}`}>
+    <TerminalWindow className={`p-2 sm:p-3 ${borderColors[color] || ""}`}>
       <div className="text-comment text-[10px] mb-1">{label}</div>
-      <div className={`text-2xl font-bold ${textColors[color] || "text-accent"}`}>
+      <div className={`text-xl sm:text-2xl font-bold ${textColors[color] || "text-accent"}`}>
         {value} <span className="text-xs">{unit}</span>
       </div>
     </TerminalWindow>
@@ -34,7 +34,7 @@ function StatCard({ label, value, unit, color }) {
  */
 export default function Stats() {
   return (
-    <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
       {STATS.map((stat) => (
         <StatCard key={stat.label} {...stat} />
       ))}

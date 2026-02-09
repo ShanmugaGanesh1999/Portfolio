@@ -5,9 +5,9 @@
  */
 export default function Prompt({ command, className = "" }) {
   return (
-    <div className={`text-xl font-bold ${className}`}>
+    <div className={`text-base sm:text-xl font-bold ${className}`}>
       <span className="text-success font-bold">➜ </span>
-      {command}
+      <span className="break-all sm:break-normal">{command}</span>
     </div>
   );
 }

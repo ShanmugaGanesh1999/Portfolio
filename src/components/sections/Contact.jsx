@@ -39,15 +39,15 @@ export default function Contact() {
 
   return (
     <footer
-      className="space-y-4 border-t border-border pt-12 pb-24"
+      className="space-y-4 border-t border-border pt-8 sm:pt-12 pb-16 sm:pb-24"
       id="contact"
     >
       <Prompt command="sudo shutdown -h now" className="text-keyword" />
 
-      <div className="grid md:grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-8 sm:gap-12">
         {/* Left — CTA + Contact Info */}
         <div>
-          <h2 className="text-4xl font-black mb-6 leading-tight">
+          <h2 className="text-2xl sm:text-4xl font-black mb-4 sm:mb-6 leading-tight">
             LET'S <span className="text-accent italic">BUILD_</span>
             <br />
             <span className="text-success">NEXT_GEN_SYS</span>

@@ -180,7 +180,9 @@ export default function PrepPlatform({ course, filePath, onBack, onNavigate }) {
       .split("/")
       .map(encodeURIComponent)
       .join("/");
-    const url = `/${encodedBase}/${encodedFile}`;
+    // Use Vite's BASE_URL to handle both dev and production base paths
+    const baseUrl = import.meta.env.BASE_URL || '/';
+    const url = `${baseUrl}${encodedBase}/${encodedFile}`;
 
     fetch(url)
       .then((res) => {
@@ -224,7 +226,7 @@ export default function PrepPlatform({ course, filePath, onBack, onNavigate }) {
   return (
     <div className="min-h-full">
       {/* Breadcrumb bar */}
-      <div className="sticky top-0 z-10 bg-bg/95 backdrop-blur-sm border-b border-border px-4 py-2.5 flex items-center justify-between">
+      <div className="sticky top-0 z-10 bg-bg/95 backdrop-blur-sm border-b border-border px-2 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-xs text-comment overflow-x-auto min-w-0">
           <button
             onClick={onBack}
@@ -285,12 +287,12 @@ export default function PrepPlatform({ course, filePath, onBack, onNavigate }) {
           </button>
         </div>
       ) : (
-        <div className="max-w-4xl mx-auto px-4 md:px-8 py-6" ref={contentRef}>
+        <div className="max-w-4xl mx-auto px-2 sm:px-4 md:px-8 py-4 sm:py-6" ref={contentRef}>
           {/* File info bar */}
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/40">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 pb-3 border-b border-border/40 gap-2">
             <div className="flex items-center gap-2 text-[10px] text-comment">
               <Icon name="description" size="text-[12px]" />
-              <span className="text-text/60 font-bold">{filePath}</span>
+              <span className="text-text/60 font-bold truncate max-w-[200px] sm:max-w-none">{filePath}</span>
             </div>
             <div className={`text-[10px] font-bold text-${course.color} flex items-center gap-1`}>
               <Icon name={course.icon} size="text-[12px]" />

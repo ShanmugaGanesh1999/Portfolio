@@ -7,7 +7,7 @@ import { EXPERIENCE } from "../../data/portfolioData";
  */
 function ExperienceCard({ period, title, company, description, tags, tagColor, onOpenProject }) {
   return (
-    <TerminalWindow className="p-4 flex flex-col sm:flex-row gap-4">
+    <TerminalWindow className="p-3 sm:p-4 flex flex-col sm:flex-row gap-3 sm:gap-4">
       <div className="text-comment font-bold text-xs shrink-0 sm:w-32">
         [ {period} ]
       </div>

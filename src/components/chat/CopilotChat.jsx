@@ -21,7 +21,7 @@ function ChatMessage({ message }) {
         {/* Avatar - only for assistant */}
         {!isUser && (
           <div
-            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shrink-0 ${
               isError
                 ? "bg-keyword/15 text-keyword"
                 : "bg-success/15 text-success"
@@ -33,7 +33,7 @@ function ChatMessage({ message }) {
 
         {/* Message body */}
         <div
-          className={`max-w-[85%] text-[13px] leading-[1.6] ${
+          className={`max-w-[90%] sm:max-w-[85%] text-[12px] sm:text-[13px] leading-[1.6] ${
             isUser
               ? "bg-accent/10 border border-accent/20 rounded-2xl rounded-tr-md px-4 py-3 text-text"
               : isError
@@ -295,7 +295,7 @@ export default function CopilotChat({ isOpen, onClose }) {
   return (
     <div className="h-full flex flex-col bg-sidebar">
       {/* ── Header ── */}
-      <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 sm:py-3.5 border-b border-border shrink-0">
         <div className="w-7 h-7 rounded-lg bg-success/15 flex items-center justify-center">
           <Icon name="smart_toy" size="text-[16px]" className="text-success" />
         </div>
@@ -303,6 +303,14 @@ export default function CopilotChat({ isOpen, onClose }) {
           <div className="text-[14px] font-bold text-text">Copilot</div>
           <div className="text-[10px] text-comment uppercase tracking-wide">Ask about Shanmuga</div>
         </div>
+        <button
+          onClick={onClose}
+          className="w-8 h-8 rounded-lg flex items-center justify-center text-comment hover:text-white hover:bg-border/50 transition-colors cursor-pointer"
+          aria-label="Close Copilot"
+          title="Close Copilot"
+        >
+          <Icon name="close" size="text-[18px]" />
+        </button>
       </div>
 
       {/* ── Sessions Section (if there are messages) ── */}
@@ -327,7 +335,7 @@ export default function CopilotChat({ isOpen, onClose }) {
       )}
 
         {/* ── Messages Area ── */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 scrollbar-thin bg-bg">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 scrollbar-thin bg-bg">
           {messages.length === 0 ? (
             /* Empty state */
             <div className="flex flex-col items-start justify-start h-full gap-8 pt-8">
@@ -367,7 +375,7 @@ export default function CopilotChat({ isOpen, onClose }) {
 
         {/* ── Suggestions (when there are messages) ── */}
         {messages.length > 0 && !isLoading && (
-          <div className="px-4 pb-3 pt-2 border-t border-border/50 bg-sidebar/30 shrink-0">
+          <div className="px-3 sm:px-4 pb-3 pt-2 border-t border-border/50 bg-sidebar/30 shrink-0">
             <div className="text-[10px] font-bold text-comment uppercase tracking-widest mb-2">Suggestions</div>
             <div className="flex flex-wrap gap-1.5">
               {suggestions.slice(0, 2).map((q) => (
@@ -386,7 +394,7 @@ export default function CopilotChat({ isOpen, onClose }) {
         {/* ── Input Area ── */}
         <form
           onSubmit={handleSubmit}
-          className="px-4 py-3 border-t border-border bg-sidebar shrink-0"
+          className="px-3 sm:px-4 py-2.5 sm:py-3 border-t border-border bg-sidebar shrink-0"
         >
           {/* Model Selector */}
           <div className="mb-2.5 flex items-center justify-between">

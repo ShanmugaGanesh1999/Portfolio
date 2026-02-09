@@ -237,7 +237,7 @@ export default function ValidationDiagram() {
             {flow.label}
           </button>
         ))}
-        <div className="ml-auto flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-wrap sm:flex-nowrap sm:ml-auto">
           <button
             onClick={() => setZoom((z) => Math.max(z - 0.2, 0.4))}
             className="text-comment hover:text-white text-xs border border-border px-1.5 py-0.5 rounded"
@@ -282,7 +282,7 @@ export default function ValidationDiagram() {
       <div
         ref={containerRef}
         className="border border-border rounded-md bg-sidebar/30 overflow-hidden relative"
-        style={{ height: 480, cursor: isPanning ? "grabbing" : "grab" }}
+        style={{ height: typeof window !== 'undefined' && window.innerWidth < 640 ? 300 : 480, cursor: isPanning ? "grabbing" : "grab" }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}

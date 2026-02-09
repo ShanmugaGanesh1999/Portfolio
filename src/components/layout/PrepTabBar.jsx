@@ -34,7 +34,7 @@ export default function PrepTabBar({ courseId, activePath, onNavigate, onClose, 
   return (
     <div 
       className="h-full flex flex-col border-r border-border bg-sidebar shrink-0 relative"
-      style={{ width: `${width}px` }}
+      style={{ width: typeof window !== 'undefined' && window.innerWidth >= 768 ? `${width}px` : '260px' }}
     >
       {/* Header with course title and close button */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-border">

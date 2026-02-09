@@ -160,9 +160,9 @@ export default function RollupSummaryProject({ onBack }) {
   ];
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6 sm:space-y-10">
       {/* Breadcrumb bar */}
-      <div className="flex items-center gap-3 -mt-2">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 -mt-2">
         <button
           onClick={onBack}
           className="flex items-center gap-1 text-comment hover:text-white transition-colors text-xs group"
@@ -204,12 +204,12 @@ export default function RollupSummaryProject({ onBack }) {
 
         {/* ─── HLD / LLD Tab Switcher ─── */}
         <div className="border border-border rounded-md overflow-hidden">
-          <div className="flex bg-sidebar/60 border-b border-border">
+          <div className="flex bg-sidebar/60 border-b border-border overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-5 sm:py-3 text-xs sm:text-sm font-bold whitespace-nowrap border-b-2 transition-all ${
                   activeTab === tab.key
                     ? "border-current text-white bg-border/20"
                     : "border-transparent text-comment hover:text-white hover:bg-border/10"
@@ -244,7 +244,7 @@ export default function RollupSummaryProject({ onBack }) {
             <h3 className="text-sm text-variable font-bold">Functional Requirements</h3>
             <div className="space-y-2">
               {REQUIREMENTS.functional.map((req, i) => (
-                <div key={i} className="border border-border rounded-md p-4 bg-sidebar/20">
+                <div key={i} className="border border-border rounded-md p-3 sm:p-4 bg-sidebar/20">
                   <div className="flex items-start gap-2">
                     <span className="text-success text-xs font-bold shrink-0">[{i + 1}]</span>
                     <div>
@@ -259,7 +259,7 @@ export default function RollupSummaryProject({ onBack }) {
             <h3 className="text-sm text-variable font-bold pt-2">Non-Functional Requirements</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {REQUIREMENTS.nonFunctional.map((nfr) => (
-                <div key={nfr.label} className="border border-border rounded-md p-4 bg-sidebar/20">
+                <div key={nfr.label} className="border border-border rounded-md p-3 sm:p-4 bg-sidebar/20">
                   <div className="text-xs text-keyword font-bold mb-1">{nfr.label}</div>
                   <p className="text-xs text-comment leading-relaxed">{nfr.value}</p>
                 </div>
