@@ -13,9 +13,11 @@ import useResizableRight from "../../hooks/useResizableRight";
  */
 export default function Layout({ children, activeProject, onOpenProject }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopSidebarVisible, setDesktopSidebarVisible] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
   const [prepTabCourse, setPrepTabCourse] = useState(null);
-  const { width: chatWidth, isResizing, startResize } = useResizableRight(420, 320, 800);
+  const [prepTabVisible, setPrepTabVisible] = useState(true);
+  const { width: chatWidth, isResizing, startResize } = useResizableRight(420, 320, 800, () => setChatOpen(false), 150);
 
   // Parse prep routes to extract course ID
   const parsePrepRoute = (id) => {
@@ -38,6 +40,18 @@ export default function Layout({ children, activeProject, onOpenProject }) {
         >
           <Icon name={sidebarOpen ? "close" : "menu"} size="text-xl" />
         </button>
+
+        {/* Desktop sidebar toggle - show when sidebar is collapsed */}
+        {!desktopSidebarVisible && (
+          <button
+            className="hidden md:flex fixed bottom-8 left-4 z-50 bg-accent text-bg w-10 h-10 rounded-full items-center justify-center shadow-lg hover:bg-accent/90 transition-colors"
+            onClick={() => setDesktopSidebarVisible(true)}
+            aria-label="Open Explorer"
+            title="Open Explorer"
+          >
+            <Icon name="folder_open" size="text-[18px]" />
+          </button>
+        )}
 
         {/* Mobile Copilot FAB */}
         {!chatOpen && (
@@ -67,34 +81,64 @@ export default function Layout({ children, activeProject, onOpenProject }) {
         )}
 
         {/* Sidebar — always rendered, shown/hidden via CSS on mobile */}
-        <div
-          className={`${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 fixed md:relative z-50 md:z-auto transition-transform duration-200`}
-        >
-          <Sidebar 
-            activeProject={activeProject} 
-            onOpenProject={(id) => {
-              onOpenProject?.(id);
-              setSidebarOpen(false);
-            }}
-            onOpenPrepTab={(courseId) => {
-              setPrepTabCourse(courseId);
-              setSidebarOpen(false);
-            }}
-          />
-        </div>
+        {desktopSidebarVisible && (
+          <div
+            className={`${
+              sidebarOpen ? "translate-x-0" : "-translate-x-full"
+            } md:translate-x-0 fixed md:relative z-50 md:z-auto transition-transform duration-200`}
+          >
+            <Sidebar 
+              activeProject={activeProject} 
+              onOpenProject={(id) => {
+                onOpenProject?.(id);
+                setSidebarOpen(false);
+              }}
+              onOpenPrepTab={(courseId) => {
+                setPrepTabCourse(courseId);
+                setPrepTabVisible(true);
+                setSidebarOpen(false);
+              }}
+              onRequestClose={() => setDesktopSidebarVisible(false)}
+            />
+          </div>
+        )}
+
+        {/* Reopen Sidebar Button */}
+        {!desktopSidebarVisible && (
+          <button
+            onClick={() => setDesktopSidebarVisible(true)}
+            className="hidden md:flex items-center justify-center w-8 h-full border-r border-border bg-sidebar hover:bg-border/30 transition-colors group shrink-0"
+            title="Open Explorer"
+          >
+            <Icon name="folder_open" size="text-[18px]" className="text-comment group-hover:text-accent transition-colors" />
+          </button>
+        )}
 
         {/* Prep Tab Bar — shows folder contents when a prep course is selected */}
-        {prepTabCourse && (
+        {prepTabCourse && prepTabVisible && (
           <PrepTabBar
             courseId={prepTabCourse}
             activePath={activePrep?.filePath}
             onNavigate={(courseId, filePath) => {
               onOpenProject?.(`prep:${courseId}:${filePath}`);
             }}
-            onClose={() => setPrepTabCourse(null)}
+            onClose={() => {
+              setPrepTabCourse(null);
+              setPrepTabVisible(false);
+            }}
+            onRequestClose={() => setPrepTabVisible(false)}
           />
+        )}
+
+        {/* Reopen Prep Tab Button */}
+        {prepTabCourse && !prepTabVisible && (
+          <button
+            onClick={() => setPrepTabVisible(true)}
+            className="hidden md:flex items-center justify-center w-8 h-full border-r border-border bg-sidebar hover:bg-border/30 transition-colors group shrink-0"
+            title={`Open ${prepTabCourse === 'dsa' ? 'DSA' : 'System Design'} Files`}
+          >
+            <Icon name="description" size="text-[18px]" className="text-comment group-hover:text-accent transition-colors" />
+          </button>
         )}
 
 

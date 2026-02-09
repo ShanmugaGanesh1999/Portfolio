@@ -7,10 +7,10 @@ import useResizable from "../../hooks/useResizable";
  * PrepTabBar — Horizontal tab interface for prep folder contents
  * Shows when a prep folder (DSA/System Design) is selected in sidebar
  */
-export default function PrepTabBar({ courseId, activePath, onNavigate, onClose }) {
+export default function PrepTabBar({ courseId, activePath, onNavigate, onClose, onRequestClose }) {
   const [expandedSection, setExpandedSection] = useState(null);
   const [expandedSubsections, setExpandedSubsections] = useState(new Set());
-  const { width, isResizing, startResize } = useResizable(320, 250, 600);
+  const { width, isResizing, startResize } = useResizable(320, 250, 600, onRequestClose, 120);
   
   const course = PREP_COURSES.find((c) => c.id === courseId);
   if (!course) return null;

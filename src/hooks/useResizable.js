@@ -5,9 +5,11 @@ import { useState, useCallback, useEffect, useRef } from 'react';
  * @param {number} defaultWidth - Default width in pixels
  * @param {number} minWidth - Minimum width in pixels
  * @param {number} maxWidth - Maximum width in pixels
+ * @param {Function} onCollapse - Optional callback when width goes below collapse threshold
+ * @param {number} collapseThreshold - Width threshold to trigger auto-collapse (default: 120)
  * @returns {Object} - { width, isResizing, startResize }
  */
-export default function useResizable(defaultWidth = 256, minWidth = 200, maxWidth = 600) {
+export default function useResizable(defaultWidth = 256, minWidth = 200, maxWidth = 600, onCollapse = null, collapseThreshold = 120) {
   const [width, setWidth] = useState(defaultWidth);
   const [isResizing, setIsResizing] = useState(false);
   const startXRef = useRef(0);
@@ -21,7 +23,11 @@ export default function useResizable(defaultWidth = 256, minWidth = 200, maxWidt
 
   const handleMouseUp = useCallback(() => {
     setIsResizing(false);
-  }, []);
+    // Check if we should auto-collapse
+    if (onCollapse && width < collapseThreshold) {
+      onCollapse();
+    }
+  }, [width, collapseThreshold, onCollapse]);
 
   const startResize = useCallback((e) => {
     e.preventDefault();

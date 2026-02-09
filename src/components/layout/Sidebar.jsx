@@ -151,10 +151,10 @@ function FileLink({ label, icon, href, active = false, indent = false, external 
  * Sidebar — VS Code file-explorer with collapsible directories.
  * Sections collapse/expand with chevron toggles to save vertical space.
  */
-export default function Sidebar({ activeProject, onOpenProject, onOpenPrepTab }) {
+export default function Sidebar({ activeProject, onOpenProject, onOpenPrepTab, onRequestClose }) {
   const sectionIds = ["hero", "about", "expertise", "experience", "work", "contact"];
   const activeSection = useScrollSpy(sectionIds);
-  const { width, isResizing, startResize } = useResizable(256, 200, 500);
+  const { width, isResizing, startResize } = useResizable(256, 200, 500, onRequestClose, 120);
 
   // Group nav items by their section key
   const sections = NAV_ITEMS.reduce((acc, item) => {
