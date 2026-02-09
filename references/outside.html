@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SG_SYSTEM_v2.0 // TERMINAL_PORTFOLIO</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: "#0d1117",
+                        sidebar: "#161b22",
+                        text: "#c9d1d9",
+                        keyword: "#ff7b72",
+                        string: "#a5d6ff",
+                        comment: "#8b949e",
+                        function: "#d2a8ff",
+                        variable: "#ffa657",
+                        success: "#3fb950",
+                        accent: "#58a6ff",
+                    },
+                    fontFamily: {
+                        mono: ["'Space Mono'", "monospace"],
+                    },
+                },
+            },
+        };
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-bg text-text font-mono selection:bg-accent/30 selection:text-white;
+                scrollbar-width: thin;
+                scrollbar-color: #30363d #0d1117;
+            }
+        }
+        @layer components {
+            .terminal-window {
+                @apply border border-[#30363d] rounded-md overflow-hidden bg-bg;
+            }
+            .nav-item {
+                @apply flex items-center gap-2 py-1 px-3 hover:bg-[#30363d]/50 cursor-pointer text-sm transition-colors;
+            }
+            .nav-item.active {
+                @apply bg-[#30363d] text-accent;
+            }
+            .prompt::before {
+                content: "➜ ";
+                @apply text-success font-bold;
+            }
+            .dir-label {
+                @apply text-comment text-[10px] uppercase font-bold tracking-widest mt-4 mb-2 px-3;
+            }
+            .syntax-keyword { @apply text-keyword; }
+            .syntax-string { @apply text-string; }
+            .syntax-comment { @apply text-comment; }
+            .syntax-func { @apply text-function; }
+            .syntax-var { @apply text-variable; }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+<header class="h-10 border-b border-[#30363d] flex items-center px-4 justify-between bg-sidebar">
+<div class="flex items-center gap-4">
+<div class="flex gap-1.5">
+<div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+<div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+<div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+</div>
+<div class="text-xs text-comment">
+<span class="material-symbols-outlined text-[14px] align-middle">terminal</span>
+                shanmuga@sg-sys: ~/portfolio/v2.0
+            </div>
+</div>
+<div class="text-[10px] text-comment font-bold">SSH: 256-BIT ENCRYPTION ACTIVE</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<aside class="w-64 border-r border-[#30363d] bg-sidebar overflow-y-auto hidden md:block">
+<div class="p-4 border-b border-[#30363d]">
+<div class="text-accent font-bold text-sm">EXPLORER</div>
+</div>
+<div class="dir-label">Root_Directory</div>
+<a class="nav-item active" href="#hero">
+<span class="material-symbols-outlined text-[18px]">description</span> index.sh
+            </a>
+<div class="dir-label">Src_Components</div>
+<a class="nav-item" href="#about">
+<span class="material-symbols-outlined text-[18px]">folder_open</span> about_me/
+            </a>
+<div class="pl-4">
+<a class="nav-item" href="#about">
+<span class="material-symbols-outlined text-[18px]">person</span> bio.txt
+                </a>
+<a class="nav-item" href="#experience">
+<span class="material-symbols-outlined text-[18px]">history</span> career.log
+                </a>
+</div>
+<div class="dir-label">Lib_Modules</div>
+<a class="nav-item" href="#expertise">
+<span class="material-symbols-outlined text-[18px]">settings</span> tech_stack.json
+            </a>
+<a class="nav-item" href="#work">
+<span class="material-symbols-outlined text-[18px]">build</span> deployments.py
+            </a>
+<div class="dir-label">External_Links</div>
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined text-[18px]">link</span> github.com
+            </a>
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined text-[18px]">link</span> linkedin.com
+            </a>
+<div class="mt-auto p-4 absolute bottom-0 w-64 border-t border-[#30363d] bg-sidebar">
+<div class="text-[10px] text-success flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-success animate-pulse"></span> SYSTEM_ONLINE
+                </div>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto p-6 space-y-12">
+<section class="space-y-4" id="hero">
+<div class="text-comment text-xs"># Last login: <span id="current-date"></span> on ttys001</div>
+<div class="prompt text-xl font-bold">cat intro.ascii</div>
+<pre class="text-accent leading-none text-[8px] md:text-[10px]">  ██████  ██░ ██  ▄▄▄       ███▄    █  ███▄ ▄███▓ █    ██   ▄████  ▄▄▄      
+▒██    ▒ ▓██░ ██▒▒████▄     ██ ▀█   █ ▓██▒▀█▀ ██▒ ██  ▓██▒ ██▒ ▀█▒▒████▄    
+░ ▓██▄   ▒██▀▀██░▒██  ▀█▄  ▓██  ▀█ ██▒▓██    ▓██░▓██  ▒██░▒██░▄▄▄░▒██  ▀█▄  
+  ▒   ██▒░▓█ ░██ ░██▄▄▄▄██ ▓██▒  ▐▌██▒▒██    ▒██ ▓▓█  ░██░░▓█  ██▓░██▄▄▄▄██ 
+▒██████▒▒░▓█▒░██▓ ▓█   ▓██▒▒██░   ▓██░▒██▒   ░██▒▒▒█████▓ ░▒▓███▀▒ ▓█   ▓██▒
+▒ ▒▓▒ ▒ ░ ▒ ░░▒░▒ ▒▒   ▓▒█░░ ▒░   ▒ ▒ ░ ▒░   ░  ░░▒▓▒ ▒ ▒  ░▒   ▒  ▒▒   ▓▒█░
+░ ░▒  ░ ░ ▒ ░▒░ ░  ▒   ▒▒ ░░ ░░   ░ ▒░░  ░      ░░░▒░ ░ ░   ░   ░   ▒   ▒▒ ░
+░  ░  ░   ░  ░░ ░  ░   ▒      ░   ░ ░ ░      ░    ░░░ ░ ░ ░ ░   ░   ░   ▒   
+      ░   ░  ░  ░      ░  ░         ░        ░      ░           ░       ░  
+  ▄████  ▄▄▄       ███▄    █ ▓█████   ██████  ██░ ██ 
+ ██▒ ▀█▒▒████▄     ██ ▀█   █ ▓█   ▀ ▒██    ▒ ▓██░ ██▒
+▒██░▄▄▄░▒██  ▀█▄  ▓██  ▀█ ██▒▒███   ░ ▓██▄   ▒██▀▀██░
+░▓█  ██▓░██▄▄▄▄██ ▓██▒  ▐▌██▒▒▓█  ▄   ▒   ██▒░▓█ ░██ 
+░▒▓███▀▒ ▓█   ▓██▒▒██░   ▓██░░▒████▒▒██████▒▒░▓█▒░██▓
+ ░▒   ▒  ▒▒   ▓▒█░░ ▒░   ▒ ▒ ░░ ▒░ ░▒ ▒▓▒ ▒ ░ ▒ ░░▒░▒
+  ░   ░   ▒   ▒▒ ░░ ░░   ░ ▒░ ░ ░  ░░ ░▒  ░ ░ ▒ ░▒░ ░
+░ ░   ░   ░   ▒      ░   ░ ░    ░   ░  ░  ░   ░  ░░ ░
+      ░       ░  ░         ░    ░  ░      ░   ░  ░  ░
+                </pre>
+<div class="bg-[#30363d]/30 border-l-4 border-accent p-4">
+<p class="syntax-keyword">class <span class="syntax-func">SoftwareEngineer</span>:</p>
+<p class="pl-4"><span class="syntax-keyword">def</span> <span class="syntax-func">__init__</span>(self):</p>
+<p class="pl-8">self.role = <span class="syntax-string">"Backend Architect"</span></p>
+<p class="pl-8">self.specialty = [<span class="syntax-string">"Cloud Infrastructure"</span>, <span class="syntax-string">"Distributed Systems"</span>]</p>
+<p class="pl-8">self.focus = <span class="syntax-string">"High-performance Fintech Architectures"</span></p>
+</div>
+</section>
+<section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="terminal-window p-3 border-t-2 border-t-accent">
+<div class="text-comment text-[10px] mb-1">CPU_UPTIME</div>
+<div class="text-2xl font-bold text-accent">7.2 <span class="text-xs">YEARS</span></div>
+</div>
+<div class="terminal-window p-3 border-t-2 border-t-success">
+<div class="text-comment text-[10px] mb-1">THROUGHPUT</div>
+<div class="text-2xl font-bold text-success">1.8M <span class="text-xs">REC/HR</span></div>
+</div>
+<div class="terminal-window p-3 border-t-2 border-t-variable">
+<div class="text-comment text-[10px] mb-1">SYSTEM_SLA</div>
+<div class="text-2xl font-bold text-variable">99.98<span class="text-xs">%</span></div>
+</div>
+<div class="terminal-window p-3 border-t-2 border-t-keyword">
+<div class="text-comment text-[10px] mb-1">CERT_STACK</div>
+<div class="text-2xl font-bold text-keyword">05 <span class="text-xs">NODES</span></div>
+</div>
+</section>
+<section class="space-y-4" id="about">
+<div class="prompt">grep -r "narrative" ./bio.txt</div>
+<div class="terminal-window p-6 bg-sidebar/50">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-accent">info</span>
+<h2 class="text-xl font-bold">SYSTEM_OVERVIEW</h2>
+</div>
+<div class="grid md:grid-cols-2 gap-8 text-sm leading-relaxed">
+<p>
+<span class="text-success font-bold">&gt;&gt;&gt;</span> I am a results-driven Software Engineer with a passion for solving complex backend challenges. With over 7 years of hands-on experience, I specialize in designing microservices architectures and optimizing high-volume data pipelines.
+                        </p>
+<p>
+<span class="text-success font-bold">&gt;&gt;&gt;</span> My approach combines technical rigor with business alignment, ensuring systems are not only scalable but drive tangible ROI. I implement bank-grade security protocols as standard operational procedure.
+                        </p>
+</div>
+</div>
+</section>
+<section class="space-y-4" id="expertise">
+<div class="prompt">cat tech_stack.json | jq '.'</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="terminal-window p-4 border-l-4 border-l-success">
+<h3 class="text-success font-bold mb-3 flex items-center justify-between">
+<span>"Backend_Core"</span>
+<span class="text-[10px] bg-success/20 px-2 py-0.5 rounded">ENABLED</span>
+</h3>
+<ul class="space-y-1 text-sm text-comment">
+<li><span class="text-success">■</span> Java / Spring Boot</li>
+<li><span class="text-success">■</span> Apache Kafka</li>
+<li><span class="text-success">■</span> Microservices</li>
+<li><span class="text-success">■</span> REST &amp; GraphQL</li>
+</ul>
+</div>
+<div class="terminal-window p-4 border-l-4 border-l-accent">
+<h3 class="text-accent font-bold mb-3 flex items-center justify-between">
+<span>"Cloud_Infra"</span>
+<span class="text-[10px] bg-accent/20 px-2 py-0.5 rounded">STABLE</span>
+</h3>
+<ul class="space-y-1 text-sm text-comment">
+<li><span class="text-accent">■</span> AWS (EC2/S3/Lambda)</li>
+<li><span class="text-accent">■</span> Terraform (IaC)</li>
+<li><span class="text-accent">■</span> Docker / K8s</li>
+<li><span class="text-accent">■</span> CI/CD Pipelines</li>
+</ul>
+</div>
+</div>
+</section>
+<section class="space-y-4" id="experience">
+<div class="prompt">tail -f career.log</div>
+<div class="space-y-3">
+<div class="terminal-window p-4 border border-[#30363d] flex gap-4">
+<div class="text-comment font-bold text-xs shrink-0 w-32">[ 2022-PRES ]</div>
+<div class="space-y-2">
+<div class="text-accent font-bold">Software Engineer @ Musk &amp; Gale</div>
+<p class="text-xs text-comment">Migrated legacy monoliths to microservices, reducing deployment time by 40%. Architecting cloud-native financial applications handling high-volume transaction throughput.</p>
+<div class="flex gap-2">
+<span class="text-[9px] border border-success/30 px-1 text-success">JAVA</span>
+<span class="text-[9px] border border-success/30 px-1 text-success">AWS</span>
+<span class="text-[9px] border border-success/30 px-1 text-success">K8S</span>
+</div>
+</div>
+</div>
+<div class="terminal-window p-4 border border-[#30363d] flex gap-4">
+<div class="text-comment font-bold text-xs shrink-0 w-32">[ 2018-2021 ]</div>
+<div class="space-y-2">
+<div class="text-accent font-bold">Technical Staff @ Zoho Corporation</div>
+<p class="text-xs text-comment">Core developer for Zoho Finance Suite. Optimized DB queries reducing report generation time by 30% for 500k+ global businesses.</p>
+<div class="flex gap-2">
+<span class="text-[9px] border border-accent/30 px-1 text-accent">JAVA</span>
+<span class="text-[9px] border border-accent/30 px-1 text-accent">POSTGRES</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="space-y-4" id="work">
+<div class="prompt">./list_deployments.sh --verbose</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+<div class="terminal-window flex flex-col group">
+<div class="h-32 bg-sidebar border-b border-[#30363d] flex items-center justify-center overflow-hidden relative">
+<pre class="text-[6px] text-success/50 leading-[5px] select-none">  /|   /|   /|   /|   /|   /|   /|   /|   /|
+ / |  / |  / |  / |  / |  / |  / |  / |  / |
+|  |_|  |_|  |_|  |_|  |_|  |_|  |_|  |_|  |
+|                                          |
+|   __/\__      __/\__      __/\__        |
+|  /      \    /      \    /      \       |
+|_/        \__/        \__/        \______/
+                            </pre>
+<div class="absolute top-2 right-2 text-[8px] font-bold text-success animate-pulse">LIVE_FEED</div>
+</div>
+<div class="p-4 space-y-2">
+<h3 class="text-variable font-bold">Market Data Aggregation Platform</h3>
+<p class="text-xs text-comment">High-frequency trading data platform processing 1.8M records per hour with 30% latency reduction.</p>
+<div class="flex justify-between items-center border-t border-[#30363d] pt-3 mt-3">
+<span class="text-[10px] text-accent font-mono">STATUS: DEPLOYED</span>
+<a class="material-symbols-outlined text-sm hover:text-white" href="#">open_in_new</a>
+</div>
+</div>
+</div>
+<div class="terminal-window p-4 flex flex-col justify-between bg-sidebar/40">
+<div>
+<div class="text-[10px] text-keyword font-bold mb-2">SECURITY_SUBSYSTEM</div>
+<h3 class="text-variable font-bold text-lg">OAuth2 SSO &amp; IAM</h3>
+<p class="text-xs text-comment mt-2 italic">Identity and Access Management system implementing OAuth2/OIDC for secure single sign-on across enterprise applications.</p>
+</div>
+<div class="mt-6">
+<div class="w-full bg-[#30363d] h-1.5 rounded-full overflow-hidden">
+<div class="bg-keyword h-full w-[95%]"></div>
+</div>
+<div class="flex justify-between mt-1">
+<span class="text-[8px] text-comment">SECURITY_SCORE</span>
+<span class="text-[8px] text-keyword">95%</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="space-y-4">
+<div class="prompt">cat credentials.log</div>
+<div class="terminal-window bg-sidebar/20 p-4">
+<div class="flex flex-wrap gap-4">
+<div class="flex items-center gap-2 text-xs bg-[#30363d] px-3 py-1.5 rounded-md border border-accent/20">
+<span class="material-symbols-outlined text-accent text-sm">verified</span>
+<span>AWS ARCHITECT</span>
+</div>
+<div class="flex items-center gap-2 text-xs bg-[#30363d] px-3 py-1.5 rounded-md border border-success/20">
+<span class="material-symbols-outlined text-success text-sm">verified</span>
+<span>K8S ADMIN (CKA)</span>
+</div>
+<div class="flex items-center gap-2 text-xs bg-[#30363d] px-3 py-1.5 rounded-md border border-keyword/20">
+<span class="material-symbols-outlined text-keyword text-sm">verified</span>
+<span>ORACLE JAVA PRO</span>
+</div>
+<div class="flex items-center gap-2 text-xs bg-[#30363d] px-3 py-1.5 rounded-md border border-variable/20">
+<span class="material-symbols-outlined text-variable text-sm">verified</span>
+<span>TERRAFORM ASSOC</span>
+</div>
+</div>
+</div>
+</section>
+<footer class="space-y-4 border-t border-[#30363d] pt-12 pb-24" id="contact">
+<div class="prompt text-keyword font-bold">sudo shutdown -h now</div>
+<div class="grid md:grid-cols-2 gap-12">
+<div>
+<h2 class="text-4xl font-black mb-6 leading-tight">
+                            LET'S <span class="text-accent italic">BUILD_</span><br/>
+<span class="text-success">NEXT_GEN_SYS</span>
+</h2>
+<div class="space-y-4 text-sm">
+<p class="flex items-center gap-3">
+<span class="text-comment">EMAIL:</span>
+<a class="text-variable hover:underline" href="mailto:hello@shanmuga.dev">hello@shanmuga.dev</a>
+</p>
+<p class="flex items-center gap-3">
+<span class="text-comment">LOC:</span>
+<span class="text-text">New York, NY</span>
+</p>
+<p class="text-comment text-xs italic mt-4">
+                                [!] SYSTEM_STATUS: Seeking full-time roles in Fintech / Cloud Infra. H1B sponsorship transfer required.
+                            </p>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<a class="terminal-window p-4 hover:bg-[#30363d]/50 transition-colors flex items-center justify-between group" href="#">
+<div>
+<div class="text-xs font-bold text-accent">GET_RESUME.PDF</div>
+<div class="text-[10px] text-comment">v2.4_FINAL_BUILD</div>
+</div>
+<span class="material-symbols-outlined text-comment group-hover:text-accent">download</span>
+</a>
+<a class="terminal-window p-4 hover:bg-[#30363d]/50 transition-colors flex items-center justify-between group" href="#">
+<div>
+<div class="text-xs font-bold text-success">SCHEDULE_SYNC.EXE</div>
+<div class="text-[10px] text-comment">AUTO_CALENDLY_TRIGGER</div>
+</div>
+<span class="material-symbols-outlined text-comment group-hover:text-success">event</span>
+</a>
+</div>
+</div>
+<div class="flex justify-between items-center pt-12 text-[10px] text-comment">
+<div>© 2024 SHANMUGA GANESH // KERNEL_VER: 5.15.0-GENERIC</div>
+<div class="flex gap-4">
+<a class="hover:text-accent" href="#">GH</a>
+<a class="hover:text-accent" href="#">LI</a>
+<a class="hover:text-accent" href="#">TW</a>
+</div>
+</div>
+</footer>
+</main>
+</div>
+<footer class="h-6 bg-accent text-bg px-3 flex items-center justify-between text-[10px] font-bold">
+<div class="flex gap-4">
+<span>MASTER</span>
+<span>+ 14,302 lines</span>
+<span>UTF-8</span>
+</div>
+<div class="flex gap-4">
+<span>LF</span>
+<span>Python/Shell</span>
+<span>0:0:1</span>
+</div>
+</footer>
+<script>
+        document.getElementById('current-date').textContent = new Date().toLocaleString();
+    </script>
+
+</body></html>
