@@ -1,6 +1,6 @@
-# Zoho Corporation — MTS Full Stack Developer
+# ZOHO Corporation - MTS (Full Stack Software Developer - CRM)
 
-**Period:** January 2022 – December 2023  
+**Period:** January 2022 - December 2023  
 **Location:** Chennai, India  
 **Tags:** `JAVA` · `KAFKA` · `REDIS` · `MICROSERVICES`
 
@@ -8,17 +8,16 @@
 
 ## Role Summary
 
-Member of Technical Staff (MTS) Full Stack Developer at Zoho Corporation, building high-scale CRM backend systems including tax configuration engines, validation pipelines, rollup aggregation services, and user activity tracking features.
+Member of Technical Staff (MTS) Full Stack Software Developer for ZOHO CRM, building Java backend systems for tax configuration, custom validation rules, rollup summary processing, and recent item retrieval.
 
 ---
 
 ## Key Accomplishments
 
-- Enhanced **Tax Configuration system** with API versioning, reducing compatibility issues across 7 integrated systems
-- Built **NIO-based validation engine** processing **2.3M records/hour**
-- Developed **Kafka/Redis-powered rollup** automating **6,500+ weekly aggregation tasks**
-- Implemented data pipeline achieving **99.9% uptime** with **36% latency improvement**
-- Designed **Recent Items feature** tracking user activity across all CRM modules with **sub-100ms retrieval**
+- Revamped the **Tax Configuration system** using Java and API versioning technique, enabling backward compatible tax workflows across **7+ integrated systems**.
+- Built **Java NIO based Custom Validation Rules** for CRM record creation and edit flows, processing **2.3M records per hour** with non blocking validation logic.
+- Built a **Kafka based Rollup Summary pipeline** to instantly update parent aggregation fields from child record changes, processing up to **1.8M record events per second**.
+- Rebuilt **Zoho CRM Recent Items** storage to cache each user's latest **20 records**, reducing retrieval latency by **50%** for faster record navigation.
 
 ---
 
@@ -27,7 +26,7 @@ Member of Technical Staff (MTS) Full Stack Developer at Zoho Corporation, buildi
 **Status:** PRODUCTION  
 **Tech Stack:** Java, PostgreSQL, Redis, Kafka, DynamoDB
 
-> API-versioned tax system across 7 integrated systems with NIO-based validation at 2.3M records/hour. Kafka/Redis rollup automating 6,500+ weekly aggregation tasks.
+> Java and API versioning based tax workflow across 7+ integrated systems, paired with NIO-based validation at 2.3M records per hour and Kafka based rollup processing up to 1.8M record events per second.
 
 ### Functional Requirements
 
@@ -81,7 +80,7 @@ ALB → API Gateway (Kong + Rate Limiter)
 **Status:** PRODUCTION  
 **Tech Stack:** Java, Kafka, Redis, PostgreSQL, NIO
 
-> NIO-based async validation processing pipeline handling 2.3M records/hour with <100ms real-time validation latency.
+> Java NIO based Custom Validation Rules system for CRM record creation and edit flows, processing 2.3M records per hour with non blocking validation logic.
 
 ### Functional Requirements
 
@@ -135,7 +134,7 @@ ALB → API Gateway (Kong)
 **Status:** PRODUCTION  
 **Tech Stack:** Java, Kafka, Redis, PostgreSQL, Microservices
 
-> Event-driven rollup aggregation system automating 6,500+ weekly tasks with P99 <100ms recalculation and P99 <50ms reads.
+> Kafka based Rollup Summary pipeline that instantly updates parent aggregation fields from child record changes, processing up to 1.8M record events per second.
 
 ### Functional Requirements
 
@@ -189,7 +188,7 @@ API Gateway (Kong) → Record Service (Java) → PostgreSQL (Transactional Data)
 **Status:** PRODUCTION  
 **Tech Stack:** Java, Kafka, Redis, PostgreSQL, Microservices
 
-> User activity tracking across all CRM modules with sub-100ms retrieval using Redis Sorted Sets.
+> User activity tracking across all CRM modules, caching each user's latest 20 records and reducing retrieval latency by 50% for faster record navigation.
 
 ### Functional Requirements
 

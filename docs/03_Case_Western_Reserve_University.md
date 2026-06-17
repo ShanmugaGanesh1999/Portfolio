@@ -1,121 +1,60 @@
-# Case Western Reserve University — Access Services Specialist
+# Case Western Reserve University - Software Engineer (Biotech)
 
-**Period:** January 2024 – May 2025  
+**Period:** March 2026 - Present  
 **Location:** Cleveland, OH  
-**Tags:** `JAVA` · `SPRING BOOT` · `OAUTH2` · `AWS` · `ORACLE`
+**Tags:** `PYTHON` · `HPC` · `MICROBIOME` · `AI` · `ML`
 
 ---
 
 ## Role Summary
 
-Access Services Specialist responsible for designing and building a centralized Identity & Access Management (IAM) platform for campus-wide services, using Java microservices and Spring Security with OAuth2 SSO.
+Software Engineer (Biotech) at Case Western Reserve University, building AI assisted microbiome quality systems, Python HPC sequencing pipelines, and ML ready microbiome data workflows.
 
 ---
 
 ## Education
 
-- **Degree:** MS Computer Science
+- **Degree:** Master's in Computer Science
 - **GPA:** 3.78 / 4.0
-- **Graduation:** 2025
-- **Coursework:** Distributed Systems, Advanced Algorithms, OS, Networking, Database Management, Software Engineering
+- **Completed:** January 2025
+- **Location:** Cleveland, OH
 
 ---
 
 ## Key Accomplishments
 
-- Led migration to a **centralized IAM platform** implementing OAuth2 SSO with Spring Security & Java microservices
-- Reduced **duplicate logins by 60%** through unified authentication architecture
-- Engineered **RBAC and attribute-based access policies**, cutting manual reviews by **50%**
-- Achieved **sub-200ms response times** and **99.9% uptime** across all identity services
+- Built an **AI assisted microbiome quality system**, reducing **false positive carryover by 35%** through automated feature validation, statistical filtering, and metadata anomaly detection.
+- Engineered a **Python HPC sequencing pipeline**, reducing **analysis turnaround by 30%** across ingestion, quality control, taxonomy profiling, and microbiome analytics.
+- Designed **ML ready microbiome data workflows**, improving **pipeline reproducibility by 40%** through standardized metadata validation, automated quality checks, and structured execution logic.
 
 ---
 
-## Project: Campus-Wide IAM Platform
+## Project: AI Assisted Microbiome Quality System
 
-**Status:** DEPLOYED  
-**Tech Stack:** Java, Spring Boot, OAuth2, Kafka, PostgreSQL
+**Tech Stack:** Python, HPC workflows, statistical filtering, metadata validation, ML ready data processing
 
-> Centralized Identity & Access Management using Spring Security, OAuth2/OIDC, and Java microservices. Reduced duplicate logins by 60%, authentication tickets by 35%, sub-200ms response times.
+> AI assisted microbiome analytics workflow for quality validation, carryover detection, standardized execution, and reproducible downstream analysis.
 
-### Functional Requirements
+### Functional Scope
 
-| Requirement                             | Details                                                                                                                                              |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Single Sign-On (SSO)                    | Users authenticate once via OAuth2/OIDC and access all campus services (dining, parking, library, labs) without re-login                             |
-| Fine-Grained Access Control             | RBAC and ABAC policies for physical access (door readers, parking gates), digital resources, and time-bound permissions (e.g., "CS lab Mon-Fri 8am-10pm") |
-| Real-Time Provisioning & Deprovisioning | Sync user attributes (enrollment status, department, roles) from LDAP/AD to downstream systems within 5 minutes; revoke access immediately on termination |
+| Area | Description |
+| ---- | ----------- |
+| Microbiome Quality Validation | Automated feature validation and statistical filtering to reduce false positive carryover |
+| Metadata Anomaly Detection | Structured metadata checks to identify suspicious or inconsistent sample annotations |
+| HPC Sequencing Pipeline | Python pipeline covering ingestion, quality control, taxonomy profiling, and microbiome analytics |
+| Reproducibility Controls | Standardized metadata validation, automated quality checks, and structured execution logic |
 
-### Non-Functional Requirements
+### Measured Outcomes
 
-| Attribute    | Target                                                                                                                             |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Consistency  | Strong Consistency for authentication/authorization decisions (cannot grant access based on stale revocation data); Eventual Consistency for audit logs |
-| Latency      | <200ms p95 for AuthZ API calls, <500ms for SSO token issuance                                                                       |
-| Availability | 99.9% uptime (campus lockout is unacceptable)                                                                                       |
+| Metric | Impact |
+| ------ | ------ |
+| False Positive Carryover | Reduced by 35% |
+| Analysis Turnaround | Reduced by 30% |
+| Pipeline Reproducibility | Improved by 40% |
 
-### Scale Estimates
+### Engineering Focus
 
-```
-Assumptions:
-  50,000 total users (students/faculty/staff)
-  70% DAU, 15 auth checks/day/user (door swipes, app logins, API calls)
-
-Total Auth Requests/sec:
-  50,000 × 0.7 × 15 / 86,400 ≈ 6 QPS avg
-  Peak (3x): ~20 QPS
-
-Storage (1-year retention):
-  Auth events: 6 QPS × 86,400 × 365 × 500 bytes ≈ 95 GB/year
-  User profiles + policies: 50K users × 10 KB ≈ 500 MB (negligible)
-
-Justification:
-  Low QPS allows single-region deployment; focus is on sub-200ms
-  latency via aggressive caching and optimized DB queries, not horizontal scale.
-```
-
-### System Architecture (High-Level)
-
-```
-Client (Web / Mobile / Card Readers)
-    ↓
-AWS ALB (Load Balancer)
-    ↓
-API Gateway (Kong + OAuth2)
-    ├── Auth Service (Spring Boot) → User Store (PostgreSQL) + Token Cache (Redis) + S3
-    ├── Authz Service (Spring Boot) → Policy Cache (Caffeine/Redis) + Policy DB (PostgreSQL)
-    └── Provisioning Service (Spring Boot) → LDAP/AD + Kafka
-                                                ↓
-                                          Kafka → Downstream Services
-                                                ↓
-                                          Audit Logger → DynamoDB (Audit Trail)
-```
-
-**Key Components:**
-
-| Component          | Technology    | Description                                                                                                      |
-| ------------------ | ------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Auth Service       | Spring Boot   | OAuth2 token issuance (password grant, refresh rotation). Validates credentials against PostgreSQL, caches JWTs in Redis |
-| Authz Service      | Spring Boot   | Policy Decision Point — evaluates RBAC + ABAC. Two-tier cache: L1 Caffeine (60s TTL) → L2 Redis (5min TTL) → PostgreSQL |
-| Provisioning Svc   | Spring Boot   | Syncs user attributes from LDAP/AD every 15 minutes. Publishes UserUpdated events to Kafka                        |
-| User Store         | PostgreSQL    | Primary user database — users, user_roles, credentials. Indexed on user_id and status                             |
-| Token Cache        | Redis         | Session/token cache for O(1) lookups                                                                              |
-| Audit Logger       | DynamoDB      | Immutable audit trail for compliance                                                                              |
-
-### Low-Level Design Highlights
-
-**Pattern:** OAuth2 Token Lifecycle + Hybrid RBAC/ABAC Policy Evaluation
-
-| Entity                | Description                                                                                  |
-| --------------------- | -------------------------------------------------------------------------------------------- |
-| User                  | Immutable identity record with userId, roles, and attributes from LDAP/AD                    |
-| AuthToken             | JWT with tokenId, expiry, claims, and signature for session management                       |
-| AccessPolicy          | RBAC role + ABAC conditions with resource pattern matching and Predicate evaluation          |
-| AuthorizationDecision | PERMIT/DENY result with reason and list of applied policy IDs                                |
-
-**Concurrency Model:**
-- ConcurrentHashMap for lock-free token reads (95% workload)
-- ReentrantReadWriteLock for policy cache — concurrent `authorize()` with exclusive `provisionRole()` writes
-- 10K concurrent users; read-heavy workload (95% reads); policy updates <1% writes
-- JWT access tokens: 3600s expiry; refresh tokens: 7 days; single active session per user
-
----
+- Build reliable Python data workflows for sequencing and microbiome analytics.
+- Make validation and quality checks repeatable across pipeline runs.
+- Prepare microbiome data outputs for downstream ML ready analysis.
+- Improve data quality and reduce manual review overhead through automation.

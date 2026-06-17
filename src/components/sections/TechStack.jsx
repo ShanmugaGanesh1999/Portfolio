@@ -10,6 +10,7 @@ function TechCategory({ title, status, statusColor, items }) {
     accent: "border-l-4 border-l-accent",
     variable: "border-l-4 border-l-variable",
     keyword: "border-l-4 border-l-keyword",
+    func: "border-l-4 border-l-func",
   };
 
   const textColors = {
@@ -17,6 +18,7 @@ function TechCategory({ title, status, statusColor, items }) {
     accent: "text-accent",
     variable: "text-variable",
     keyword: "text-keyword",
+    func: "text-func",
   };
 
   const bgColors = {
@@ -24,6 +26,7 @@ function TechCategory({ title, status, statusColor, items }) {
     accent: "bg-accent/20",
     variable: "bg-variable/20",
     keyword: "bg-keyword/20",
+    func: "bg-func/20",
   };
 
   const dotColors = {
@@ -31,6 +34,7 @@ function TechCategory({ title, status, statusColor, items }) {
     accent: "text-accent",
     variable: "text-variable",
     keyword: "text-keyword",
+    func: "text-func",
   };
 
   return (

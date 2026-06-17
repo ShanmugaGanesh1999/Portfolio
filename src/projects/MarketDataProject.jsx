@@ -16,7 +16,7 @@ import {
 // ──────────────────────────────────────
 // Section wrapper — collapsible terminal-style
 // ──────────────────────────────────────
-function Section({ id, title, command, children, defaultOpen = true }) {
+function Section({ id, command, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <section className="space-y-3" id={id}>
@@ -197,9 +197,9 @@ export default function MarketDataProject({ onBack }) {
           # {PROJECT_META.title}
         </h1>
         <p className="text-sm text-comment leading-relaxed">
-          A deep dive into the architecture I designed and built at Musk and Gale for the Market Data Aggregation
-          Platform — ingesting 50K events/sec from 10+ financial data providers with &lt;500ms latency via Kafka,
-          in-memory OHLCV windowing, and TimescaleDB batch writes.
+          A deep dive into the Java and Python based Market Data Aggregation Platform I built at Musk and Gale -
+          combining a Python Django REST backend, React service calls, real time WebSocket and Celery processing,
+          and PostgreSQL models that improved secure financial query performance by 41%.
         </p>
       </div>
 

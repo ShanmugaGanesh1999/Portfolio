@@ -6,9 +6,9 @@ export const PROJECT_META = {
   title: "Market Data Aggregation Platform",
   subtitle: "System Design Deep Dive",
   company: "Musk and Gale",
-  role: "Software Engineer",
+  role: "Software Engineer (Fintech)",
   period: "JUN 2025 – PRESENT",
-  tags: ["PYTHON", "DJANGO", "KAFKA", "TIMESCALEDB", "REDIS", "AWS"],
+  tags: ["JAVA", "PYTHON", "DJANGO", "REACT", "POSTGRESQL", "AWS"],
   status: "DEPLOYED",
 };
 
@@ -536,4 +536,4 @@ export const BOTTLENECKS = {
 };
 
 export const SUMMARY =
-  "This platform processes 50K events/sec from 10+ financial data providers with <500ms ingestion latency and <100ms query response (p95). The architecture decouples ingestion via Kafka, uses in-memory OHLCV windowing to avoid per-event DB writes, and batch-flushes to TimescaleDB every 10 seconds. Redis handles deduplication and query caching, while Celery workers archive cold data to S3 Parquet. The system achieves 99.98% uptime with eventual consistency on the write path and strong consistency for compliance queries — processing 1.8M records/hour with 2.2 TB/day storage throughput.";
+  "This Java and Python based Market Data Aggregation Platform uses a Python Django REST backend with React frontend service calls, real time WebSocket and Celery processing, and PostgreSQL data models for secure financial aggregation. The platform reaches 1.8M records per hour, reduces API latency by 32%, and improves query performance by 41% through indexing, normalized schemas, and encrypted data handling.";

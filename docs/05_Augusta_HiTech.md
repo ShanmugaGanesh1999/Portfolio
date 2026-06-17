@@ -1,110 +1,50 @@
-# Augusta HiTech Software Solution — Junior Associate (Full Stack Developer)
+# Augusta Hitech Software Solution - Junior Associate (Full Stack Software Developer)
 
-**Period:** November 2018 – December 2021  
+**Period:** November 2020 - December 2021  
 **Location:** Coimbatore, India  
-**Tags:** `PYTHON` · `ANGULAR` · `FLUTTER` · `ML`
+**Tags:** `ANGULAR` · `NODE.JS` · `CRM` · `API`
 
 ---
 
 ## Role Summary
 
-Junior Associate (Full Stack Developer) at Augusta HiTech, building ML-powered lead scoring and CRM pipeline automation systems that significantly boosted sales conversion and revenue.
+Junior Associate (Full Stack Software Developer) at Augusta Hitech, building Angular and Node.js CRM modules for marketing and sales workflows, reusable UI components, API integrations, dashboards, and lead allocation workflows.
 
 ---
 
 ## Key Accomplishments
 
-- Implemented **ML-driven lead allocation** using Python & scikit-learn, reducing manual errors by **22%**
-- Built **backend APIs and data pipelines** powering CRM workflows
-- Improved lead conversion from **5,500 to 8,800 annually** (+60% increase)
-- Generated **$240,000 additional annual revenue** through automation
+- Developed **Angular and Node.js CRM modules** for marketing and sales workflows, improving customer engagement by **32%** through reusable UI components and API integrations.
+- Built **Node.js lead allocation workflows** with Angular dashboards, increasing qualified lead retention by **60%** through automated routing and improved sales process visibility.
 
 ---
 
-## Project: ML Lead Scoring & CRM Pipeline
+## Project: CRM Lead Allocation Workflow
 
 **Status:** OPERATIONAL  
-**Tech Stack:** Python, scikit-learn, Angular, PostgreSQL, Redis, Celery, RabbitMQ
+**Tech Stack:** Angular, Node.js, CRM workflows, dashboards, API integrations
 
-> Python + scikit-learn ML-driven lead allocation integrated into CRM workflows. Boosted lead conversion from 5,500 to 8,800 annually (+60%), generating $240K additional revenue.
+> Angular and Node.js CRM workflows for marketing and sales operations. Improved customer engagement by 32% and increased qualified lead retention by 60% through automated routing and clearer dashboard visibility.
 
-### Functional Requirements
+### Functional Scope
 
-| Requirement                  | Details                                                                                                                      |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| ML-Driven Lead Scoring       | Train and serve a Gradient Boosting model on 50+ lead features (firmographics, engagement, behavioral data) with >82% accuracy |
-| Intelligent Lead Allocation  | Auto-assign scored leads to sales reps based on lead quality tier, rep capacity, expertise matching, and round-robin fairness — reducing manual allocation errors by 22% |
-| CRM Workflow Automation      | Trigger automated follow-up sequences, task creation, and pipeline stage transitions based on lead score thresholds and engagement events |
+| Area | Description |
+| ---- | ----------- |
+| CRM Modules | Angular UI modules for marketing and sales workflows |
+| API Integrations | Node.js APIs connecting CRM workflows and routing logic |
+| Lead Allocation | Automated routing workflows for qualified leads |
+| Dashboards | Angular dashboards for improved sales process visibility |
 
-### Non-Functional Requirements
+### Measured Outcomes
 
-| Attribute    | Target                                                                                                            |
-| ------------ | ----------------------------------------------------------------------------------------------------------------- |
-| Latency      | <200ms for real-time lead scoring API, <500ms for allocation decisions, <2s for bulk re-scoring (1,000 leads)      |
-| Accuracy     | >82% classification accuracy, <5% false positive rate on high-quality leads (prevents wasted rep time)             |
-| Availability | 99.5% uptime for scoring API; batch training pipeline tolerates overnight maintenance windows                      |
+| Metric | Impact |
+| ------ | ------ |
+| Customer Engagement | Improved by 32% |
+| Qualified Lead Retention | Increased by 60% |
 
-### Scale Estimates
+### Engineering Focus
 
-```
-Lead Volume:
-  15,000 new leads/month × 12 months = 180,000 leads/year
-  Peak: 800 leads/day during campaign launches
-
-Scoring Requests:
-  180K leads × 3 re-scores/lifecycle = 540K scoring requests/year
-  ~1,500/day → ~0.02 QPS avg, peak burst: 50 QPS
-
-Feature Computation:
-  50 features × 180K leads = 9M feature values/year
-  Real-time features: 12 (engagement-based)
-  Batch features: 38 (firmographic + historical)
-
-Model Training:
-  Weekly retrain on 180K labeled records
-  Training time: ~45 min (Gradient Boosting, 500 estimators)
-```
-
-### System Architecture (High-Level)
-
-```
-CRM Frontend (Angular SPA)
-  ↓
-API Gateway (Nginx + Flask)
-  ├── Lead Ingestion (Flask API) → RabbitMQ → Feature Engine (Python/Pandas) → Feature Store (Redis + PostgreSQL)
-  ├── Scoring Service (Flask + scikit-learn) → Model Registry (MLflow) + Feature Store
-  └── Allocation Engine (Flask) → Allocation DB (PostgreSQL) + Redis (Rep Capacity Cache)
-                                    ↓
-                              Notification Service → Email/Slack/CRM Task Creation
-```
-
-**Key Components:**
-
-| Component        | Technology            | Description                                                                                               |
-| ---------------- | --------------------- | --------------------------------------------------------------------------------------------------------- |
-| Lead Ingestion   | Flask API             | Ingests leads from web forms, email campaigns, social media APIs, and CSV uploads. Validates and deduplicates |
-| Feature Engine   | Python / Pandas       | Computes 50+ ML features per lead — firmographic, behavioral, and engagement signals                       |
-| Feature Store    | Redis + PostgreSQL    | Dual-layer: Redis for 12 real-time engagement signals (1hr TTL), PostgreSQL for 38 batch features          |
-| Scoring Service  | Flask + scikit-learn  | Core ML inference — loads trained model, fetches features, returns probability score (0.0–1.0) and tier (A/B/C/D). Sub-200ms latency |
-| Model Registry   | MLflow                | Tracks model versions with accuracy/F1 metrics for champion/challenger promotion                           |
-| Allocation Engine| Flask                 | Assigns scored leads via weighted multi-factor algorithm (expertise, capacity, fairness, geography)        |
-| RabbitMQ         | Message Queue         | Decouples scoring from allocation. Queues: lead.new, lead.score, lead.allocate, lead.notify. 3x retry DLQ |
-
-### Low-Level Design Highlights
-
-**Pattern:** Python + scikit-learn Strategy Pattern
-
-| Entity             | Description                                                                          |
-| ------------------ | ------------------------------------------------------------------------------------ |
-| Lead               | CRM lead record with features, ML score, tier, and allocation status                |
-| FeatureVector      | 50+ computed features (firmographic + behavioral + engagement)                       |
-| ScoringResult      | ML prediction output — probability, tier, confidence, and feature importance        |
-| AllocationDecision | Rep assignment result with match score and allocation rationale                      |
-
-**ML Pipeline:**
-- Gradient Boosting classifier with 500 estimators
-- Weekly automated retraining with champion/challenger promotion and rollback
-- Historical CRM data with 5,500+ conversions/year provides training labels
-- RabbitMQ decouples scoring from allocation — scoring API returns immediately, allocation runs async
-
----
+- Build reusable Angular UI components for CRM workflows.
+- Connect frontend dashboards with Node.js API workflows.
+- Improve visibility into lead routing and sales process state.
+- Reduce manual routing friction through automated allocation logic.

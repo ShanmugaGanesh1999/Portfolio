@@ -124,12 +124,12 @@ export default function Contact() {
             LI
           </a>
           <a
-            href={PERSONAL.socialLinks.twitter}
+            href={PERSONAL.socialLinks.website}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-accent transition-colors"
           >
-            TW
+            WEB
           </a>
         </div>
       </div>

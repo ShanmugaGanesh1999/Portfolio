@@ -155,7 +155,7 @@ function FileLink({ label, icon, href, active = false, indent = false, external 
 export default function Sidebar({ activeProject, onOpenProject, onOpenPrepTab, onRequestClose }) {
   const sectionIds = ["hero", "about", "expertise", "experience", "work", "contact"];
   const activeSection = useScrollSpy(sectionIds);
-  const { width, isResizing, startResize } = useResizable(256, 200, 500, onRequestClose, 120);
+  const { width, startResize } = useResizable(256, 200, 500, onRequestClose, 120);
   const { theme, toggle: toggleTheme } = useTheme();
 
   // Track session time
@@ -278,6 +278,12 @@ export default function Sidebar({ activeProject, onOpenProject, onOpenPrepTab, o
             label="leetcode.com"
             icon="code"
             href={PERSONAL.socialLinks.leetcode}
+            external
+          />
+          <FileLink
+            label="shanmugaganesh.dev"
+            icon="public"
+            href={PERSONAL.socialLinks.website}
             external
           />
           <FileLink

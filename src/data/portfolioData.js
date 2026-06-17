@@ -6,35 +6,36 @@
 
 export const PERSONAL = {
   name: "SHANMUGA GANESH",
-  role: "Backend / Full Stack Engineer",
-  specialty: ["Backend Systems", "Distributed Architecture", "Cloud"],
-  focus: "Architecting robust backend systems & scalable full-stack platforms with Java, Python, Spring Boot & AWS",
+  role: "Full Stack Software Engineer",
+  specialty: ["Full Stack Engineering", "AI/Data Workflows", "Cloud Systems"],
+  focus: "Building scalable applications with Java, Python, React, Angular, and AWS across AI assisted data workflows, backend APIs, cloud systems, and real time processing",
   email: import.meta.env.VITE_EMAIL || "shanmugaganesh1999@gmail.com",
   phone: import.meta.env.VITE_PHONE || "(216) 466-6648",
   location: "Cleveland, OH",
-  status: "7+ years Backend & Full Stack experience. Open to full-time opportunities.",
+  status: "5+ years Full Stack Software Engineering experience. Open to full-time opportunities.",
   resumeUrl: import.meta.env.VITE_RESUME_URL || "#",
   resumeLabel: "GET_RESUME.PDF",
-  resumeVersion: "v3.0_FINAL_BUILD",
+  resumeVersion: "v2026_06_PROFILE_REFRESH",
   calendlyUrl: import.meta.env.VITE_CALENDLY_URL || "#",
   socialLinks: {
-    github: import.meta.env.VITE_GITHUB_URL || "https://github.com",
-    linkedin: import.meta.env.VITE_LINKEDIN_URL || "https://linkedin.com",
+    github: import.meta.env.VITE_GITHUB_URL || "https://github.com/ShanmugaGanesh1999",
+    linkedin: import.meta.env.VITE_LINKEDIN_URL || "https://linkedin.com/in/shanmuga-ganesh",
     leetcode: import.meta.env.VITE_LEETCODE_URL || "https://leetcode.com/u/Shanmuga_Ganesh/",
+    website: import.meta.env.VITE_SITE_URL || "https://shanmugaganesh.dev",
   },
 };
 
 export const STATS = [
-  { label: "CPU_UPTIME", value: "7+", unit: "YEARS", color: "accent" },
-  { label: "THROUGHPUT", value: "1.8M", unit: "REC/HR", color: "success" },
-  { label: "SYSTEM_SLA", value: "99.98", unit: "%", color: "variable" },
-  { label: "LEAD_CONV", value: "+60", unit: "%", color: "keyword" },
+  { label: "EXP_YEARS", value: "5+", unit: "YEARS", color: "accent" },
+  { label: "MICRO_QA", value: "-35", unit: "% FP", color: "success" },
+  { label: "DB_PERF", value: "+41", unit: "%", color: "variable" },
+  { label: "LEAD_RET", value: "+60", unit: "%", color: "keyword" },
 ];
 
 export const ABOUT = {
   paragraphs: [
-    "With 7+ years as a Backend & Full Stack Engineer, I architect, build, and deploy high-throughput backend systems and scalable web platforms. I hold a Master's in Computer Science from Case Western Reserve University and bring deep expertise in Java, Python, Spring Boot, Django, AWS, microservices, RESTful APIs, and real-time data processing.",
-    "I consistently deliver secure, high-performance backend solutions in Agile environments — from designing distributed microservices and optimizing databases to building real-time data pipelines, engineering IAM platforms, and deploying cloud-native infrastructure that drives measurable business impact.",
+    "Full Stack Software Engineer with 5+ years of experience building scalable applications using Java, Python, React, Angular, and AWS. Experienced in AI assisted data workflows, microbiome analytics, backend APIs, cloud systems, and real time data processing.",
+    "I focus on improving performance, automation, data quality, and system reliability across software and AI driven platforms, from Python HPC sequencing pipelines and ML ready data workflows to Django/React financial systems and high-throughput CRM services.",
   ],
 };
 
@@ -43,93 +44,110 @@ export const TECH_STACK = [
     title: "Languages",
     status: "CORE",
     statusColor: "success",
-    items: ["Java", "Python", "JavaScript / TypeScript", "SQL / HTML5 / CSS3"],
+    items: ["Java", "Python", "JavaScript / TypeScript", "SQL"],
   },
   {
-    title: "Frameworks",
-    status: "ENABLED",
+    title: "Frontend",
+    status: "UI",
     statusColor: "accent",
-    items: ["Spring Boot / Spring Security", "Django / FastAPI", "React.js / Next.js / Angular", "Node.js / Hibernate"],
+    items: ["React.js", "Angular", "HTML5 / CSS3", "Responsive UI / Component Architecture"],
   },
   {
-    title: "Cloud_&_DevOps",
-    status: "STABLE",
+    title: "Backend_And_APIs",
+    status: "SERVICES",
     statusColor: "variable",
-    items: ["AWS (EC2/S3/RDS/Lambda/ECS)", "Docker / Kubernetes", "Terraform / GitHub Actions", "CI/CD Pipelines"],
+    items: ["Spring Boot / Spring Security", "Django REST Framework / FastAPI", "Node.js / Hibernate", "REST APIs / GraphQL / WebSockets"],
   },
   {
-    title: "Data_&_Tools",
-    status: "SYNCED",
+    title: "Security",
+    status: "AUTH",
     statusColor: "keyword",
-    items: ["PostgreSQL / MySQL / TimescaleDB", "Redis / MongoDB / DynamoDB", "Kafka / RabbitMQ / WebSockets", "ElasticSearch / OAuth2 / JWT"],
+    items: ["OAuth 2.0", "JWT", "RBAC / IAM", "Secure API Design"],
+  },
+  {
+    title: "Data_And_Messaging",
+    status: "STREAMS",
+    statusColor: "func",
+    items: ["PostgreSQL / MySQL", "MongoDB / DynamoDB", "Redis", "Kafka / RabbitMQ"],
+  },
+  {
+    title: "Cloud_Testing_AI",
+    status: "AI_READY",
+    statusColor: "success",
+    items: ["AWS / Docker / GitHub Actions", "PyTest / JUnit / React Testing Library", "GPT / BERT / RAG / LLM Workflows", "ML Pipelines / Anomaly Detection / Performance Tuning"],
   },
 ];
 
 export const EXPERIENCE = [
   {
-    period: "JUN 2025-PRES",
-    title: "Software Engineer",
-    company: "Musk and Gale",
-    location: "Cleveland, OH",
-    description: [
-      { text: "Led development of Market Data Aggregation Platform, achieving 95% feature clarity per sprint", projectId: "market-data", linkText: "Market Data Aggregation Platform" },
-      "Architected Python/Django REST backend integrated with React, reducing API latency by 32%",
-      "Engineered real-time data streams via WebSockets & Celery processing 1.8M records/hour",
-      "Deployed using AWS ECS Fargate with Terraform IaC, achieving 99.98% uptime",
-    ],
-    tags: ["PYTHON", "DJANGO", "REACT", "AWS", "TERRAFORM"],
-    tagColor: "success",
-  },
-  {
-    period: "JAN 2024-MAY 2025",
-    title: "Access Services Specialist",
+    period: "MAR 2026-PRES",
+    title: "Software Engineer (Biotech)",
     company: "Case Western Reserve University",
     location: "Cleveland, OH",
     description: [
-      { text: "Led migration to centralized IAM platform implementing OAuth2 SSO with Spring Security & Java microservices", projectId: "access-mgmt", linkText: "centralized IAM platform" },
-      "Reduced duplicate logins by 60% through unified authentication architecture",
-      "Engineered RBAC and attribute-based access policies, cutting manual reviews by 50%",
-      "Achieved sub-200ms response times and 99.9% uptime across all identity services",
+      "Built an AI assisted microbiome quality system, reducing false positive carryover by 35% through automated feature validation, statistical filtering, and metadata anomaly detection",
+      "Engineered a Python HPC sequencing pipeline, reducing analysis turnaround by 30% across ingestion, quality control, taxonomy profiling, and microbiome analytics",
+      "Designed ML ready microbiome data workflows, improving pipeline reproducibility by 40% through standardized metadata validation, automated quality checks, and structured execution logic",
     ],
-    tags: ["JAVA", "SPRING BOOT", "OAUTH2", "AWS", "ORACLE"],
-    tagColor: "accent",
+    tags: ["PYTHON", "HPC", "MICROBIOME", "AI", "ML"],
+    tagColor: "success",
+  },
+  {
+    period: "JUN 2025-PRES",
+    title: "Software Engineer (Fintech)",
+    company: "Musk and Gale",
+    location: "Cleveland, OH",
+    description: [
+      { text: "Led a Java and Python based Market Data Aggregation Platform, achieving 95% sprint feature clarity by translating market data, compliance, governance, and business rules into scalable engineering deliverables", projectId: "market-data", linkText: "Market Data Aggregation Platform" },
+      "Built a Python Django REST backend with React, reducing API latency by 32% through query optimization, payload tuning, and cleaner frontend service calls",
+      "Engineered real time API data streams using WebSockets and Celery, reaching 1.8M records per hour with reliable ingestion, retry handling, and timeout resilient integrations",
+      "Designed PostgreSQL data models for secure financial aggregation, improving query performance by 41% through indexing, normalized schemas, and encrypted data handling",
+    ],
+    tags: ["JAVA", "PYTHON", "DJANGO", "REACT", "AWS"],
+    tagColor: "success",
   },
   {
     period: "JAN 2022-DEC 2023",
-    title: "MTS Full Stack Developer",
+    title: "MTS (Full Stack Software Developer - CRM)",
     company: "Zoho Corporation",
     location: "Chennai, India",
     description: [
-      { text: "Enhanced Tax Configuration system with API versioning, reducing compatibility issues across 7 integrated systems", projectId: "tax-config", linkText: "Tax Configuration system" },
-      { text: "Built NIO-based validation engine processing 2.3M records/hour", projectId: "record-validation", linkText: "validation engine" },
-      { text: "Developed Kafka/Redis-powered rollup automating 6,500+ weekly aggregation tasks", projectId: "rollup-summary", linkText: "rollup" },
-      "Implemented data pipeline achieving 99.9% uptime with 36% latency improvement",
-      { text: "Designed Recent Items feature tracking user activity across all CRM modules with sub-100ms retrieval", projectId: "recent-items", linkText: "Recent Items" },
+      { text: "Revamped the Tax Configuration system using Java and API versioning technique, enabling backward compatible tax workflows across 7+ integrated systems", projectId: "tax-config", linkText: "Tax Configuration system" },
+      { text: "Built Java NIO based Custom Validation Rules system for CRM record creation and edit flows, processing 2.3M records per hour with non blocking validation logic", projectId: "record-validation", linkText: "Custom Validation Rules" },
+      { text: "Built a Kafka based Rollup Summary pipeline to instantly update parent aggregation fields from child record changes, processing up to 1.8M record events per second", projectId: "rollup-summary", linkText: "Rollup Summary" },
+      { text: "Rebuilt Zoho CRM Recent Items storage to cache each user's latest 20 records, reducing retrieval latency by 50% for faster record navigation", projectId: "recent-items", linkText: "Recent Items" },
     ],
     tags: ["JAVA", "KAFKA", "REDIS", "MICROSERVICES"],
     tagColor: "keyword",
   },
   {
-    period: "NOV 2018-DEC 2021",
-    title: "Junior Associate (Full Stack Developer)",
-    company: "Augusta HiTech Software Solution",
+    period: "NOV 2020-DEC 2021",
+    title: "Junior Associate (Full Stack Software Developer)",
+    company: "Augusta Hitech Software Solution",
     location: "Coimbatore, India",
     description: [
-      { text: "Implemented ML-driven lead allocation using Python & scikit-learn, reducing manual errors by 22%", projectId: "ml-lead-scoring", linkText: "ML-driven lead allocation" },
-      "Built backend APIs and data pipelines powering CRM workflows",
-      "Improved lead conversion from 5,500 to 8,800 annually (+60% increase)",
-      "Generated $240,000 additional annual revenue through automation",
+      "Developed Angular and Node.js CRM modules for marketing and sales workflows, improving customer engagement by 32% through reusable UI components and API integrations",
+      "Built Node.js lead allocation workflows with Angular dashboards, increasing qualified lead retention by 60% through automated routing and improved sales process visibility",
     ],
-    tags: ["PYTHON", "ANGULAR", "FLUTTER", "ML"],
+    tags: ["ANGULAR", "NODE.JS", "CRM", "API"],
     tagColor: "func",
   },
 ];
 
 export const PROJECTS = [
   {
+    title: "AI Assisted Microbiome Quality System",
+    description:
+      "Python and ML ready microbiome analytics workflows for quality validation, metadata anomaly detection, and HPC sequencing analysis. Reduced false positive carryover by 35%, analysis turnaround by 30%, and improved reproducibility by 40%.",
+    status: "ACTIVE",
+    statusColor: "success",
+    tags: ["PYTHON", "AI", "MICROBIOME"],
+    link: "#",
+  },
+  {
     title: "Market Data Aggregation Platform",
     description:
-      "Python/Django + React platform processing 1.8M records/hour via WebSockets & Celery. 32% API latency reduction, PostgreSQL with AES-256 encryption, deployed on AWS ECS Fargate with 99.98% uptime.",
+      "Java and Python based fintech platform with Python Django REST backend and React frontend. Reaches 1.8M records per hour via WebSockets and Celery, reduces API latency by 32%, and improves PostgreSQL query performance by 41%.",
     status: "DEPLOYED",
     statusColor: "accent",
     hasAsciiArt: true,
@@ -139,7 +157,7 @@ export const PROJECTS = [
     title: "OAuth2 SSO & IAM Platform",
     subtitle: "SECURITY_SUBSYSTEM",
     description:
-      "Centralized Identity & Access Management using Spring Security, OAuth2/OIDC, and Java microservices. Reduced duplicate logins by 60%, authentication tickets by 35%, sub-200ms response times.",
+      "Archived campus identity project using Spring Security, OAuth2/OIDC, and Java microservices. Reduced duplicate logins by 60%, authentication tickets by 35%, and achieved sub-200ms response times.",
     progress: 99,
     progressLabel: "UPTIME_SLA",
     progressColor: "keyword",
@@ -148,16 +166,16 @@ export const PROJECTS = [
   {
     title: "Tax Configuration Engine",
     description:
-      "API-versioned tax system across 7 integrated systems with NIO-based validation at 2.3M records/hour. Kafka/Redis rollup automating 6,500+ weekly aggregation tasks.",
+      "Java and API versioning based CRM tax workflow across 7+ integrated systems. Paired with Java NIO validation at 2.3M records per hour and Kafka based rollup processing up to 1.8M record events per second.",
     status: "ACTIVE",
     statusColor: "success",
     tags: ["JAVA", "KAFKA", "REDIS"],
     link: "#",
   },
   {
-    title: "ML Lead Scoring & CRM Pipeline",
+    title: "CRM Lead Allocation Workflow",
     description:
-      "Python + scikit-learn ML-driven lead allocation integrated into CRM workflows. Boosted lead conversion from 5,500 to 8,800 annually (+60%), generating $240K additional revenue.",
+      "Angular and Node.js CRM workflows for marketing and sales operations. Improved customer engagement by 32% and increased qualified lead retention by 60% through automated routing and clearer dashboard visibility.",
     highlight: "+60%",
     highlightLabel: "CONV_DELTA",
     status: "OPERATIONAL",
@@ -169,17 +187,17 @@ export const PROJECTS = [
 export const CERTIFICATIONS = [
   { name: "JAVA / SPRING BOOT", color: "keyword" },
   { name: "PYTHON / DJANGO", color: "success" },
-  { name: "MICROSERVICES", color: "accent" },
-  { name: "REST APIs", color: "variable" },
+  { name: "AI / RAG / LLM WORKFLOWS", color: "accent" },
+  { name: "REST / GRAPHQL APIs", color: "variable" },
   { name: "KAFKA / REDIS", color: "func" },
-  { name: "AGILE / SCRUM", color: "comment" },
+  { name: "PYTEST / JUNIT / RTL", color: "comment" },
 ];
 
 export const EDUCATION = [
   {
     institution: "Case Western Reserve University",
     degree: "MS Computer Science",
-    detail: "GPA 3.78/4.0 | Cleveland, OH | 2025",
+    detail: "GPA 3.78/4.0 | Cleveland, OH | January 2025",
     coursework: "Distributed Systems, Advanced Algorithms, OS, Networking, Database Management, Software Engineering",
   },
 ];
@@ -196,7 +214,6 @@ export const NAV_ITEMS = [
   { label: "recent_items.md", icon: "description", projectId: "recent-items", section: "Projects" },
   { label: "market_data.md", icon: "description", projectId: "market-data", section: "Projects" },
   { label: "campus_iam.md", icon: "description", projectId: "access-mgmt", section: "Projects" },
-  { label: "ml_lead_scoring.md", icon: "description", projectId: "ml-lead-scoring", section: "Projects" },
 ];
 
 export const ASCII_ART = `  ██████  ██░ ██  ▄▄▄       ███▄    █  ███▄ ▄███▓ █    ██   ▄████  ▄▄▄      

@@ -1,46 +1,47 @@
 # Shanmuga Ganesh
 
-**Backend / Full Stack Engineer**
+**Full Stack Software Engineer**
 
 ---
 
 ## Contact
 
-| Field    | Details                          |
-| -------- | -------------------------------- |
-| Email    | shanmugaganesh1999@gmail.com     |
-| Phone    | (216) 466-6648                   |
-| Location | Cleveland, OH                    |
-| GitHub   | [github.com](https://github.com) |
-| LinkedIn | [linkedin.com](https://linkedin.com) |
+| Field    | Details |
+| -------- | ------- |
+| Email    | shanmugaganesh1999@gmail.com |
+| Phone    | 216-466-6648 |
+| Location | Cleveland, OH |
+| GitHub   | [github.com/ShanmugaGanesh1999](https://github.com/ShanmugaGanesh1999) |
+| LinkedIn | [linkedin.com/in/shanmuga-ganesh](https://linkedin.com/in/shanmuga-ganesh) |
 | LeetCode | [leetcode.com/u/Shanmuga_Ganesh](https://leetcode.com/u/Shanmuga_Ganesh/) |
+| Website  | [shanmugaganesh.dev](https://shanmugaganesh.dev) |
 
 ---
 
 ## Summary
 
-Backend / Full Stack Engineer with 7+ years of experience specializing in **Backend Systems**, **Distributed Architecture**, and **Cloud**. Focused on architecting robust backend systems & scalable full-stack platforms with Java, Python, Spring Boot & AWS.
+Full Stack Software Engineer with 5+ years of experience building scalable applications using **Java**, **Python**, **React**, **Angular**, and **AWS**. Experienced in **AI assisted data workflows**, **microbiome analytics**, backend APIs, cloud systems, and real time data processing.
 
-> 7+ years Backend & Full Stack experience. Open to full-time opportunities.
+> 5+ years Full Stack Software Engineering experience. Open to full-time opportunities.
 
 ---
 
 ## About
 
-With 7+ years as a Backend & Full Stack Engineer, I architect, build, and deploy high-throughput backend systems and scalable web platforms. I hold a Master's in Computer Science from Case Western Reserve University and bring deep expertise in Java, Python, Spring Boot, Django, AWS, microservices, RESTful APIs, and real-time data processing.
+Shanmuga builds scalable software and data systems across Java, Python, React, Angular, and AWS. His recent work spans AI assisted microbiome quality systems, Python HPC sequencing pipelines, Django/React fintech platforms, high-throughput CRM services, and automation workflows that improve data quality, performance, and reliability.
 
-I consistently deliver secure, high-performance backend solutions in Agile environments — from designing distributed microservices and optimizing databases to building real-time data pipelines, engineering IAM platforms, and deploying cloud-native infrastructure that drives measurable business impact.
+He focuses on practical engineering outcomes: reducing false positive carryover, improving analysis turnaround, making pipelines reproducible, lowering API latency, improving database query performance, and making business workflows easier to operate at scale.
 
 ---
 
 ## Key Metrics
 
-| Metric         | Value       |
-| -------------- | ----------- |
-| CPU Uptime     | 7+ Years    |
-| Throughput     | 1.8M Rec/Hr |
-| System SLA     | 99.98%      |
-| Lead Conversion| +60%        |
+| Metric | Value |
+| ------ | ----- |
+| Experience | 5+ Years |
+| Microbiome False Positive Carryover | -35% |
+| Financial Query Performance | +41% |
+| Qualified Lead Retention | +60% |
 
 ---
 
@@ -48,43 +49,82 @@ I consistently deliver secure, high-performance backend solutions in Agile envir
 
 ### Case Western Reserve University
 
-- **Degree:** MS Computer Science
+- **Degree:** Master's in Computer Science
 - **GPA:** 3.78 / 4.0
 - **Location:** Cleveland, OH
-- **Year:** 2025
+- **Completed:** January 2025
 - **Coursework:** Distributed Systems, Advanced Algorithms, OS, Networking, Database Management, Software Engineering
 
 ---
 
 ## Technical Skills
 
-### Languages (Core)
+### Languages
 
 - Java
 - Python
 - JavaScript / TypeScript
-- SQL / HTML5 / CSS3
+- SQL
 
-### Frameworks (Enabled)
+### Frontend
+
+- React.js
+- Angular
+- HTML5 / CSS3
+- Responsive UI / Component Based Architecture
+
+### Backend and APIs
 
 - Spring Boot / Spring Security
-- Django / FastAPI
-- React.js / Next.js / Angular
-- Node.js / Hibernate
+- Hibernate
+- Django REST Framework
+- FastAPI
+- Node.js
+- REST APIs
+- GraphQL
+- WebSockets
+- API Versioning
 
-### Cloud & DevOps (Stable)
+### Security
 
-- AWS (EC2 / S3 / RDS / Lambda / ECS)
-- Docker / Kubernetes
-- Terraform / GitHub Actions
-- CI/CD Pipelines
+- OAuth 2.0
+- JWT
+- RBAC
+- IAM
+- Secure API Design
 
-### Data & Tools (Synced)
+### Databases and Messaging
 
-- PostgreSQL / MySQL / TimescaleDB
-- Redis / MongoDB / DynamoDB
-- Kafka / RabbitMQ / WebSockets
-- ElasticSearch / OAuth2 / JWT
+- PostgreSQL
+- MySQL
+- MongoDB
+- DynamoDB
+- Redis
+- Kafka
+- RabbitMQ
+
+### Cloud, DevOps, Testing, AI, and Architecture
+
+- AWS
+- Docker
+- GitHub Actions
+- CI/CD
+- PyTest
+- JUnit
+- React Testing Library
+- Integration Testing
+- scikit-learn
+- GPT
+- BERT
+- RAG
+- LLM Workflows
+- Prompt Engineering
+- ML Pipelines
+- Anomaly Detection
+- Microservices
+- Distributed Systems
+- System Design
+- Performance Tuning
 
 ---
 
@@ -92,35 +132,35 @@ I consistently deliver secure, high-performance backend solutions in Agile envir
 
 - Java / Spring Boot
 - Python / Django
-- Microservices
-- REST APIs
+- AI / RAG / LLM Workflows
+- REST / GraphQL APIs
 - Kafka / Redis
-- Agile / Scrum
+- PyTest / JUnit / React Testing Library
 
 ---
 
 ## Experience Overview
 
-| Period          | Role                                  | Company                          | Location         |
-| --------------- | ------------------------------------- | -------------------------------- | ---------------- |
-| Jun 2025 – Pres | Software Engineer                    | Musk and Gale                    | Cleveland, OH    |
-| Jan 2024 – May 2025 | Access Services Specialist       | Case Western Reserve University  | Cleveland, OH    |
-| Jan 2022 – Dec 2023 | MTS Full Stack Developer         | Zoho Corporation                 | Chennai, India   |
-| Nov 2018 – Dec 2021 | Junior Associate (Full Stack Dev)| Augusta HiTech Software Solution | Coimbatore, India|
+| Period | Role | Company | Location |
+| ------ | ---- | ------- | -------- |
+| Mar 2026 - Present | Software Engineer (Biotech) | Case Western Reserve University | Cleveland, OH |
+| Jun 2025 - Present | Software Engineer (Fintech) | Musk and Gale | Cleveland, OH |
+| Jan 2022 - Dec 2023 | MTS (Full Stack Software Developer - CRM) | ZOHO Corporation | Chennai, India |
+| Nov 2020 - Dec 2021 | Junior Associate (Full Stack Software Developer) | Augusta Hitech Software Solution | Coimbatore, India |
 
 ---
 
 ## Projects Overview
 
-| Project                            | Status     | Tech Stack                          |
-| ---------------------------------- | ---------- | ----------------------------------- |
-| Market Data Aggregation Platform   | DEPLOYED   | Python, Django, Kafka, React, AWS   |
-| OAuth2 SSO & IAM Platform         | DEPLOYED   | Java, Spring Boot, OAuth2, Kafka    |
-| Tax Configuration Engine           | PRODUCTION | Java, PostgreSQL, Redis, Kafka      |
-| Record Validation System            | PRODUCTION | Java, Kafka, Redis, NIO             |
-| Rollup Summary Field System         | PRODUCTION | Java, Kafka, Redis, Microservices   |
-| Recent Items Feature                 | PRODUCTION | Java, Kafka, Redis, Microservices   |
-| ML Lead Scoring & CRM Pipeline      | OPERATIONAL| Python, scikit-learn, Angular, Redis |
+| Project | Status | Tech Stack |
+| ------- | ------ | ---------- |
+| AI Assisted Microbiome Quality System | ACTIVE | Python, HPC, AI, ML, Microbiome Analytics |
+| Market Data Aggregation Platform | DEPLOYED | Java, Python, Django, React, WebSockets, PostgreSQL, AWS |
+| Tax Configuration Engine | PRODUCTION | Java, API Versioning, PostgreSQL, Redis, Kafka |
+| Record Validation System | PRODUCTION | Java, NIO, Kafka, Redis |
+| Rollup Summary Field System | PRODUCTION | Java, Kafka, Redis, Microservices |
+| Recent Items Feature | PRODUCTION | Java, Kafka, Redis, Microservices |
+| CRM Lead Allocation Workflow | OPERATIONAL | Angular, Node.js, CRM Workflows |
 
 ---
 

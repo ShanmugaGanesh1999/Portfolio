@@ -1,32 +1,32 @@
-# Musk and Gale — Software Engineer
+# Musk and Gale - Software Engineer (Fintech)
 
-**Period:** June 2025 – Present  
+**Period:** June 2025 - Present  
 **Location:** Cleveland, OH  
-**Tags:** `PYTHON` · `DJANGO` · `REACT` · `AWS` · `TERRAFORM`
+**Tags:** `JAVA` · `PYTHON` · `DJANGO` · `REACT` · `AWS`
 
 ---
 
 ## Role Summary
 
-Software Engineer building a Market Data Aggregation Platform, focusing on real-time data processing, backend architecture, and cloud-native deployment.
+Software Engineer (Fintech) building a Java and Python based Market Data Aggregation Platform, focusing on market data processing, backend APIs, governance/compliance workflows, React integration, and secure financial data models.
 
 ---
 
 ## Key Accomplishments
 
-- Led development of the **Market Data Aggregation Platform**, achieving 95% feature clarity per sprint
-- Architected **Python/Django REST backend** integrated with React, reducing API latency by **32%**
-- Engineered **real-time data streams** via WebSockets & Celery processing **1.8M records/hour**
-- Deployed using **AWS ECS Fargate** with Terraform IaC, achieving **99.98% uptime**
+- Led a **Java and Python based Market Data Aggregation Platform**, achieving **95% sprint feature clarity** by translating market data, compliance, governance, and business rules into scalable engineering deliverables.
+- Built a **Python Django REST backend** with React, reducing **API latency by 32%** through query optimization, payload tuning, and cleaner frontend service calls.
+- Engineered **real time API data streams** using WebSockets and Celery, reaching **1.8M records per hour** with reliable ingestion, retry handling, and timeout resilient integrations.
+- Designed **PostgreSQL data models** for secure financial aggregation, improving **query performance by 41%** through indexing, normalized schemas, and encrypted data handling.
 
 ---
 
 ## Project: Market Data Aggregation Platform
 
 **Status:** DEPLOYED  
-**Tech Stack:** Python, Django, Kafka, TimescaleDB, Redis, AWS
+**Tech Stack:** Java, Python, Django, React, WebSockets, Celery, PostgreSQL, AWS
 
-> Python/Django + React platform processing 1.8M records/hour via WebSockets & Celery. 32% API latency reduction, PostgreSQL with AES-256 encryption, deployed on AWS ECS Fargate with 99.98% uptime.
+> Java and Python based fintech platform with a Python Django REST backend and React frontend. Reaches 1.8M records per hour via WebSockets and Celery, reduces API latency by 32%, and improves PostgreSQL query performance by 41%.
 
 ### Functional Requirements
 
