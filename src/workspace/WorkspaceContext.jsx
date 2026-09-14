@@ -152,11 +152,10 @@ export function WorkspaceProvider({ children }) {
     dispatch({ type: "SET_PALETTE", open: false });
   }, []);
 
-  // ── Shell mode (VS Code / Claude Code / Codex) ──────────────
+  // ── Shell mode (VS Code ⇄ Claude Code) ──────────────────────
   const setShellMode = useCallback(
     (mode) => {
-      const next =
-        mode === "claude" || mode === "codex" ? mode : "vscode";
+      const next = mode === "claude" ? "claude" : "vscode";
       if (stateRef.current.shellMode === next) return;
       // Crossfade the palette swap like the theme transition.
       const root = document.documentElement;
@@ -168,10 +167,7 @@ export function WorkspaceProvider({ children }) {
         /* private mode */
       }
       dispatch({ type: "SET_SHELL", mode: next });
-      log(
-        "shell",
-        `switched to ${next === "claude" ? "Claude Code" : next === "codex" ? "Codex" : "VS Code"} shell`
-      );
+      log("shell", `switched to ${next === "claude" ? "Claude Code" : "VS Code"} shell`);
     },
     [log]
   );

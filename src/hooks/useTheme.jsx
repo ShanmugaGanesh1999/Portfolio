@@ -99,79 +99,46 @@ const LIGHT_COLORS = {
 
 /** Claude Code shell palettes (warm charcoal / ivory + terracotta). */
 const CLAUDE_DARK_COLORS = {
-  accent:   "#d97757",
-  success:  "#4eba65",
-  keyword:  "#ff6b80",
-  variable: "#d4a27f",
-  func:     "#a3b78c",
-  string:   "#b1b9f9",
-  comment:  "#a8a29a",
-  bg:       "#1f1e1d",
-  sidebar:  "#262624",
-  border:   "#3e3c37",
-  text:     "#faf9f5",
+  accent:   "#d58c6b",
+  success:  "#9cba84",
+  keyword:  "#d99892",
+  variable: "#a39e98",
+  func:     "#c1a0d9",
+  string:   "#97b5cf",
+  comment:  "#a39e98",
+  bg:       "#1c1c1c",
+  sidebar:  "#232323",
+  border:   "#44413d",
+  text:     "#e8e6e1",
 };
 
 const CLAUDE_LIGHT_COLORS = {
-  accent:   "#d97757",
-  success:  "#2c7a39",
-  keyword:  "#ab2b3f",
-  variable: "#a9583e",
-  func:     "#788c5d",
-  string:   "#6a9bcc",
-  comment:  "#73726c",
-  bg:       "#faf9f5",
-  sidebar:  "#f0eee6",
-  border:   "#d1cfc5",
-  text:     "#141413",
-};
-
-/** Codex shell palettes (neutral charcoal/white + cyan accent). */
-const CODEX_DARK_COLORS = {
-  accent:   "#6fd0e2",
-  success:  "#2ea043",
-  keyword:  "#f85149",
-  variable: "#f2cc60",
-  func:     "#cba6f7",
-  string:   "#a6e3a1",
-  comment:  "#8f9092",
-  bg:       "#0e0f10",
-  sidebar:  "#17181b",
-  border:   "#2a2c30",
-  text:     "#e6e6e3",
-};
-
-const CODEX_LIGHT_COLORS = {
-  accent:   "#005f87",
-  success:  "#1a7f37",
-  keyword:  "#cf222e",
-  variable: "#953800",
-  func:     "#8250df",
-  string:   "#116329",
-  comment:  "#6e6e73",
-  bg:       "#ffffff",
-  sidebar:  "#f7f7f8",
-  border:   "#e5e5e7",
-  text:     "#202124",
+  accent:   "#a85d3c",
+  success:  "#466738",
+  keyword:  "#a84e45",
+  variable: "#6c655e",
+  func:     "#7b5099",
+  string:   "#3c6488",
+  comment:  "#6c655e",
+  bg:       "#faf9f6",
+  sidebar:  "#f0eee9",
+  border:   "#d2cbc2",
+  text:     "#302d29",
 };
 
 /**
  * useThemeColors — Returns the colour hex map that matches the current theme
- * (and the active shell: VS Code, Claude Code, or Codex). Use this in SVG
- * diagram components instead of hardcoded hex values.
+ * (and the active shell: VS Code or the Claude Code terminal). Use this in
+ * SVG diagram components instead of hardcoded hex values.
  */
 // eslint-disable-next-line react-refresh/only-export-components -- hook + provider co-located by design
 export function useThemeColors() {
   const { theme } = useTheme();
-  const shell =
-    typeof document !== "undefined"
-      ? document.documentElement.getAttribute("data-shell")
-      : null;
-  if (shell === "claude") {
+  const isClaude =
+    typeof document !== "undefined" &&
+    document.documentElement.getAttribute("data-shell") === "claude";
+  if (isClaude) {
     return theme === "light" ? CLAUDE_LIGHT_COLORS : CLAUDE_DARK_COLORS;
-  }
-  if (shell === "codex") {
-    return theme === "light" ? CODEX_LIGHT_COLORS : CODEX_DARK_COLORS;
   }
   return theme === "light" ? LIGHT_COLORS : DARK_COLORS;
 }

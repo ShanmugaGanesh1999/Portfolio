@@ -1,9 +1,12 @@
 // ============================================================
-// CLAUDE SHELL — the full-screen Claude Code CLI experience.
-// Owns the session scrollback, the prompt dispatch (slash
-// commands / "!shell" passthrough / natural language → the
-// portfolio assistant), the agent engine, and permission
-// dialogs. Shares workspace state with the VS Code shell.
+// CLAUDE SHELL — the Claude Code terminal, rebuilt from the
+// reference design (claude-code-terminal.html): a floating
+// terminal window on a desktop backdrop, macOS titlebar with
+// traffic lights, border-broken welcome panel with pixel
+// mascot, hairline composer with block cursor, statusline
+// with permission modes, slash menu, and modal panels.
+// Portfolio functionality (RAG answers, agents, project
+// deep-dives, shell passthrough) runs on top.
 // ============================================================
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
@@ -18,49 +21,161 @@ import { createShellExecutor, resolveProject, resolvePrep } from "../commands";
 import { PERSONAL } from "../../data/portfolioData";
 import { PROJECT_TABS } from "../../workspace/registry";
 import ModeSwitcher from "../../components/ui/ModeSwitcher";
-import Scrollback from "./Scrollback";
-import ClaudePrompt from "./ClaudePrompt";
-import AgentPanel from "./AgentPanel";
-import { randomVerb, formatTokens } from "./verbs";
+import CliWelcome from "./CliWelcome";
+import CliFileView from "./CliFileView";
+import TerminalMarkdown from "../shared/Markdown";
+import { randomVerb } from "./verbs";
 
-const MAX_BLOCKS = 150;
+const CONFIG_KEY = "sg-claude-terminal:config:v1";
+const MODE_LABELS = ["default mode", "⏵⏵ accept edits on", "⏸ plan mode on"];
+const MASCOT = " ▐▛███▜▌\n▝▜█████▛▘\n  ▘▘ ▝▝";
+const SPINNER_FRAMES = ["·", "✢", "✳", "✶", "✻", "✽"];
+const FRAME_MS = 140;
+
+const SLASH_COMMANDS = [
+  { name: "/help", description: "Show commands and keyboard shortcuts" },
+  { name: "/open", description: "Open a project deep-dive (e.g. /open market_data)" },
+  { name: "/projects", description: "Jump to the projects section" },
+  { name: "/about", description: "Jump to the about section" },
+  { name: "/skills", description: "Jump to the tech stack" },
+  { name: "/experience", description: "Jump to the experience section" },
+  { name: "/contact", description: "Jump to the contact section" },
+  { name: "/research", description: "Spawn a research agent" },
+  { name: "/tour", description: "Watch the agents work (multi-agent demo)" },
+  { name: "/model", description: "Change the assistant model" },
+  { name: "/theme", description: "Switch between dark and light themes" },
+  { name: "/config", description: "Edit the terminal display settings" },
+  { name: "/status", description: "Show this session's configuration" },
+  { name: "/clear", description: "Clear the conversation and start fresh" },
+  { name: "/exit", description: "Back to the VS Code workspace" },
+];
+
+const HELP_KEYS = [
+  ["Enter", "Send a message or run a command"],
+  ["Shift + Enter", "Insert a new line"],
+  ["↑ / ↓", "Browse prompt history or command suggestions"],
+  ["Tab", "Complete the selected slash command"],
+  ["Shift + Tab", "Cycle permission modes"],
+  ["Esc", "Stop a response or dismiss a menu"],
+  ["Ctrl + C", "Stop a response or clear the current input"],
+  ["Ctrl + L", "Jump to the end of the transcript"],
+  ["?", "Show this help when the prompt is empty"],
+];
+
 let uidCounter = 0;
-const uid = () => `b${Date.now().toString(36)}-${uidCounter++}`;
+const uid = () => `t${Date.now().toString(36)}-${uidCounter++}`;
 
-const ICON = "✳";
+// ─── Small pieces ─────────────────────────────────────────────
+function SpinnerGlyph({ active }) {
+  const [frame, setFrame] = useState(0);
+  useEffect(() => {
+    if (!active) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(() => setFrame((f) => f + 1), FRAME_MS);
+    return () => clearInterval(id);
+  }, [active]);
+  return (
+    <span className="ct-spinner" aria-hidden="true">
+      {SPINNER_FRAMES[frame % SPINNER_FRAMES.length]}
+    </span>
+  );
+}
 
+function ToolEntry({ name, path, output, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <details className="ct-tool-entry" open={open}>
+      <summary onClick={(e) => { e.preventDefault(); setOpen(!open); }}>
+        <span className="ct-tool-dot" aria-hidden="true">●</span>
+        <span className="ct-tool-title">
+          {name}
+          <span className="ct-tool-path">({path})</span>
+        </span>
+        <span className="ct-tool-detail-hint">
+          {open ? "click to collapse" : "click to expand"}
+        </span>
+      </summary>
+      <div className="ct-tool-output">
+        <span className="stem" aria-hidden="true">⎿</span>
+        <pre>{output}</pre>
+      </div>
+    </details>
+  );
+}
+
+function Entry({ kind, children }) {
+  const marker = kind === "user" ? "❯" : kind === "system" ? "✻" : "●";
+  const cls =
+    kind === "user" ? "ct-entry ct-user-entry" : kind === "system" ? "ct-entry ct-system-entry" : "ct-entry";
+  return (
+    <div className={cls}>
+      <span className="ct-entry-marker" aria-hidden="true">{marker}</span>
+      <div className="ct-entry-body">{children}</div>
+    </div>
+  );
+}
+
+// ─── Main shell ───────────────────────────────────────────────
 export default function ClaudeShell() {
   const ws = useWorkspace();
-  const { theme, setTheme, toggle: toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
-  // ── Session state ──────────────────────────────────────────
+  // ── Terminal config (name / font size) ──
+  const [config, setConfig] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(CONFIG_KEY) || "null");
+      if (saved && typeof saved === "object") {
+        return {
+          userName: typeof saved.userName === "string" ? saved.userName.slice(0, 50) : "visitor",
+          fontSize: Number.isFinite(saved.fontSize) ? Math.min(20, Math.max(12, saved.fontSize)) : 15,
+        };
+      }
+    } catch { /* ignore */ }
+    return { userName: "visitor", fontSize: 15 };
+  });
+  const persistConfig = useCallback((next) => {
+    setConfig(next);
+    try { localStorage.setItem(CONFIG_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+  }, []);
+
+  // ── Session state ──
   const [blocks, setBlocks] = useState(() => {
-    const initial = [
-      { id: uid(), kind: "banner" },
-      { id: uid(), kind: "welcome" },
-    ];
-    // Deep link / mode switch with a file already open → print it.
+    const initial = [];
     const activeId = ws.state.activeTabId;
     if (activeId && activeId !== "welcome") {
-      initial.push({ id: uid(), kind: "tool", name: "Read", args: activeId });
+      initial.push({ id: uid(), kind: "tool", name: "Read", path: activeId, output: "project deep-dive" });
       initial.push({ id: uid(), kind: "file", tabId: activeId });
     }
     return initial;
   });
-  const [busy, setBusy] = useState(null); // main-thread spinner {verb, startedAt, tokens}
-  const [agents, setAgents] = useState([]);
-  const [model, setModel] = useState(getDefaultModelId());
+  const [busy, setBusy] = useState(null); // { label, verb, startedAt }
+  const [input, setInput] = useState("");
   const [history, setHistory] = useState([]);
+  const [histIdx, setHistIdx] = useState(0);
+  const [savedDraft, setSavedDraft] = useState("");
+  const [menuIdx, setMenuIdx] = useState(0);
+  const [mode, setMode] = useState(0);
+  const [model, setModel] = useState(getDefaultModelId());
+  const [panel, setPanel] = useState(null); // {type, ...}
+  const [windowState, setWindowState] = useState("normal"); // normal | minimized | maximized
+  const [ended, setEnded] = useState(false);
+  const [toastMsg, setToastMsg] = useState(null);
+  const [recent, setRecent] = useState({ text: "No recent activity", time: "" });
+  const [agents, setAgents] = useState([]);
   const [permission, setPermission] = useState(null);
+
+  const viewportRef = useRef(null);
+  const inputRef = useRef(null);
   const abortRef = useRef(null);
-  const convoRef = useRef([]); // chat history for context
+  const autoScrollRef = useRef(true);
+  const toastTimerRef = useRef(null);
 
   const models = getAvailableModels();
-  const modelName = models.find((m) => m.id === model)?.name ?? model;
+  const currentModel = models.find((m) => m.id === model) || models[0];
 
-  // ── Block helpers ──────────────────────────────────────────
+  // ── Helpers ──
   const pushBlock = useCallback((block) => {
-    setBlocks((prev) => [...prev, { id: uid(), ...block }].slice(-MAX_BLOCKS));
+    setBlocks((prev) => [...prev, { id: uid(), ...block }]);
   }, []);
 
   const patchBlock = useCallback((id, patch) => {
@@ -69,91 +184,52 @@ export default function ClaudeShell() {
     );
   }, []);
 
-  const addHistory = (text) => setHistory((h) => [...h, text].slice(-100));
+  const toast = useCallback((text) => {
+    setToastMsg(text);
+    clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToastMsg(null), 3000);
+  }, []);
 
-  // ── Natural language → portfolio assistant ─────────────────
-  const ask = useCallback(
-    async (question) => {
-      pushBlock({ kind: "user", text: question });
-      const verb = randomVerb();
-      const asstId = uid();
-      const startedAt = Date.now();
-      pushBlock({
-        id: asstId,
-        kind: "assistant",
-        content: "",
-        isStreaming: true,
-        verb,
-        startedAt,
-        tokens: 0,
-        model: modelName,
-      });
-      setBusy({ verb, startedAt, tokens: 0 });
+  const scrollToEnd = useCallback((force = false) => {
+    const el = viewportRef.current;
+    if (el && (force || autoScrollRef.current)) el.scrollTop = el.scrollHeight;
+  }, []);
 
-      const controller = new AbortController();
-      abortRef.current = controller;
-      let acc = "";
+  const focusPrompt = useCallback(() => {
+    if (!ended) inputRef.current?.focus({ preventScroll: true });
+  }, [ended]);
 
-      try {
-        await chatQuery(
-          question,
-          convoRef.current.slice(-10),
-          (chunk) => {
-            acc += chunk;
-            const tokens = Math.round(acc.length / 4);
-            patchBlock(asstId, { content: acc, tokens });
-            setBusy((b) => (b ? { ...b, tokens } : b));
-          },
-          controller.signal,
-          model
-        );
-        patchBlock(asstId, {
-          isStreaming: false,
-          endedAt: Date.now(),
-          tokens: Math.round(acc.length / 4),
-        });
-      } catch (err) {
-        if (err.name === "AbortError") {
-          patchBlock(asstId, (b) => ({
-            isStreaming: false,
-            endedAt: Date.now(),
-            content: b.content + "\n\n*(interrupted)*",
-          }));
-        } else {
-          patchBlock(asstId, {
-            isStreaming: false,
-            error: true,
-            content: `⚠ ${err.message || "Something went wrong."}`,
-          });
-        }
-      } finally {
-        setBusy(null);
-        abortRef.current = null;
-      }
-    },
-    [pushBlock, patchBlock, model, modelName]
-  );
-
-  // Keep conversational history in sync from finished blocks.
   useEffect(() => {
-    convoRef.current = blocks
-      .filter(
-        (b) =>
-          (b.kind === "assistant" && !b.isStreaming && !b.error && !b.agent) ||
-          (b.kind === "user" &&
-            !b.text.startsWith("/") &&
-            !b.text.startsWith("!") &&
-            b.text !== "?")
-      )
-      .map((b) =>
-        b.kind === "user"
-          ? { role: "user", content: b.text }
-          : { role: "assistant", content: b.content }
-      )
-      .slice(-10);
-  }, [blocks]);
+    if (window.matchMedia("(min-width: 641px)").matches) focusPrompt();
+  }, [focusPrompt]);
 
-  // ── Permission gate (Claude-style dialogs) ─────────────────
+  // Auto-scroll on new blocks while pinned near the bottom.
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (el && autoScrollRef.current) el.scrollTop = el.scrollHeight;
+  }, [blocks, busy]);
+
+  const setBusyState = (label, verb) => {
+    setBusy(label ? { label, verb: verb || "Thinking", startedAt: Date.now() } : null);
+  };
+
+  const cancelRun = useCallback((showMessage = true) => {
+    abortRef.current?.abort();
+    setBusy(null);
+    if (showMessage) pushBlock({ kind: "system", text: "Interrupted · the response was stopped." });
+  }, [pushBlock]);
+
+  // ── Slash menu ──
+  const menuOpen = /^\/[^\s]*$/.test(input) && !busy;
+  const menuMatches = useMemo(() => {
+    if (!menuOpen) return [];
+    return SLASH_COMMANDS.filter((c) => c.name.startsWith(input.toLowerCase()));
+  }, [menuOpen, input]);
+  const clampedMenuIdx = Math.min(menuIdx, Math.max(0, menuMatches.length - 1));
+
+  useEffect(() => setMenuIdx(0), [input]);
+
+  // ── Permission gate (panel-styled) ──
   const confirmPermission = useCallback(
     (request) =>
       new Promise((resolve) => {
@@ -161,30 +237,24 @@ export default function ClaudeShell() {
       }),
     []
   );
-
   const answerPermission = (ok) => {
     permission?.resolve(ok);
     setPermission(null);
-    pushBlock({
-      kind: "result",
-      tone: ok ? "ok" : "err",
-      text: ok ? "approved" : "denied (esc)",
-    });
+    pushBlock({ kind: "system", text: ok ? "Approved." : "Declined (esc)." });
   };
-
   useEffect(() => {
     if (!permission) return;
     const onKey = (e) => {
       if (e.key === "Escape") answerPermission(false);
-      else if (e.key === "1") answerPermission(true);
-      else if (e.key === "2") answerPermission(false);
+      else if (e.key === "1" || e.key.toLowerCase() === "y") answerPermission(true);
+      else if (e.key === "2" || e.key.toLowerCase() === "n") answerPermission(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [permission]);
 
-  // ── Shell passthrough ("!" prefix) ─────────────────────────
+  // ── Shell passthrough ("!" prefix) ──
   const shellRun = useMemo(
     () =>
       createShellExecutor({
@@ -192,465 +262,793 @@ export default function ClaudeShell() {
         theme,
         setTheme,
         print: (type, text) =>
-          pushBlock({
-            kind: "result",
-            tone: type === "err" ? "err" : type === "ok" ? "ok" : "muted",
-            text,
-          }),
+          pushBlock({ kind: "tool-plain", text, tone: type }),
         confirm: confirmPermission,
         exit: () => ws.setShellMode("vscode"),
       }),
     [ws, theme, setTheme, pushBlock, confirmPermission]
   );
 
-  // ── Agent engine ───────────────────────────────────────────
-  // Color index comes from a ref so same-tick spawns stay distinct.
-  const agentColorIdxRef = useRef(0);
+  // ── Natural language → portfolio assistant ──
+  const ask = useCallback(
+    async (question) => {
+      const verb = randomVerb();
+      setBusyState(`${verb}…`, verb);
+      const id = uid();
+      pushBlock({ id, kind: "assistant", content: "", streaming: true });
+      const controller = new AbortController();
+      abortRef.current = controller;
+      let acc = "";
+      try {
+        await chatQuery(
+          question,
+          blocks
+            .filter((b) => (b.kind === "assistant" && !b.streaming) || b.kind === "user")
+            .slice(-10)
+            .map((b) => (b.kind === "user" ? { role: "user", content: b.text } : { role: "assistant", content: b.content })),
+          (chunk) => {
+            acc += chunk;
+            patchBlock(id, { content: acc });
+          },
+          controller.signal,
+          model
+        );
+        patchBlock(id, { streaming: false });
+      } catch (err) {
+        if (err.name === "AbortError") {
+          patchBlock(id, (b) => ({ streaming: false, content: b.content + "\n\n(interrupted)" }));
+        } else {
+          patchBlock(id, { streaming: false, error: true, content: `⚠ ${err.message}` });
+        }
+      } finally {
+        setBusy(null);
+        abortRef.current = null;
+      }
+    },
+    [blocks, model, pushBlock, patchBlock]
+  );
+
+  // ── Agents ──
   const spawnAgent = useCallback(
     (name, task, fn) => {
       const id = uid();
-      const verb = randomVerb();
-      const agentIndex = agentColorIdxRef.current++;
-      setAgents((a) => [...a, { id, name, task, status: "running", verb, tokens: 0 }]);
+      setAgents((a) => [...a, { id, name, task, status: "running" }]);
       ws.log("agent", `${name}: ${task}`);
       (async () => {
         try {
           await fn({
-            tool: (n, args) => pushBlock({ kind: "tool", name: n, args }),
-            print: (text, tone) => pushBlock({ kind: "result", text, tone }),
-            addTokens: (n) =>
-              setAgents((a) =>
-                a.map((x) => (x.id === id ? { ...x, tokens: x.tokens + n } : x))
-              ),
+            tool: (toolName, path, output) =>
+              pushBlock({ kind: "tool", name: toolName, path, output }),
+            system: (text) => pushBlock({ kind: "system", text }),
             pushBlock,
             patchBlock,
-            agentIndex,
-            agentId: id,
           });
         } finally {
           setAgents((a) => a.map((x) => (x.id === id ? { ...x, status: "done" } : x)));
-          window.setTimeout(
-            () => setAgents((a) => a.filter((x) => x.id !== id)),
-            30000
-          );
+          window.setTimeout(() => setAgents((a) => a.filter((x) => x.id !== id)), 30000);
         }
       })();
     },
     [pushBlock, patchBlock, ws]
   );
 
-  // researcher — streams a genuine RAG answer as an agent block.
   const spawnResearcher = useCallback(
     (question) => {
       spawnAgent("researcher", question, async (ctx) => {
-        ctx.tool("Agent", `researcher(${question})`);
-        const blockId = uid();
-        ctx.pushBlock({
-          id: blockId,
-          kind: "assistant",
-          content: "",
-          isStreaming: true,
-          verb: "Researching",
-          startedAt: Date.now(),
-          tokens: 0,
-          agent: "researcher",
-          agentIndex: ctx.agentIndex,
-        });
-        let chars = 0;
-        await chatQuery(question, [], (chunk) => {
-          chars += chunk.length;
-          ctx.patchBlock(blockId, (b) => ({
-            content: b.content + chunk,
-            tokens: Math.round(chars / 4),
-          }));
-          ctx.addTokens(0); // token counter lives on the block; agent row stays light
-        }, null, model).catch((err) => {
-          ctx.patchBlock(blockId, { error: true, content: `⚠ ${err.message}` });
-        });
-        ctx.patchBlock(blockId, { isStreaming: false, endedAt: Date.now() });
-        ctx.addTokens(Math.round(chars / 4));
+        ctx.tool("Agent", `researcher(${question})`, "running…");
+        const id = uid();
+        ctx.pushBlock({ id, kind: "assistant", content: "", streaming: true, agent: true });
+        try {
+          await chatQuery(
+            question,
+            [],
+            (chunk) => {
+              ctx.patchBlock(id, (b) => ({ content: b.content + chunk }));
+            },
+            null,
+            model
+          );
+        } catch (err) {
+          ctx.patchBlock(id, { streaming: false, error: true, content: `⚠ ${err.message}` });
+        }
+        ctx.patchBlock(id, { streaming: false });
       });
     },
     [spawnAgent, model]
   );
 
-  // explorer — opens a project deep-dive.
   const spawnExplorer = useCallback(
     (projectId) => {
       const meta = PROJECT_TABS[projectId];
       if (!meta) return;
       spawnAgent("explorer", `open ${meta.title}`, async (ctx) => {
-        ctx.tool("Read", meta.title);
+        ctx.tool("Read", meta.title, `${meta.language} system-design deep dive`);
         ws.openTab(projectId);
-        ctx.addTokens(320);
         ctx.pushBlock({ kind: "file", tabId: projectId });
-        ctx.print(`Read ${meta.title} — ${meta.language} deep dive`, "ok");
       });
     },
     [spawnAgent, ws]
   );
 
-  // curator — reprints the welcome document / scrolls to a section.
-  const spawnCurator = useCallback(
-    (sectionNote) => {
-      spawnAgent("curator", sectionNote, async (ctx) => {
-        ctx.tool("Read", "welcome.md");
-        ctx.addTokens(180);
-        document
-          .getElementById(sectionNote.includes("project") ? "cli-projects" : "cli-hero")
-          ?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    },
-    [spawnAgent]
-  );
-
-  // ── Slash commands ─────────────────────────────────────────
+  // ── Slash command execution ──
   const scrollToAnchor = useCallback(
     (id) => {
       const el = document.getElementById(id);
       if (el) {
+        autoScrollRef.current = false;
         el.scrollIntoView({ behavior: "smooth", block: "start" });
-        pushBlock({ kind: "recap", text: `scrolled to ${id.replace("cli-", "")}` });
-      } else {
-        pushBlock({ kind: "welcome" });
-        window.setTimeout(
-          () => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }),
-          150
-        );
+        window.setTimeout(() => (autoScrollRef.current = true), 800);
       }
     },
-    [pushBlock]
+    []
   );
 
   const runSlash = useCallback(
     (raw) => {
-      const body = raw.slice(1).trim();
-      const [name, ...rest] = body.split(/\s+/);
-      const arg = rest.join(" ");
-      pushBlock({ kind: "user", text: raw });
-
-      switch (name) {
-        case "help":
-          pushBlock({
-            kind: "result",
-            text: [
-              "Commands:",
-              "  /open <project>    Open a project deep-dive (or list projects)",
-              "  /projects          Jump to the projects section",
-              "  /about /skills /experience /contact   Jump to sections",
-              "  /research <query>  Spawn a research agent",
-              "  /tour              Run a 3-agent demo tour",
-              "  /agents            List agents",
-              "  /model [name]      Show or switch the assistant model",
-              "  /resume            Download resume.pdf (asks permission)",
-              "  /theme             Toggle dark/light",
-              "  /status            Session status",
-              "  /clear             Clear the session",
-              "  /mode              Back to the VS Code shell",
-              "  /exit              Same as /mode",
-            ].join("\n"),
-          });
+      const [command, ...args] = raw.trim().split(/\s+/);
+      const argument = args.join(" ");
+      switch (command.toLowerCase()) {
+        case "/help":
+          pushBlock({ kind: "help" });
           break;
 
-        case "open": {
-          if (!arg) {
+        case "/open": {
+          if (!argument) {
             pushBlock({
-              kind: "result",
+              kind: "tool-plain",
+              tone: "out",
               text:
                 "projects: " +
-                Object.entries(PROJECT_TABS)
-                  .map(([, m]) => m.title.replace(/\.\w+$/, ""))
+                Object.values(PROJECT_TABS)
+                  .map((m) => m.title.replace(/\.\w+$/, ""))
                   .join("  "),
             });
-            pushBlock({ kind: "recap", text: "usage: /open <project> — e.g. /open market_data" });
             break;
           }
-          const projectId = resolveProject(arg);
+          const projectId = resolveProject(argument);
           if (projectId) {
             spawnExplorer(projectId);
           } else {
-            const course = resolvePrep(arg);
+            const course = resolvePrep(argument);
             if (course) {
               ws.openPrepPanel(course.id);
-              pushBlock({ kind: "tool", name: "Read", args: `prep/${course.id}` });
+              pushBlock({ kind: "tool", name: "Read", path: `prep/${course.id}`, output: "prep reader" });
               pushBlock({ kind: "file", tabId: `prep:${course.id}` });
             } else {
-              pushBlock({ kind: "result", tone: "err", text: `open: ${arg}: not found` });
+              pushBlock({ kind: "system", text: `No project named '${argument}'. Try /open market_data.` });
             }
           }
           break;
         }
 
-        case "projects": scrollToAnchor("cli-projects"); break;
-        case "about": scrollToAnchor("cli-about"); break;
-        case "skills": scrollToAnchor("cli-skills"); break;
-        case "experience": scrollToAnchor("cli-experience"); break;
-        case "contact": scrollToAnchor("cli-contact"); break;
+        case "/projects": scrollToAnchor("cli-projects"); break;
+        case "/about": scrollToAnchor("cli-about"); break;
+        case "/skills": scrollToAnchor("cli-skills"); break;
+        case "/experience": scrollToAnchor("cli-experience"); break;
+        case "/contact": scrollToAnchor("cli-contact"); break;
 
-        case "research": {
-          if (!arg) {
-            pushBlock({ kind: "result", tone: "err", text: "usage: /research <question>" });
-            break;
+        case "/research":
+          if (!argument) {
+            pushBlock({ kind: "system", text: "Usage: /research <question>" });
+          } else {
+            spawnResearcher(argument);
           }
-          spawnResearcher(arg);
           break;
-        }
 
-        case "tour":
-          pushBlock({ kind: "recap", text: "starting tour — 3 agents in parallel" });
-          spawnCurator("scroll to hero");
+        case "/tour":
+          pushBlock({ kind: "system", text: "Starting tour — 2 agents in parallel…" });
           spawnExplorer("market-data");
           spawnResearcher("What is Shanmuga currently working on at Sherwin Williams?");
           break;
 
-        case "agents":
-        case "tasks":
-          if (!agents.length) {
-            pushBlock({ kind: "result", text: "no agents running — try /research or /tour" });
+        case "/model": {
+          const match = models.find((m) => m.name.toLowerCase() === argument.toLowerCase() || m.id === argument.toLowerCase());
+          if (match) {
+            setModel(match.id);
+            toast(`Model set to ${match.name}.`);
+          } else if (!argument) {
+            setPanel({ type: "model" });
           } else {
-            pushBlock({
-              kind: "result",
-              text: agents
-                .map(
-                  (a) =>
-                    `◯ ${a.name} — ${a.task} [${a.status} · ↓ ${formatTokens(a.tokens)}]`
-                )
-                .join("\n"),
-            });
-          }
-          break;
-
-        case "model": {
-          if (!arg) {
-            pushBlock({
-              kind: "result",
-              text:
-                "models: " +
-                models.map((m) => `${m.id === model ? "❯ " : "  "}${m.name}`).join("\n"),
-            });
-            pushBlock({ kind: "recap", text: "usage: /model <part-of-name>" });
-            break;
-          }
-          const q = arg.toLowerCase();
-          const found = models.find((m) => m.name.toLowerCase().includes(q) || m.id.includes(q));
-          if (found) {
-            setModel(found.id);
-            pushBlock({ kind: "result", tone: "ok", text: `model → ${found.name}` });
-          } else {
-            pushBlock({ kind: "result", tone: "err", text: `model: ${arg} not found` });
+            pushBlock({ kind: "system", text: "Pick a model with /model — no argument opens the picker." });
           }
           break;
         }
 
-        case "resume":
-          confirmPermission({
-            title: "Do you want to download resume.pdf?",
-            detail: "Opens the resume PDF from Google Drive in a new tab.",
-          }).then((ok) => {
-            if (ok) window.open(PERSONAL.resumeUrl, "_blank", "noopener");
-          });
+        case "/theme": {
+          if (theme === "dark" || theme === "light") {
+            if (argument === "dark" || argument === "light") setTheme(argument);
+            else setTheme(theme === "dark" ? "light" : "dark");
+          }
+          break;
+        }
+
+        case "/config":
+          setPanel({ type: "config" });
           break;
 
-        case "theme":
-          toggleTheme();
-          pushBlock({ kind: "recap", text: `theme → ${theme === "dark" ? "light" : "dark"}` });
-          break;
-
-        case "status":
+        case "/status":
           pushBlock({
-            kind: "result",
+            kind: "tool-plain",
+            tone: "out",
             text: [
-              `shell:   claude code v3.0`,
-              `model:  ${modelName}`,
-              `theme:  ${theme}`,
-              `tabs:   ${ws.state.tabs.length} open`,
-              `agents: ${agents.filter((a) => a.status === "running").length} running`,
+              "Session status", "",
+              `  Interface   Claude Code terminal — portfolio edition`,
+              `  Visitor     ${config.userName}`,
+              `  Directory   ~/portfolio`,
+              `  Model       ${currentModel.name}`,
+              `  Theme       ${theme}`,
+              `  Permission  ${MODE_LABELS[mode]} (visual)`,
+              `  Agents      ${agents.filter((a) => a.status === "running").length} running`,
+              `  Backend     Portfolio RAG assistant (docs/*.md)`,
             ].join("\n"),
           });
           break;
 
-        case "clear":
-          setBlocks([
-            { id: uid(), kind: "banner" },
-            { id: uid(), kind: "welcome" },
-          ]);
-          convoRef.current = [];
+        case "/clear":
+          cancelRun(false);
+          setBlocks([]);
+          setRecent({ text: "No recent activity", time: "" });
+          viewportRef.current?.scrollTo({ top: 0 });
           break;
 
-        case "mode":
-        case "exit":
-          pushBlock({ kind: "recap", text: "switching to VS Code shell …" });
+        case "/exit":
+          pushBlock({ kind: "system", text: "switching to VS Code workspace …" });
           window.setTimeout(() => ws.setShellMode("vscode"), 350);
           break;
 
         default:
-          pushBlock({
-            kind: "result",
-            tone: "err",
-            text: `unknown command: /${name} — try /help`,
-          });
+          pushBlock({ kind: "system", text: `Unknown command: ${command}. Type /help to see supported commands.` });
       }
     },
-    [
-      pushBlock, spawnExplorer, spawnResearcher, spawnCurator, agents, models,
-      model, modelName, theme, toggleTheme, ws, confirmPermission, scrollToAnchor,
-    ]
+    [pushBlock, spawnExplorer, spawnResearcher, models, config, currentModel, theme, setTheme, agents, mode, cancelRun, ws, scrollToAnchor, toast]
   );
 
-  // ── Prompt dispatch ────────────────────────────────────────
-  const onSubmit = useCallback(
-    (raw) => {
-      const text = raw.trim();
-      if (!text) return;
-      addHistory(text);
+  // ── Submit ──
+  const submitInput = useCallback(() => {
+    if (ended) return;
+    if (busy) { cancelRun(); return; }
+    let message = input.trim();
+    if (!message) return;
+    if (menuOpen && menuMatches.length) message = menuMatches[clampedMenuIdx].name;
+    setHistory((h) => [...h, message].slice(-100));
+    setHistIdx(history.length + 1);
+    setSavedDraft("");
+    setInput("");
+    autoScrollRef.current = true;
+    setRecent({ text: message.replace(/\s+/g, " "), time: "just now" });
 
-      if (text === "?") {
-        pushBlock({ kind: "user", text: "?" });
-        pushBlock({ kind: "shortcuts" });
-        return;
-      }
-      if (text.startsWith("/")) {
-        runSlash(text);
-        return;
-      }
-      if (text.startsWith("!")) {
-        pushBlock({ kind: "user", text });
-        const result = shellRun(text.slice(1));
-        if (result?.clear) {
-          setBlocks([{ id: uid(), kind: "banner" }]);
-        }
-        return;
-      }
-      ask(text);
-    },
-    [ask, pushBlock, runSlash, shellRun]
-  );
+    const silent = /^\/(clear|config|model|theme|exit)(\s|$)/i.test(message);
+    if (!silent && !message.startsWith("!")) pushBlock({ kind: "user", text: message });
 
-  const onInterrupt = useCallback(() => {
-    abortRef.current?.abort();
-  }, []);
+    if (message.startsWith("/")) runSlash(message);
+    else if (message.startsWith("!")) {
+      const result = shellRun(message.slice(1));
+      if (result?.clear) setBlocks([]);
+    } else ask(message);
+    focusPrompt();
+    scrollToEnd(message.toLowerCase() !== "/clear");
+  }, [ended, busy, input, menuOpen, menuMatches, clampedMenuIdx, history.length, runSlash, shellRun, ask, cancelRun, pushBlock, focusPrompt, scrollToEnd]);
 
-  const slashCommands = useMemo(
-    () => [
-      { name: "help", description: "Show available commands" },
-      { name: "open", description: "Open a project deep-dive" },
-      { name: "projects", description: "Jump to projects" },
-      { name: "about", description: "Jump to about" },
-      { name: "skills", description: "Jump to tech stack" },
-      { name: "experience", description: "Jump to experience" },
-      { name: "contact", description: "Jump to contact" },
-      { name: "research", description: "Spawn a research agent" },
-      { name: "tour", description: "3-agent guided tour" },
-      { name: "agents", description: "List running agents" },
-      { name: "model", description: "Show / switch model" },
-      { name: "resume", description: "Download resume.pdf" },
-      { name: "theme", description: "Toggle dark / light" },
-      { name: "status", description: "Session status" },
-      { name: "clear", description: "Clear the session" },
-      { name: "mode", description: "Back to VS Code shell" },
-      { name: "exit", description: "Back to VS Code shell" },
-    ],
-    []
-  );
+  // ── Keyboard ──
+  const onKeyDown = (e) => {
+    if (e.isComposing) return;
+    const key = e.key;
+    if (key === "Enter" && !e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault(); submitInput(); return;
+    }
+    if (key === "Tab" && e.shiftKey) { e.preventDefault(); cycleMode(); return; }
+    if (key === "Tab" && menuOpen && menuMatches.length) {
+      e.preventDefault(); setInput(menuMatches[clampedMenuIdx].name); return;
+    }
+    if ((key === "ArrowUp" || key === "ArrowDown") && menuOpen && menuMatches.length) {
+      e.preventDefault();
+      setMenuIdx((i) => (i + (key === "ArrowUp" ? -1 : 1) + menuMatches.length) % menuMatches.length);
+      return;
+    }
+    const caret = e.target.selectionStart;
+    const atFirstLine = !input.slice(0, caret).includes("\n");
+    const atLastLine = !input.slice(caret).includes("\n");
+    if (key === "ArrowUp" && atFirstLine && history.length) {
+      e.preventDefault();
+      if (histIdx === history.length) setSavedDraft(input);
+      const next = Math.max(0, histIdx - 1);
+      setHistIdx(next);
+      setInput(history[next]);
+      return;
+    }
+    if (key === "ArrowDown" && atLastLine && history.length) {
+      e.preventDefault();
+      const next = Math.min(history.length, histIdx + 1);
+      setHistIdx(next);
+      setInput(next === history.length ? savedDraft : history[next]);
+      return;
+    }
+    if (key === "?" && !input) { e.preventDefault(); pushBlock({ kind: "help" }); scrollToEnd(true); return; }
+    if (e.ctrlKey && key.toLowerCase() === "c") {
+      e.preventDefault();
+      if (busy) cancelRun();
+      else { setInput(""); }
+      return;
+    }
+    if (e.ctrlKey && key.toLowerCase() === "l") {
+      e.preventDefault(); scrollToEnd(true); return;
+    }
+  };
+
+  // Global keys: Esc handling (interrupt / dismiss menu / close panel).
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.isComposing) return;
+      if (!panel && e.key === "Escape") {
+        if (busy) { e.preventDefault(); cancelRun(); }
+        focusPrompt();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [panel, busy, cancelRun, focusPrompt]);
+
+  const cycleMode = () => {
+    setMode((m) => (m + 1) % MODE_LABELS.length);
+    focusPrompt();
+  };
+
+  // Sync textarea height.
+  const syncHeight = (el) => {
+    el.style.height = "26px";
+    el.style.height = `${Math.min(160, el.scrollHeight)}px`;
+  };
 
   const runningAgents = agents.filter((a) => a.status === "running").length;
 
+  // ── Window state helpers ──
+  const endSession = () => {
+    cancelRun(false);
+    setPanel(null);
+    setEnded(true);
+  };
+  const toggleMaximize = () => {
+    setWindowState((s) => (s === "maximized" ? "normal" : s === "minimized" ? "maximized" : "maximized"));
+  };
+
+  if (ended) {
+    return (
+      <div className="ct-stage">
+        <section className="ct-terminal" aria-label="Claude Code terminal">
+          <header className="ct-titlebar">
+            <div className="ct-window-controls" aria-label="Terminal window controls">
+              <button className="ct-window-control ct-window-close" onClick={endSession} aria-label="End session"><span aria-hidden="true">×</span></button>
+              <button className="ct-window-control ct-window-minimize" aria-label="Minimized" disabled><span aria-hidden="true">−</span></button>
+              <button className="ct-window-control ct-window-maximize" aria-label="Maximized" disabled><span aria-hidden="true">+</span></button>
+            </div>
+            <div className="ct-window-title"><span>~/portfolio — claude</span></div>
+          </header>
+          <section className="ct-session-ended">
+            <pre className="ct-mascot" aria-hidden="true">{MASCOT}</pre>
+            <h2 className="ct-greeting">See you next time.</h2>
+            <p>Your terminal session has ended.</p>
+            <button
+              className="ct-terminal-button"
+              onClick={() => { setEnded(false); setBlocks([]); focusPrompt(); }}
+            >
+              Restart session
+            </button>
+          </section>
+        </section>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-dvh flex flex-col bg-bg text-text font-mono">
-      {/* ── Header ── */}
-      <header className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 h-12 border-b border-border shrink-0">
-        <span className="text-accent text-lg select-none" aria-hidden="true">
-          {ICON}
-        </span>
-        <span className="font-display font-semibold text-base text-text">
-          Claude Code
-        </span>
-        <span className="text-[10px] text-comment/60 border border-border rounded px-1.5 py-0.5 select-none">
-          v3.0
-        </span>
-        <span className="hidden sm:inline text-[10px] text-comment/50 font-mono truncate">
-          ~/portfolio
-        </span>
-        <div className="ml-auto flex items-center gap-2">
-          <button
-            onClick={toggleTheme}
-            aria-label={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
-            title={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
-            className="w-8 h-8 flex items-center justify-center rounded-md text-comment hover:text-text hover:bg-border/30 transition-colors"
-          >
-            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
-              {theme === "dark" ? "light_mode" : "dark_mode"}
-            </span>
-          </button>
-          <ModeSwitcher />
-        </div>
-      </header>
+    <div className="ct-stage">
+      <section
+        className={`ct-terminal ${windowState === "minimized" ? "ct-minimized" : ""} ${
+          windowState === "maximized" ? "ct-maximized" : ""
+        } ${busy ? "ct-is-busy" : ""}`}
+        style={{ "--ct-font-size": `${config.fontSize}px` }}
+        aria-label="Claude Code terminal"
+      >
+        {/* ── Titlebar ── */}
+        <header className="ct-titlebar" onDoubleClick={(e) => { if (!e.target.closest("button")) toggleMaximize(); }}>
+          <div className="ct-window-controls" aria-label="Terminal window controls">
+            <button className="ct-window-control ct-window-close" onClick={endSession} title="End this session" aria-label="End session"><span aria-hidden="true">×</span></button>
+            <button
+              className="ct-window-control ct-window-minimize"
+              onClick={() => setWindowState((s) => (s === "minimized" ? "normal" : "minimized"))}
+              title="Minimize or restore"
+              aria-label="Minimize or restore terminal"
+            ><span aria-hidden="true">−</span></button>
+            <button
+              className="ct-window-control ct-window-maximize"
+              onClick={toggleMaximize}
+              title="Maximize or restore"
+              aria-label="Maximize or restore terminal"
+            ><span aria-hidden="true">+</span></button>
+          </div>
+          <div className="ct-window-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" style={{ color: "var(--ct-faint)", flexShrink: 0 }}>
+              <path d="M3 7.5V5a1 1 0 0 1 1-1h5l2 3h9a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7.5Z" />
+            </svg>
+            <span>portfolio — claude</span>
+          </div>
+          <span className="ct-window-meta">
+            <ModeSwitcher compact />
+          </span>
+        </header>
 
-      {/* ── Scrollback ── */}
-      <Scrollback blocks={blocks} />
+        {/* ── Viewport (scrollback) ── */}
+        <div
+          className="ct-viewport"
+          ref={viewportRef}
+          tabIndex={-1}
+          aria-label="Terminal output"
+          onScroll={(e) => {
+            const el = e.currentTarget;
+            autoScrollRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 90;
+          }}
+          onClick={(e) => {
+            if (e.target.closest("button, a, summary, details, input, textarea, select")) return;
+            if (!window.getSelection()?.toString()) focusPrompt();
+          }}
+        >
+          {/* Shell context */}
+          <div className="ct-shell-context" aria-hidden="true">
+            <div>
+              <span className="path">~/portfolio</span>
+              <span className="branch">git:(<span className="ct-branch-name" style={{ color: "var(--color-success)" }}>main</span>)</span>
+            </div>
+            <div className="ct-shell-command"><span className="chevron">❯</span><span>claude</span></div>
+          </div>
 
-      {/* ── Agents strip ── */}
-      <AgentPanel agents={agents} />
-
-      {/* ── Permission dialog (Claude-style) ── */}
-      {permission && (
-        <div className="border-t border-border bg-sidebar/60 px-3 sm:px-5 py-3 select-none">
-          <div className="max-w-3xl mx-auto">
-            <p className="text-sm text-text">{permission.title}</p>
-            {permission.detail && (
-              <p className="text-xs text-comment mt-0.5 italic">{permission.detail}</p>
-            )}
-            <div className="mt-2 space-y-1">
-              <button
-                onClick={() => answerPermission(true)}
-                className="block w-full text-left text-xs text-text hover:text-accent transition-colors"
-              >
-                <span className="text-accent mr-2">❯</span>1. Yes
-              </button>
-              <button
-                onClick={() => answerPermission(false)}
-                className="block w-full text-left text-xs text-comment hover:text-keyword transition-colors"
-              >
-                <span className="mr-4"> </span>2. No, and tell Claude what to do
-                differently (esc)
+          {/* Welcome panel */}
+          <section className="ct-welcome" aria-labelledby="ct-welcome-heading">
+            <h1 className="ct-welcome-heading" id="ct-welcome-heading">
+              Claude Code <span className="ct-version">v3.0</span>
+            </h1>
+            <div className="ct-welcome-identity">
+              <h2 className="ct-greeting">Welcome back, {config.userName}!</h2>
+              <pre className="ct-mascot" aria-label="Claude's pixel mascot" role="img">{MASCOT}</pre>
+              <div className="ct-identity-model">
+                <button type="button" className="ct-inline-command" onClick={() => setPanel({ type: "model" })} title="Change the model">
+                  {currentModel.name}
+                </button>
+                <span> · portfolio assistant</span>
+              </div>
+              <button type="button" className="ct-inline-command ct-identity-path" onClick={() => setPanel({ type: "config" })} title="Terminal settings">
+                ~/portfolio
               </button>
             </div>
-            <p className="text-[10px] text-comment/50 mt-2">
-              1 / 2 to choose · esc to cancel
-            </p>
-          </div>
-        </div>
-      )}
+            <div className="ct-welcome-info">
+              <div>
+                <h3>Tips for getting started</h3>
+                <p>
+                  Run <button type="button" className="ct-inline-command" onClick={() => { pushBlock({ kind: "user", text: "/open market_data" }); runSlash("/open market_data"); }}>/open market_data</button> to read a system-design deep-dive.
+                </p>
+                <p>
+                  Ask <button type="button" className="ct-inline-command" onClick={() => { const q = "What did he build at Zoho?"; pushBlock({ kind: "user", text: q }); ask(q); }}>"what did he build at Zoho?"</button> — the assistant knows the resume.
+                </p>
+                <p style={{ color: "var(--color-comment)" }}>
+                  Type <button type="button" className="ct-inline-command" onClick={() => { pushBlock({ kind: "user", text: "/help" }); runSlash("/help"); }}>/help</button> for commands, or <span style={{ color: "var(--color-text)" }}>!ls</span> for the shell.
+                </p>
+              </div>
+              <div className="ct-recent-activity">
+                <h3>Recent activity</h3>
+                <div className="ct-recent-line">
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{recent.text}</span>
+                  <span style={{ flexShrink: 0, color: "var(--ct-faint)", fontSize: "0.93em" }}>{recent.time}</span>
+                </div>
+              </div>
+            </div>
+          </section>
 
-      {/* ── Prompt ── */}
-      <ClaudePrompt
-        commands={slashCommands}
-        busy={busy}
-        history={history}
-        onSubmit={onSubmit}
-        onInterrupt={onInterrupt}
-      />
-
-      {/* ── Footer ── */}
-      <footer className="h-6 shrink-0 border-t border-border flex items-center justify-between px-3 sm:px-5 text-[10px] text-comment/60 select-none">
-        <span>
-          {ICON} claude code · ~/portfolio
-        </span>
-        <span className="flex items-center gap-2 sm:gap-3">
-          <span>{modelName}</span>
-          {runningAgents > 0 && (
-            <span className="text-accent">
-              {runningAgents} agent{runningAgents > 1 ? "s" : ""}
+          {/* Tip */}
+          <div className="ct-tip">
+            <span className="ct-tip-icon" aria-hidden="true">✻</span>
+            <span>
+              <strong>Tip:</strong> Type{" "}
+              <button type="button" className="ct-inline-command" onClick={() => { pushBlock({ kind: "user", text: "/tour" }); runSlash("/tour"); }}>/tour</button>{" "}
+              to watch the agents work.
             </span>
+          </div>
+
+          {/* Portfolio document */}
+          <CliWelcome />
+
+          {/* Conversation */}
+          <div className="ct-conversation" role="log" aria-label="Conversation" aria-live="polite">
+            {blocks.map((block) => {
+              switch (block.kind) {
+                case "user":
+                  return <Entry key={block.id} kind="user">{block.text}</Entry>;
+                case "system":
+                  return <Entry key={block.id} kind="system">{block.text}</Entry>;
+                case "assistant":
+                  return (
+                    <Entry key={block.id} kind="assistant">
+                      {block.error ? (
+                        <span style={{ color: "var(--color-keyword)" }}>{block.content}</span>
+                      ) : (
+                        <div className="ct-markdown-body">
+                          <TerminalMarkdown content={block.content || "…"} />
+                        </div>
+                      )}
+                    </Entry>
+                  );
+                case "tool":
+                  return (
+                    <ToolEntry key={block.id} name={block.name} path={block.path} output={block.output} defaultOpen={false} />
+                  );
+                case "tool-plain":
+                  return (
+                    <div key={block.id} className="ct-tool-output" style={{ marginTop: 4 }}>
+                      <span className="stem" aria-hidden="true">⎿</span>
+                      <pre>{block.text}</pre>
+                    </div>
+                  );
+                case "file":
+                  return (
+                    <div key={block.id} className="ct-tool-output" style={{ display: "block" }}>
+                      <span className="stem" aria-hidden="true">⎿</span>
+                      <CliFileView tabId={block.tabId} />
+                    </div>
+                  );
+                case "help":
+                  return (
+                    <Entry key={block.id} kind="assistant">
+                      <div>
+                        <h3 className="ct-help-heading">Available commands</h3>
+                        <div className="ct-help-grid">
+                          {SLASH_COMMANDS.map((c) => (
+                            <span key={c.name} className="ct-help-row" style={{ display: "contents" }}>
+                              <button type="button" className="ct-inline-command key" onClick={() => { pushBlock({ kind: "user", text: c.name }); runSlash(c.name); }}>{c.name}</button>
+                              <span style={{ color: "var(--color-comment)" }}>{c.description}</span>
+                            </span>
+                          ))}
+                        </div>
+                        <h3 className="ct-help-heading">Keyboard shortcuts</h3>
+                        <div className="ct-help-grid">
+                          {HELP_KEYS.map(([k, d]) => (
+                            <span key={k} style={{ display: "contents" }}>
+                              <span className="key">{k}</span>
+                              <span style={{ color: "var(--color-comment)" }}>{d}</span>
+                            </span>
+                          ))}
+                        </div>
+                        <p style={{ marginTop: 18, color: "var(--ct-faint)", fontSize: "0.85em" }}>
+                          This terminal is the portfolio of Shanmuga Ganesh — answers come from the
+                          portfolio docs, tools read real project write-ups. /tour and the window
+                          controls are extras for this edition.
+                        </p>
+                      </div>
+                    </Entry>
+                  );
+                default:
+                  return null;
+              }
+            })}
+          </div>
+
+          {/* Thinking row */}
+          {busy && (
+            <div className="ct-thinking" role="status">
+              <SpinnerGlyph active />
+              <span>{busy.label}</span>
+              <small>esc to interrupt</small>
+            </div>
           )}
-          <button
-            onClick={toggleTheme}
-            className="hover:text-text transition-colors cursor-pointer"
+        </div>
+
+        {/* ── Composer ── */}
+        <footer className="ct-composer">
+          {/* Slash menu */}
+          {menuOpen && menuMatches.length > 0 && (
+            <div className="ct-command-menu" role="listbox" aria-label="Slash commands">
+              {menuMatches.map((c, i) => (
+                <button
+                  key={c.name}
+                  type="button"
+                  role="option"
+                  aria-selected={i === clampedMenuIdx}
+                  className="ct-command-option"
+                  onMouseEnter={() => setMenuIdx(i)}
+                  onClick={() => { setInput(c.name); }}
+                >
+                  <span className="command-name">{c.name}</span>
+                  <span className="command-description">{c.description}</span>
+                </button>
+              ))}
+              <div className="ct-menu-footer" role="presentation">
+                ↑ ↓ navigate · enter select · tab complete · esc dismiss
+              </div>
+            </div>
+          )}
+
+          {/* Prompt form */}
+          <form
+            className="ct-prompt-form"
+            autoComplete="off"
+            onSubmit={(e) => { e.preventDefault(); submitInput(); }}
           >
-            {theme}
-          </button>
-        </span>
-      </footer>
+            <span className="ct-prompt-symbol" aria-hidden="true">❯</span>
+            <div className={`ct-input-wrap ${input.length === 0 ? "is-empty" : ""}`}>
+              <label htmlFor="ct-prompt" className="sr-only">Message or slash command</label>
+              <textarea
+                id="ct-prompt"
+                ref={inputRef}
+                className="ct-prompt-input"
+                rows={1}
+                maxLength={20000}
+                spellCheck={false}
+                autoCapitalize="off"
+                autoComplete="off"
+                autoCorrect="off"
+                placeholder='Try "what did he build at Zoho?"'
+                value={input}
+                onChange={(e) => { setInput(e.target.value); setMenuIdx(0); syncHeight(e.target); }}
+                onKeyDown={onKeyDown}
+                aria-controls="ct-command-menu"
+                aria-expanded={menuOpen}
+              />
+              <span className="ct-block-cursor" aria-hidden="true" />
+            </div>
+            <button
+              className="ct-send-button"
+              type="submit"
+              title={busy ? "Stop response (Escape)" : "Send message (Enter)"}
+              aria-label={busy ? "Stop response" : "Send message"}
+            >
+              {busy ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                  <rect x="6" y="6" width="12" height="12" rx="1" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M19 5v8a3 3 0 0 1-3 3H5m5-5-5 5 5 5" />
+                </svg>
+              )}
+            </button>
+          </form>
+
+          {/* Statusline */}
+          <div className="ct-statusline">
+            <div className="ct-status-left">
+              <button type="button" className="ct-text-button" onClick={() => { pushBlock({ kind: "help" }); scrollToEnd(true); }}>
+                ? for shortcuts
+              </button>
+              <button
+                type="button"
+                className="ct-text-button ct-mode-button"
+                data-mode={mode}
+                onClick={cycleMode}
+                title="Cycle visual permission mode (Shift+Tab)"
+              >
+                <span>{MODE_LABELS[mode]}</span>
+                <span className="ct-mode-hint"> · shift+tab to cycle</span>
+              </button>
+            </div>
+            <div className="ct-status-right">
+              <span title="Running agents">
+                {runningAgents > 0 ? `${runningAgents} agent${runningAgents > 1 ? "s" : ""} · ` : ""}
+              </span>
+              <span className="ct-status-dot" aria-hidden="true" />
+              <span>{currentModel.name}</span>
+            </div>
+          </div>
+        </footer>
+
+        {/* ── Modal panels ── */}
+        {panel && (
+          <div className="ct-panel-backdrop" onClick={(e) => { if (e.target === e.currentTarget) setPanel(null); }}>
+            <section className="ct-panel" role="dialog" aria-modal="true">
+              {panel.type === "model" && (
+                <>
+                  <div className="ct-panel-header">
+                    <h2 className="ct-panel-title">Select model</h2>
+                    <button type="button" className="ct-text-button ct-panel-close" onClick={() => setPanel(null)}>esc to close</button>
+                  </div>
+                  <p className="ct-panel-description">Pick the assistant that answers questions about Shanmuga's background.</p>
+                  <div className="ct-option-list">
+                    {models.map((m, i) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        className={`ct-option-button${m.id === model ? " is-selected" : ""}`}
+                        onClick={() => { setModel(m.id); setPanel(null); toast(`Model set to ${m.name}.`); }}
+                      >
+                        <span>{i + 1}. {m.name}</span>
+                        <span style={{ color: "var(--color-comment)" }}>{m.id === model ? "✓ selected" : m.description}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {panel.type === "config" && (
+                <>
+                  <div className="ct-panel-header">
+                    <h2 className="ct-panel-title">Terminal settings</h2>
+                    <button type="button" className="ct-text-button ct-panel-close" onClick={() => setPanel(null)}>esc to close</button>
+                  </div>
+                  <p className="ct-panel-description">Make this terminal your own. Everything stays in this browser.</p>
+                  <form
+                    className="ct-settings-form"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const name = e.target.elements["ct-setting-name"].value.trim() || "visitor";
+                      const size = Number(e.target.elements["ct-setting-font"].value);
+                      persistConfig({ userName: name.slice(0, 50), fontSize: Math.min(20, Math.max(12, size)) });
+                      setPanel(null);
+                      toast("Settings saved locally.");
+                    }}
+                  >
+                    <label className="ct-setting">
+                      <span>Your name (for the greeting)</span>
+                      <input id="ct-setting-name" type="text" defaultValue={config.userName} maxLength={50} required />
+                    </label>
+                    <div className="ct-settings-row">
+                      <label className="ct-setting">
+                        <span>Text size</span>
+                        <select id="ct-setting-font" defaultValue={config.fontSize}>
+                          {Array.from({ length: 9 }, (_, i) => (
+                            <option key={i + 12} value={i + 12}>{i + 12}px</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="ct-setting">
+                        <span>Theme</span>
+                        <select id="ct-setting-theme" defaultValue={theme} onChange={(e) => setTheme(e.target.value)}>
+                          <option value="dark">Dark</option>
+                          <option value="light">Light</option>
+                        </select>
+                      </label>
+                    </div>
+                    <div className="ct-form-actions">
+                      <button
+                        type="button"
+                        className="ct-text-button"
+                        style={{ fontSize: "0.79em" }}
+                        onClick={() => { persistConfig({ userName: "visitor", fontSize: 15 }); setPanel(null); toast("Default settings restored."); }}
+                      >
+                        Reset defaults
+                      </button>
+                      <button type="submit" className="ct-terminal-button">Save settings</button>
+                    </div>
+                  </form>
+                  <p style={{ marginTop: 17, fontSize: "0.77em", color: "var(--ct-faint)" }}>
+                    The directory label stays ~/portfolio — this terminal is Shanmuga's portfolio.
+                  </p>
+                </>
+              )}
+            </section>
+          </div>
+        )}
+
+        {/* ── Permission dialog (panel-styled) ── */}
+        {permission && (
+          <div className="ct-panel-backdrop">
+            <section className="ct-panel" role="dialog" aria-modal="true">
+              <div className="ct-panel-header">
+                <h2 className="ct-panel-title">{permission.title}</h2>
+                <button type="button" className="ct-text-button ct-panel-close" onClick={() => answerPermission(false)}>esc to cancel</button>
+              </div>
+              {permission.detail && <p className="ct-panel-description">{permission.detail}</p>}
+              <div className="ct-option-list">
+                <button type="button" className="ct-option-button" onClick={() => answerPermission(true)}>
+                  <span>1. Yes, proceed</span>
+                  <span style={{ color: "var(--color-comment)" }}>(y)</span>
+                </button>
+                <button type="button" className="ct-option-button" onClick={() => answerPermission(false)}>
+                  <span>2. No, and tell Claude what to do differently</span>
+                  <span style={{ color: "var(--color-comment)" }}>(esc)</span>
+                </button>
+              </div>
+            </section>
+          </div>
+        )}
+
+        {/* ── Toast ── */}
+        {toastMsg && <div className="ct-toast" role="status">{toastMsg}</div>}
+      </section>
     </div>
   );
 }
