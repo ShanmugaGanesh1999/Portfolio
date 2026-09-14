@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 
 /**
- * useScrollSpy — Tracks which section is currently visible in viewport
+ * useScrollSpy — Tracks which section is currently visible in the editor.
+ * The effect keys on a serialized id list, so callers may pass an inline
+ * array without tearing down the observer on every render.
  * @param {string[]} sectionIds - Array of section IDs to observe
  * @param {number} offset - Offset from top (default: 100)
  * @returns {string} - Currently active section ID
  */
 export default function useScrollSpy(sectionIds, offset = 100) {
   const [activeId, setActiveId] = useState(sectionIds[0] || "");
+  const idsKey = sectionIds.join(",");
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -26,13 +29,13 @@ export default function useScrollSpy(sectionIds, offset = 100) {
       }
     );
 
-    sectionIds.forEach((id) => {
+    idsKey.split(",").forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
 
     return () => observer.disconnect();
-  }, [sectionIds, offset]);
+  }, [idsKey, offset]);
 
   return activeId;
 }

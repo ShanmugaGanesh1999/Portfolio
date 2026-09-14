@@ -1,6 +1,6 @@
 # Case Western Reserve University - Software Engineer (Biotech)
 
-**Period:** March 2026 - Present  
+**Period:** March 2026 - July 2026  
 **Location:** Cleveland, OH  
 **Tags:** `PYTHON` · `HPC` · `MICROBIOME` · `AI` · `ML`
 

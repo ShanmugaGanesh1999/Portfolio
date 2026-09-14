@@ -1,23 +1,35 @@
-import { useState, useEffect } from "react";
+// ============================================================
+// SIDEBAR — VS Code Explorer: file tree with collapsible folders,
+// section links, project deep-dive files, prep courses, externals.
+// Consumes the workspace context directly. Rendered once by Layout
+// (static column on desktop, slide-in drawer on mobile).
+// ============================================================
+
+import { useState, useMemo } from "react";
 import { Icon, ResizeHandle } from "../ui";
 import { NAV_ITEMS, PERSONAL } from "../../data/portfolioData";
 import { PREP_COURSES } from "../../prep/prepData";
 import useScrollSpy from "../../hooks/useScrollSpy";
-import useResizable from "../../hooks/useResizable";
-import { useTheme } from "../../hooks/useTheme";
+import usePanelResize from "../../hooks/usePanelResize";
+import useMediaQuery from "../../hooks/useMediaQuery";
+import { useWorkspace } from "../../workspace/WorkspaceContext";
+import { SECTION_IDS } from "../../workspace/registry";
+
+const FOLDER_ORDER = ["Root_Directory", "about_me", "Lib_Modules", "Projects"];
 
 /**
- * FolderSection — A VS Code-style collapsible directory group.
- * Clicking the header toggles children visibility with a chevron indicator.
+ * FolderSection — collapsible directory group.
+ * Uses the grid-rows 0fr/1fr technique so height animates smoothly
+ * without the old max-height clipping problem.
  */
 function FolderSection({ label, defaultOpen = true, children }) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
     <div className="select-none">
-      {/* Folder header — clickable toggle */}
       <button
         onClick={() => setOpen((prev) => !prev)}
+        aria-expanded={open}
         className="flex items-center gap-1 w-full py-1.5 px-3 text-comment text-[10px] uppercase font-bold tracking-widest hover:bg-border/30 transition-colors cursor-pointer"
       >
         <Icon
@@ -28,230 +40,155 @@ function FolderSection({ label, defaultOpen = true, children }) {
         {label}
       </button>
 
-      {/* Collapsible content */}
       <div
-        className={`overflow-hidden transition-all duration-200 ease-in-out ${
-          open ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
+        className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
       >
-        {children}
+        <div className="overflow-hidden min-h-0">{children}</div>
       </div>
     </div>
   );
 }
 
-/**
- * PrepFolder — A collapsible subfolder inside the Prep section tree.
- * Used for week folders, subsections, etc.
- */
-function PrepFolder({ label, icon, indent = 1, defaultOpen = false, children }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div>
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 w-full text-left py-1 px-3 text-sm hover:bg-border/50 text-text transition-colors"
-        style={{ paddingLeft: `${indent * 12 + 12}px` }}
-      >
-        <Icon
-          name={open ? "expand_more" : "chevron_right"}
-          size="text-[14px]"
-          className="text-comment shrink-0"
-        />
-        <Icon name={icon || "folder"} size="text-[16px]" className="text-comment shrink-0" />
-        <span className="truncate">{label}</span>
-      </button>
-      {open && <div>{children}</div>}
-    </div>
-  );
-}
-
-/**
- * PrepFileLink — A single prep file entry that opens markdown in main content
- */
-function PrepFileLink({ label, icon, indent = 2, isActive, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex items-center gap-2 py-1 px-3 cursor-pointer text-sm transition-colors w-full text-left ${
-        isActive ? "bg-border text-accent" : "hover:bg-border/50 text-text"
-      }`}
-      style={{ paddingLeft: `${indent * 12 + 12}px` }}
-    >
-      <Icon name={icon || "description"} />
-      <span className="truncate">{label}</span>
-    </button>
-  );
-}
-
-/**
- * FileLink — A single file/folder entry inside a FolderSection
- */
-function FileLink({ label, icon, href, active = false, indent = false, external = false, projectId, onOpenProject, activeProject }) {
-  const baseClass = `flex items-center gap-2 py-1 px-3 cursor-pointer text-sm transition-colors ${
+/** Section / project file entries. */
+function FileLink({ label, icon, active = false, onClick, indent = false, external = false, href }) {
+  const baseClass = `flex items-center gap-2 py-1 px-3 cursor-pointer text-sm transition-colors w-full text-left ${
     indent ? "pl-7" : ""
-  }`;
-
-  // Project links — click to open project in main content
-  const isProjectActive = projectId && activeProject === projectId;
-  const stateClass = active || isProjectActive
-    ? "bg-border text-accent"
-    : "hover:bg-border/50 text-text";
-
-  if (projectId) {
-    return (
-      <button
-        onClick={() => onOpenProject?.(projectId)}
-        className={`${baseClass} ${stateClass} w-full text-left`}
-      >
-        <Icon name={icon} />
-        {label}
-      </button>
-    );
-  }
+  } ${active ? "bg-border text-accent" : "hover:bg-border/50 text-text"}`;
 
   if (external) {
     return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`${baseClass} ${stateClass}`}
-      >
+      <a href={href} target="_blank" rel="noopener noreferrer" className={baseClass}>
         <Icon name={icon} />
-        {label}
+        <span className="truncate">{label}</span>
       </a>
     );
   }
 
   return (
-    <a
-      href={href}
-      className={`${baseClass} ${stateClass}`}
-      onClick={(e) => {
-        // If viewing a project, clear it first then scroll to section
-        if (activeProject) {
-          e.preventDefault();
-          onOpenProject?.(null);
-          const targetId = href?.replace("#", "");
-          if (targetId) {
-            setTimeout(() => {
-              document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth" });
-            }, 50);
-          }
-        }
-      }}
-    >
+    <button onClick={onClick} className={baseClass} aria-current={active ? "page" : undefined}>
       <Icon name={icon} />
-      {label}
-    </a>
+      <span className="truncate">{label}</span>
+    </button>
   );
 }
 
-/**
- * Sidebar — VS Code file-explorer with collapsible directories.
- * Sections collapse/expand with chevron toggles to save vertical space.
- */
-export default function Sidebar({ activeProject, onOpenProject, onOpenPrepTab, onRequestClose }) {
-  const sectionIds = ["hero", "about", "expertise", "experience", "work", "contact"];
-  const activeSection = useScrollSpy(sectionIds);
-  const { width, startResize } = useResizable(256, 200, 500, onRequestClose, 120);
-  const { theme, toggle: toggleTheme } = useTheme();
+export default function Sidebar({ variant = "desktop" }) {
+  const ws = useWorkspace();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const { activeTabId } = ws.state;
+  const activeSection = useScrollSpy(SECTION_IDS);
+  const onWelcome = activeTabId === "welcome";
 
-  // Track session time
-  const [sessionTime, setSessionTime] = useState(0);
-  
-  useEffect(() => {
-    const startTime = Date.now();
-    const timer = setInterval(() => {
-      setSessionTime(Math.floor((Date.now() - startTime) / 1000));
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, []);
-  
-  // Format session time as "Xh Ym Zs" or "Xm Ys" or "Xs"
-  const formatSessionTime = (seconds) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    
-    if (h > 0) return `${h}h ${m}m ${s}s`;
-    if (m > 0) return `${m}m ${s}s`;
-    return `${s}s`;
+  const { size, startResize, handlers, nudge } = usePanelResize({
+    axis: "x",
+    defaultSize: 256,
+    minSize: 200,
+    maxSize: 480,
+    collapseBelow: 140,
+    onCollapse: () =>
+      isDesktop ? ws.setExplorer(false) : ws.setMobileDrawer(false),
+  });
+
+  // Group nav items by folder, preserving declaration order.
+  const sections = useMemo(
+    () =>
+      NAV_ITEMS.reduce((acc, item) => {
+        if (!acc[item.folder]) acc[item.folder] = [];
+        acc[item.folder].push(item);
+        return acc;
+      }, {}),
+    []
+  );
+
+  const handleSection = (sectionId) => {
+    ws.scrollToSection(sectionId);
+    if (!isDesktop) ws.setMobileDrawer(false);
   };
 
-  // Group nav items by their section key
-  const sections = NAV_ITEMS.reduce((acc, item) => {
-    if (!acc[item.section]) acc[item.section] = [];
-    acc[item.section].push(item);
-    return acc;
-  }, {});
-
-  const isActive = (item) => {
-    if (item.projectId) return false; // handled via activeProject
-    if (activeProject) return false; // no section active when viewing project
-    const target = item.href.replace("#", "");
-    return target === activeSection;
+  const handleProject = (projectId) => {
+    ws.openTab(projectId);
+    if (!isDesktop) ws.setMobileDrawer(false);
   };
 
   return (
-    <aside 
+    <aside
       className="border-r border-border bg-sidebar overflow-y-auto flex flex-col shrink-0 h-full relative"
-      style={{ width: typeof window !== 'undefined' && window.innerWidth >= 768 ? `${width}px` : '280px' }}
+      style={{ width: variant === "desktop" ? `${size}px` : "280px" }}
     >
       {/* Explorer title */}
       <div className="p-4 border-b border-border shrink-0">
         <div className="flex items-center justify-between">
           <div className="text-accent font-bold text-sm">EXPLORER</div>
-          <button
-            onClick={toggleTheme}
-            className="flex items-center justify-center w-7 h-7 rounded hover:bg-border/50 transition-colors group cursor-pointer"
-            title={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
-          >
-            <Icon
-              name={theme === "dark" ? "light_mode" : "dark_mode"}
-              size="text-[16px]"
-              className="text-comment group-hover:text-accent transition-colors"
-            />
-          </button>
+          {variant === "mobile" && (
+            <button
+              onClick={() => ws.setMobileDrawer(false)}
+              aria-label="Close explorer drawer"
+              className="flex items-center justify-center w-7 h-7 rounded hover:bg-border/50 transition-colors text-comment hover:text-keyword"
+            >
+              <Icon name="close" size="text-[16px]" />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* File tree — fills available space */}
-      <nav className="flex-1 overflow-y-auto py-1">
-        {Object.entries(sections).map(([section, items]) => (
-          <FolderSection key={section} label={section} defaultOpen>
-            {items.map((item) => (
-              <FileLink
-                key={item.label}
-                label={item.label}
-                icon={item.icon}
-                href={item.href}
-                active={isActive(item)}
-                indent={item.indent}
-                projectId={item.projectId}
-                onOpenProject={onOpenProject}
-                activeProject={activeProject}
-              />
-            ))}
-          </FolderSection>
-        ))}
+      {/* File tree */}
+      <nav className="flex-1 overflow-y-auto py-1" aria-label="Explorer file tree">
+        {FOLDER_ORDER.map((folder) =>
+          sections[folder] ? (
+            <FolderSection key={folder} label={folder} defaultOpen>
+              {sections[folder].map((item) =>
+                item.projectId ? (
+                  <FileLink
+                    key={item.label}
+                    label={item.label}
+                    icon={item.icon}
+                    active={activeTabId === item.projectId}
+                    onClick={() => handleProject(item.projectId)}
+                  />
+                ) : (
+                  <FileLink
+                    key={item.label}
+                    label={item.label}
+                    icon={item.icon}
+                    active={onWelcome && item.sectionId === activeSection}
+                    onClick={() => handleSection(item.sectionId)}
+                  />
+                )
+              )}
+            </FolderSection>
+          ) : null
+        )}
 
-        {/* Prep — DSA & System Design folders (click to open tab bar) */}
+        {/* Prep — DSA & System Design courses */}
         <FolderSection label="Prep" defaultOpen={false}>
           {PREP_COURSES.map((course) => {
-            const isActive = activeProject?.startsWith(`prep:${course.id}`);
+            const active = activeTabId === `prep:${course.id}`;
             return (
               <button
                 key={course.id}
-                onClick={() => onOpenPrepTab?.(course.id)}
+                onClick={() => {
+                  ws.openPrepPanel(course.id);
+                  if (!isDesktop) ws.setMobileDrawer(false);
+                }}
                 className={`flex items-center gap-2 w-full text-left py-1 px-3 text-sm transition-colors ${
-                  isActive ? "bg-border text-accent" : "hover:bg-border/50 text-text"
+                  active ? "bg-border text-accent" : "hover:bg-border/50 text-text"
                 }`}
                 style={{ paddingLeft: "36px" }}
+                aria-current={active ? "page" : undefined}
               >
-                <Icon name={course.icon} size="text-[16px]" className="text-comment shrink-0" />
+                <Icon
+                  name={course.icon}
+                  size="text-[16px]"
+                  className={
+                    active
+                      ? "text-accent shrink-0"
+                      : course.color === "success"
+                      ? "text-success shrink-0"
+                      : "text-accent shrink-0"
+                  }
+                />
                 <span className="truncate">
                   {course.id === "dsa" ? "DSA" : "System_Design"}
                 </span>
@@ -260,57 +197,27 @@ export default function Sidebar({ activeProject, onOpenProject, onOpenPrepTab, o
           })}
         </FolderSection>
 
-        {/* External Links — collapsed by default so upper sections get room */}
+        {/* External links */}
         <FolderSection label="External_Links" defaultOpen={false}>
-          <FileLink
-            label="github.com"
-            icon="link"
-            href={PERSONAL.socialLinks.github}
-            external
-          />
-          <FileLink
-            label="linkedin.com"
-            icon="link"
-            href={PERSONAL.socialLinks.linkedin}
-            external
-          />
-          <FileLink
-            label="leetcode.com"
-            icon="code"
-            href={PERSONAL.socialLinks.leetcode}
-            external
-          />
-          <FileLink
-            label="shanmugaganesh.dev"
-            icon="public"
-            href={PERSONAL.socialLinks.website}
-            external
-          />
-          <FileLink
-            label="calendar.google"
-            icon="event"
-            href={PERSONAL.calendlyUrl}
-            external
-          />
-          <FileLink
-            label="resume.pdf"
-            icon="download"
-            href={PERSONAL.resumeUrl}
-            external
-          />
+          <FileLink label="github.com" icon="link" href={PERSONAL.socialLinks.github} external />
+          <FileLink label="linkedin.com" icon="link" href={PERSONAL.socialLinks.linkedin} external />
+          <FileLink label="leetcode.com" icon="code" href={PERSONAL.socialLinks.leetcode} external />
+          <FileLink label="shanmugaganesh.dev" icon="public" href={PERSONAL.socialLinks.website} external />
+          <FileLink label="calendar.google" icon="event" href={PERSONAL.calendlyUrl} external />
+          <FileLink label="resume.pdf" icon="download" href={PERSONAL.resumeUrl} external />
         </FolderSection>
       </nav>
 
-      {/* Status indicator — always at bottom */}
-      <div className="shrink-0 p-4 border-t border-border bg-sidebar">
-        <div className="text-[10px] text-success flex items-center gap-2">
-          <Icon name="schedule" size="text-[12px]" className="text-success" />
-          Session: {formatSessionTime(sessionTime)}
-        </div>
-      </div>
-
-      {/* Resize handle */}
-      <ResizeHandle onMouseDown={startResize} side="right" />
+      {/* Resize handle (desktop only) */}
+      {variant === "desktop" && (
+        <ResizeHandle
+          side="right"
+          startResize={startResize}
+          handlers={handlers}
+          nudge={nudge}
+          label="Resize explorer sidebar"
+        />
+      )}
     </aside>
   );
 }

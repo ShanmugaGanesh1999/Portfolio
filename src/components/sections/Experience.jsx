@@ -1,5 +1,6 @@
 import { Prompt, TerminalWindow, Badge } from "../ui";
 import { EXPERIENCE } from "../../data/portfolioData";
+import { useWorkspace } from "../../workspace/WorkspaceContext";
 
 /**
  * ExperienceCard — Single career entry (reusable)
@@ -34,7 +35,7 @@ function ExperienceCard({ period, title, company, description, tags, tagColor, o
                   {before}
                   <button
                     onClick={() => onOpenProject(projectId)}
-                    className="text-func underline decoration-func/40 underline-offset-2 hover:text-white hover:decoration-white/60 transition-colors cursor-pointer"
+                    className="text-func underline decoration-func/40 underline-offset-2 hover:text-text hover:decoration-func transition-colors cursor-pointer"
                   >
                     {linkText}
                   </button>
@@ -62,16 +63,19 @@ function ExperienceCard({ period, title, company, description, tags, tagColor, o
 }
 
 /**
- * Experience — Career timeline section
+ * Experience — Career timeline section.
+ * Inline project links open the matching editor tab.
  */
-export default function Experience({ onOpenProject }) {
+export default function Experience() {
+  const ws = useWorkspace();
+
   return (
     <section className="space-y-4" id="experience">
       <Prompt command="tail -f career.log" />
 
       <div className="space-y-3">
         {EXPERIENCE.map((exp) => (
-          <ExperienceCard key={exp.period} {...exp} onOpenProject={onOpenProject} />
+          <ExperienceCard key={exp.period} {...exp} onOpenProject={ws.openTab} />
         ))}
       </div>
     </section>

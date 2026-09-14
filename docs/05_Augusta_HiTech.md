@@ -1,6 +1,6 @@
 # Augusta Hitech Software Solution - Junior Associate (Full Stack Software Developer)
 
-**Period:** November 2020 - December 2021  
+**Period:** November 2018 - December 2021  
 **Location:** Coimbatore, India  
 **Tags:** `ANGULAR` · `NODE.JS` · `CRM` · `API`
 

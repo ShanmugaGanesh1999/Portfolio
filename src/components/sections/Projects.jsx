@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Prompt, TerminalWindow, ProgressBar, Icon } from "../ui";
 import { PROJECTS } from "../../data/portfolioData";
 
@@ -27,6 +28,7 @@ function AsciiArtPreview() {
  * ProjectCard — Individual project display
  */
 function ProjectCard({ project }) {
+  const [denied, setDenied] = useState(false);
   const {
     title,
     subtitle,
@@ -41,6 +43,7 @@ function ProjectCard({ project }) {
     highlightLabel,
     tags,
     link,
+    proprietary,
   } = project;
 
   const textColors = {
@@ -65,10 +68,10 @@ function ProjectCard({ project }) {
             </span>
             <a
               href={link}
-              className="hover:text-white transition-colors"
+              className="hover:text-text transition-colors"
               aria-label={`View ${title}`}
             >
-              <Icon name="open_in_new" size="text-sm" className="text-comment hover:text-white" />
+              <Icon name="open_in_new" size="text-sm" className="text-comment hover:text-text" />
             </a>
           </div>
         </div>
@@ -116,6 +119,49 @@ function ProjectCard({ project }) {
           <span className={`text-[10px] ${textColors[statusColor]} font-mono ml-auto`}>
             STATUS: {status}
           </span>
+        </div>
+      </TerminalWindow>
+    );
+  }
+
+  // Proprietary card — details restricted by employer
+  if (proprietary) {
+    return (
+      <TerminalWindow
+        className="p-4 cursor-pointer select-none hover:border-keyword/60 transition-colors"
+        onClick={() => setDenied((d) => !d)}
+      >
+        <h3 className="text-variable font-bold flex items-center gap-2">
+          {title}
+          <Icon
+            name={denied ? "lock_open" : "lock"}
+            size="text-sm"
+            className="text-comment"
+          />
+        </h3>
+        <p className="text-xs text-comment mt-2">{description}</p>
+        {tags && (
+          <div className="flex gap-2 mt-3">
+            {tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-[8px] font-bold bg-border/50 px-1.5 py-0.5 border border-border text-comment"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+        <div className="mt-3 pt-3 border-t border-border">
+          {denied ? (
+            <span className="text-[10px] text-keyword font-mono">
+              ACCESS_DENIED: It's proprietary so I cannot show that.
+            </span>
+          ) : (
+            <span className={`text-[10px] ${textColors[statusColor]} font-mono`}>
+              STATUS: {status}
+            </span>
+          )}
         </div>
       </TerminalWindow>
     );

@@ -14,8 +14,8 @@ export default function Header() {
         </div>
         <div className="text-xs text-comment truncate">
           <Icon name="terminal" size="text-[14px]" className="mr-1" />
-          <span className="hidden sm:inline">shanmuga@sg-sys: ~/portfolio/v2.0</span>
-          <span className="sm:hidden">~/portfolio/v2.0</span>
+          <span className="hidden sm:inline">shanmuga@sg-sys: ~/portfolio/v3.0</span>
+          <span className="sm:hidden">~/portfolio/v3.0</span>
         </div>
       </div>
       <div className="text-[10px] text-comment font-bold hidden sm:block">

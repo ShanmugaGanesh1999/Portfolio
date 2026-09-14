@@ -4,7 +4,7 @@ import { CERTIFICATIONS } from "../../data/portfolioData";
 /**
  * CertBadge — Individual certification badge (reusable)
  */
-function CertBadge({ name, color }) {
+function CertBadge({ name, color, icon = "verified" }) {
   const borderColors = {
     accent: "border-accent/20",
     success: "border-success/20",
@@ -30,7 +30,7 @@ function CertBadge({ name, color }) {
       }`}
     >
       <Icon
-        name="verified"
+        name={icon}
         size="text-sm"
         className={iconColors[color] || "text-accent"}
       />

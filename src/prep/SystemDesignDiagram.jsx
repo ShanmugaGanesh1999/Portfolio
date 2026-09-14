@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useMemo, useId } from "react";
+import useMediaQuery from "../hooks/useMediaQuery";
 import { parseMermaid } from "./parseMermaid";
 import { renderNodeBackground } from "../utils/nodeShapes";
 import { useThemeColors } from "../hooks/useTheme";
@@ -155,8 +156,9 @@ function SubgraphRegion({ sg, nodes, dim }) {
 // SystemDesignDiagram — pan / zoom / click-inspect
 // ══════════════════════════════════════════════════
 export default function SystemDesignDiagram({ mermaidCode }) {
+  const isMobile = useMediaQuery("(max-width: 639px)");
   const C = useThemeColors();
-  const { nodes, edges, subgraphs } = useMemo(
+  const { nodes, edges, subgraphs, warnings } = useMemo(
     () => parseMermaid(mermaidCode),
     [mermaidCode],
   );
@@ -233,10 +235,10 @@ export default function SystemDesignDiagram({ mermaidCode }) {
       {/* ── Controls ── */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex items-center border border-border rounded-md overflow-hidden shrink-0">
-          <button onClick={zOut} className="px-2 py-1 text-xs text-comment hover:text-white hover:bg-border/50 transition-colors" title="Zoom out">−</button>
+          <button onClick={zOut} className="px-2 py-1 text-xs text-comment hover:text-text hover:bg-border/50 transition-colors" title="Zoom out">−</button>
           <span className="text-[10px] text-comment px-2 border-x border-border tabular-nums">{Math.round(tf.s * 100)}%</span>
-          <button onClick={zIn} className="px-2 py-1 text-xs text-comment hover:text-white hover:bg-border/50 transition-colors" title="Zoom in">+</button>
-          <button onClick={zRst} className="px-2 py-1 text-[10px] text-comment hover:text-white hover:bg-border/50 transition-colors border-l border-border" title="Reset">RESET</button>
+          <button onClick={zIn} className="px-2 py-1 text-xs text-comment hover:text-text hover:bg-border/50 transition-colors" title="Zoom in">+</button>
+          <button onClick={zRst} className="px-2 py-1 text-[10px] text-comment hover:text-text hover:bg-border/50 transition-colors border-l border-border" title="Reset">RESET</button>
         </div>
         {/* Legend */}
         <div className="flex items-center gap-2 flex-wrap ml-auto">
@@ -249,12 +251,23 @@ export default function SystemDesignDiagram({ mermaidCode }) {
         </div>
       </div>
 
+      {/* ── Parser warnings ── */}
+      {warnings.length > 0 && (
+        <div className="border border-variable/40 bg-variable/10 rounded-md px-3 py-1.5 text-[10px] text-variable flex items-start gap-2">
+          <span className="shrink-0 font-bold">⚠ MERMAID_PARSE</span>
+          <span className="leading-relaxed">
+            {warnings.slice(0, 3).join(" · ")}
+            {warnings.length > 3 ? ` (+${warnings.length - 3} more)` : ""}
+          </span>
+        </div>
+      )}
+
       {/* ── Canvas ── */}
       <div
         ref={ref}
         className="border border-border rounded-md bg-sidebar/30 overflow-hidden relative"
         style={{
-          height: typeof window !== "undefined" && window.innerWidth < 640 ? "280px" : "420px",
+          height: isMobile ? "280px" : "420px",
           cursor: pan ? "grabbing" : "grab",
           touchAction: "none",
         }}
@@ -264,6 +277,16 @@ export default function SystemDesignDiagram({ mermaidCode }) {
         onPointerLeave={pUp}
         onClick={() => setSel(null)}
       >
+        {/* Empty state */}
+        {nodes.length === 0 && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-comment select-none z-10">
+            <span className="text-xl opacity-50">◇</span>
+            <span className="text-xs font-bold">EMPTY_DIAGRAM</span>
+            <span className="text-[10px] opacity-70">
+              No renderable nodes found in the mermaid source
+            </span>
+          </div>
+        )}
         {/* Grid */}
         <div
           className="absolute inset-0 opacity-[0.03]"

@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { chatQuery, getSuggestedQuestions, getAvailableModels, getDefaultModelId } from "../../services/chatService";
 import { Icon } from "../ui";
+import { useWorkspace } from "../../workspace/WorkspaceContext";
 
 // ─── Timestamp Formatter ─────────────────────────────────────
 
@@ -66,36 +69,64 @@ function ChatMessage({ message }) {
   );
 }
 
-// ─── Minimal Markdown Renderer ───────────────────────────────
+// ─── Markdown Renderer (safe — ReactMarkdown, no raw HTML) ───
+
+const MD_COMPONENTS = {
+  p: (props) => <p className="mb-1.5 last:mb-0 leading-[1.6]" {...props} />,
+  strong: (props) => <strong className="font-bold text-text" {...props} />,
+  em: (props) => <em className="text-string" {...props} />,
+  a: ({ href, children }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-accent underline decoration-accent/30 underline-offset-2 hover:decoration-accent/60 transition-colors"
+    >
+      {children}
+    </a>
+  ),
+  h1: (props) => <h1 className="font-bold text-text text-[15px] mt-3 mb-1.5 first:mt-0" {...props} />,
+  h2: (props) => <h2 className="font-bold text-text text-[14px] mt-3 mb-1.5 first:mt-0" {...props} />,
+  h3: (props) => <h3 className="font-bold text-text text-[13px] mt-2.5 mb-1 first:mt-0" {...props} />,
+  ul: (props) => <ul className="list-disc ml-4 space-y-1 my-1.5 marker:text-success" {...props} />,
+  ol: (props) => <ol className="list-decimal ml-4 space-y-1 my-1.5 marker:text-variable" {...props} />,
+  li: (props) => <li className="leading-[1.5] pl-0.5" {...props} />,
+  blockquote: (props) => (
+    <blockquote className="border-l-2 border-accent/40 pl-3 my-1.5 text-comment italic" {...props} />
+  ),
+  hr: () => <hr className="border-border my-2" />,
+  pre: (props) => (
+    <pre className="bg-bg border border-border rounded-md p-2.5 my-1.5 overflow-x-auto text-[11px] font-mono scrollbar-thin" {...props} />
+  ),
+  code: ({ className, children, ...props }) => {
+    const isBlock = /language-/.test(className || "");
+    if (isBlock) return <code className={`${className} font-mono`} {...props}>{children}</code>;
+    return (
+      <code className="bg-border/40 px-1.5 py-0.5 rounded-md text-variable text-[12px] font-mono" {...props}>
+        {children}
+      </code>
+    );
+  },
+  table: (props) => (
+    <div className="overflow-x-auto my-2 scrollbar-thin">
+      <table className="w-full text-[11px] border-collapse" {...props} />
+    </div>
+  ),
+  th: (props) => (
+    <th className="border border-border bg-border/30 px-2 py-1 text-left font-bold text-accent" {...props} />
+  ),
+  td: (props) => <td className="border border-border px-2 py-1 align-top" {...props} />,
+};
 
 function MarkdownRenderer({ content }) {
   if (!content) return null;
-
-  const parts = content.split("\n").map((line, i) => {
-    // Bold
-    line = line.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-text">$1</strong>');
-    // Inline code
-    line = line.replace(/`([^`]+)`/g, '<code class="bg-border/40 px-1.5 py-0.5 rounded-md text-variable text-[12px] font-mono">$1</code>');
-    // Links
-    line = line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" class="text-accent underline decoration-accent/30 underline-offset-2 hover:decoration-accent/60 transition-colors">$1</a>');
-    
-    // Bullet points
-    if (line.match(/^[-•]\s/)) {
-      const text = line.slice(2);
-      return <p key={i} className="flex gap-2 mb-1"><span className="text-success shrink-0">›</span><span dangerouslySetInnerHTML={{ __html: text }} /></p>;
-    }
-    
-    // Headings
-    if (line.match(/^#{1,3}\s/)) {
-      const text = line.replace(/^#{1,3}\s/, "");
-      return <p key={i} className="font-bold text-text text-[14px] mt-3 mb-2 first:mt-0" dangerouslySetInnerHTML={{ __html: text }} />;
-    }
-
-    if (!line.trim()) return <br key={i} />;
-    return <p key={i} className="mb-1.5 last:mb-0" dangerouslySetInnerHTML={{ __html: line }} />;
-  });
-
-  return <div className="space-y-0">{parts}</div>;
+  return (
+    <div className="break-words">
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
 }
 
 // ─── Model Switcher ──────────────────────────────────────────
@@ -173,6 +204,7 @@ function ModelSwitcher({ selectedModel, onModelChange }) {
 // ─── Main Chat Panel ─────────────────────────────────────────
 
 export default function CopilotChat({ isOpen, onClose }) {
+  const ws = useWorkspace();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -254,6 +286,7 @@ export default function CopilotChat({ isOpen, onClose }) {
         }
         return updated;
       });
+      ws.log("copilot", `answered query with ${currentModel.name}`);
     } catch (err) {
       if (err.name === "AbortError") return;
 
@@ -272,6 +305,7 @@ export default function CopilotChat({ isOpen, onClose }) {
       setIsLoading(false);
       abortRef.current = null;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, messages, selectedModel, models]);
 
   const handleSubmit = (e) => {
@@ -305,7 +339,7 @@ export default function CopilotChat({ isOpen, onClose }) {
         </div>
         <button
           onClick={onClose}
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-comment hover:text-white hover:bg-border/50 transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-lg flex items-center justify-center text-comment hover:text-text hover:bg-border/50 transition-colors cursor-pointer"
           aria-label="Close Copilot"
           title="Close Copilot"
         >

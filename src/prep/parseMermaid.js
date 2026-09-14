@@ -32,7 +32,7 @@ const DEFAULT_COLOR = "comment";
 /**
  * Main entry point.
  * @param {string} raw — raw mermaid source (content between ```mermaid fences)
- * @returns {{ nodes: Array, edges: Array, subgraphs: Array }}
+ * @returns {{ nodes: Array, edges: Array, subgraphs: Array, warnings: string[] }}
  */
 export function parseMermaid(raw) {
   const lines = raw.split("\n").map((l) => l.trim()).filter(Boolean);
@@ -41,16 +41,22 @@ export function parseMermaid(raw) {
   const edges = [];
   const subgraphs = [];         // { name, nodeIds[], color }
   const subgraphStack = [];     // for nested subgraphs
+  const warnings = [];
   let colorIdx = 0;
 
   for (const line of lines) {
     // ── Skip graph declaration ──
     if (/^graph\s+(TD|TB|LR|RL|BT)/i.test(line)) continue;
 
+    // ── Skip comments / style directives ──
+    if (/^(%%|style |classDef |click )/i.test(line)) continue;
+
     // ── Subgraph end ──
     if (/^end$/i.test(line)) {
       if (subgraphStack.length > 0) {
         subgraphs.push(subgraphStack.pop());
+      } else {
+        warnings.push('Unmatched "end" ignored');
       }
       continue;
     }
@@ -89,7 +95,11 @@ export function parseMermaid(raw) {
     if (nd) {
       nodesMap.set(nd.id, nd);
       addToCurrentSubgraph(subgraphStack, nd.id);
+      continue;
     }
+
+    // ── Unrecognized line — surface it instead of dropping silently ──
+    warnings.push(`Unsupported syntax skipped: "${line.slice(0, 60)}${line.length > 60 ? "…" : ""}"`);
   }
 
   // Flush any unclosed subgraphs
@@ -111,8 +121,46 @@ export function parseMermaid(raw) {
     if (src && src.color !== DEFAULT_COLOR) e.color = src.color;
   }
 
+  if (nodesMap.size === 0) {
+    warnings.push("No diagram nodes were recognized — the diagram may be empty.");
+  }
+  if (hasCycle(Array.from(nodesMap.keys()), edges)) {
+    warnings.push("Cycle detected — cyclic nodes are drawn in the top row and may overlap.");
+  }
+
   const nodes = layoutNodes(Array.from(nodesMap.values()), edges, subgraphs);
-  return { nodes, edges, subgraphs };
+  return { nodes, edges, subgraphs, warnings };
+}
+
+// ──────────────────────────────────────
+// Cycle detection (iterative DFS over the edge list)
+// ──────────────────────────────────────
+function hasCycle(nodeIds, edges) {
+  const adj = new Map(nodeIds.map((id) => [id, []]));
+  for (const e of edges) {
+    if (adj.has(e.from) && adj.has(e.to)) adj.get(e.from).push(e.to);
+  }
+  const state = new Map(nodeIds.map((id) => [id, 0])); // 0=unvisited 1=in-stack 2=done
+
+  for (const start of nodeIds) {
+    if (state.get(start) !== 0) continue;
+    const stack = [[start, 0]];
+    while (stack.length) {
+      const [node, nextIdx] = stack[stack.length - 1];
+      if (nextIdx === 0) state.set(node, 1);
+      const neighbors = adj.get(node) ?? [];
+      if (nextIdx < neighbors.length) {
+        stack[stack.length - 1][1] += 1;
+        const nb = neighbors[nextIdx];
+        if (state.get(nb) === 1) return true;
+        if (state.get(nb) === 0) stack.push([nb, 0]);
+      } else {
+        state.set(node, 2);
+        stack.pop();
+      }
+    }
+  }
+  return false;
 }
 
 // ──────────────────────────────────────

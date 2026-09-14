@@ -4,12 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Apply the saved theme before first paint (no flash of wrong theme) -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("sg-theme");
+          if (t !== "light" && t !== "dark") t = "dark";
+        } catch (e) {
+          t = "dark";
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      })();
+    </script>
     
     <!-- Primary Meta Tags -->
-    <title>Shanmuga Ganesh | Full Stack Software Engineer | AI, Data & Cloud Systems</title>
-    <meta name="title" content="Shanmuga Ganesh | Full Stack Software Engineer | AI, Data & Cloud Systems" />
-    <meta name="description" content="Full Stack Software Engineer with 5+ years building scalable Java, Python, React, Angular, and AWS applications across AI assisted data workflows, microbiome analytics, backend APIs, cloud systems, and real time processing." />
-    <meta name="keywords" content="Full Stack Software Engineer, Java Developer, Python Developer, React Developer, Angular Developer, AWS, AI Data Workflows, Microbiome Analytics, Backend APIs, Cloud Systems, RAG, LLM Workflows, GraphQL, Cleveland OH" />
+    <title>Shanmuga Ganesh | Senior Full-Stack AI Software Engineer | AI, Data & Cloud Systems</title>
+    <meta name="title" content="Shanmuga Ganesh | Senior Full-Stack AI Software Engineer | AI, Data & Cloud Systems" />
+    <meta name="description" content="Senior Full-Stack AI Software Engineer with 8+ years building scalable Java, Python, React, and Next.js applications across Generative AI, LLM workflows, RAG, Databricks, backend APIs, distributed systems, and real time data pipelines." />
+    <meta name="keywords" content="Senior Full-Stack AI Software Engineer, Full Stack Software Engineer, Java Developer, Python Developer, React Developer, Next.js Developer, Angular Developer, AWS, Azure, Databricks, Generative AI, RAG, LLM Workflows, Microsoft Entra ID, Backend APIs, Cloud Systems, Real Time Data Pipelines, GraphQL, Cleveland OH" />
     <meta name="author" content="Shanmuga Ganesh" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://shanmugaganesh.dev/" />
@@ -17,8 +29,8 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://shanmugaganesh.dev/" />
-    <meta property="og:title" content="Shanmuga Ganesh | Full Stack Software Engineer" />
-    <meta property="og:description" content="Full Stack Software Engineer with 5+ years building scalable Java, Python, React, Angular, and AWS applications across AI assisted data workflows, microbiome analytics, backend APIs, cloud systems, and real time processing." />
+    <meta property="og:title" content="Shanmuga Ganesh | Senior Full-Stack AI Software Engineer" />
+    <meta property="og:description" content="Senior Full-Stack AI Software Engineer with 8+ years building scalable Java, Python, React, and Next.js applications across Generative AI, LLM workflows, RAG, Databricks, backend APIs, distributed systems, and real time data pipelines." />
     <meta property="og:image" content="https://shanmugaganesh.dev/og-image.png" />
     <meta property="og:site_name" content="Shanmuga Ganesh Portfolio" />
     <meta property="og:locale" content="en_US" />
@@ -26,12 +38,12 @@
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://shanmugaganesh.dev/" />
-    <meta property="twitter:title" content="Shanmuga Ganesh | Full Stack Software Engineer" />
-    <meta property="twitter:description" content="Full Stack Software Engineer with 5+ years building scalable Java, Python, React, Angular, and AWS applications across AI assisted data workflows, microbiome analytics, backend APIs, cloud systems, and real time processing." />
+    <meta property="twitter:title" content="Shanmuga Ganesh | Senior Full-Stack AI Software Engineer" />
+    <meta property="twitter:description" content="Senior Full-Stack AI Software Engineer with 8+ years building scalable Java, Python, React, and Next.js applications across Generative AI, LLM workflows, RAG, Databricks, backend APIs, distributed systems, and real time data pipelines." />
     <meta property="twitter:image" content="https://shanmugaganesh.dev/og-image.png" />
     
     <!-- Additional SEO -->
-    <meta name="theme-color" content="#1e1e1e" />
+    <meta name="theme-color" content="#0d1117" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     
@@ -43,10 +55,10 @@
       "name": "Shanmuga Ganesh",
       "url": "https://shanmugaganesh.dev/",
       "image": "https://shanmugaganesh.dev/og-image.png",
-      "jobTitle": "Full Stack Software Engineer",
+      "jobTitle": "Senior Full-Stack AI Software Engineer",
       "worksFor": {
         "@type": "Organization",
-        "name": "Case Western Reserve University"
+        "name": "Sherwin Williams"
       },
       "alumniOf": {
         "@type": "EducationalOrganization",
@@ -71,19 +83,28 @@
         "Java",
         "Python",
         "React",
+        "Next.js",
         "Angular",
         "Spring Boot",
         "AWS",
+        "Azure",
+        "Databricks",
+        "Generative AI",
+        "LLM Workflows",
+        "RAG",
+        "Prompt Engineering",
+        "Microsoft Entra ID",
         "AI Assisted Data Workflows",
         "Microbiome Analytics",
         "Backend APIs",
         "Cloud Systems",
         "GraphQL",
-        "RAG",
-        "LLM Workflows",
         "ML Pipelines",
+        "Real Time Data Pipelines",
+        "ACID Transactions",
         "Testing",
         "Performance Tuning",
+        "Observability",
         "Microservices",
         "Distributed Systems",
         "RESTful APIs"

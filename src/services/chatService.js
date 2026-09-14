@@ -12,9 +12,7 @@
 import { MASTER_SYSTEM_PROMPT, RAG_CHUNKS } from "../data/masterPrompt";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const GOOGLE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models";
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
-const GOOGLE_API_KEY = "AIzaSyBt59VUZIIWQ3JGPhgQV2vr59pC0B9-eQo";
 
 // ─── Available Models (Fast & Cost-Effective Only) ───────────
 
@@ -223,86 +221,10 @@ function buildMessages(query, conversationHistory = []) {
   return [systemMessage, ...recentHistory, { role: "user", content: query }];
 }
 
-// ─── Google Gemini API Call ──────────────────────────────────
-
-async function callGoogleAPI(messages, modelConfig, onChunk, signal) {
-  const url = `${GOOGLE_API_URL}/${modelConfig.routerModel}:streamGenerateContent?key=${GOOGLE_API_KEY}`;
-  
-  // Convert messages to Google format
-  const contents = messages
-    .filter(m => m.role !== "system")
-    .map(m => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }]
-    }));
-
-  // Add system instruction
-  const systemMessage = messages.find(m => m.role === "system");
-  
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      contents,
-      systemInstruction: systemMessage ? {
-        parts: [{ text: systemMessage.content }]
-      } : undefined,
-      generationConfig: {
-        maxOutputTokens: modelConfig.maxTokens,
-        temperature: modelConfig.temperature,
-      },
-    }),
-    signal,
-  });
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error?.message || `Google API error: ${response.status}`);
-  }
-
-  if (onChunk) {
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let fullText = "";
-    let buffer = "";
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      
-      // Google sends JSON objects separated by newlines
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
-
-      for (const line of lines) {
-        if (!line.trim()) continue;
-        try {
-          const parsed = JSON.parse(line);
-          const content = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (content) {
-            fullText += content;
-            onChunk(content);
-          }
-        } catch {
-          // Skip malformed chunks
-        }
-      }
-    }
-    return fullText;
-  }
-
-  const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Google API.";
-}
-
-// ─── Chat API Call (Router) ──────────────────────────────────
+// ─── Chat API Call (OpenRouter) ───────────────────────────────
 
 /**
- * Send a query to selected model (OpenRouter or Google API).
+ * Send a query to the selected model via OpenRouter (SSE streaming).
  * @param {string} query - User's question
  * @param {Array} conversationHistory - Previous messages [{role, content}]
  * @param {function} onChunk - Callback for each streamed text chunk
@@ -317,42 +239,43 @@ export async function chatQuery(
   signal = null,
   modelId = DEFAULT_MODEL,
 ) {
-  // Guard: validate & rate-limit before hitting the API
+  // Guard: config check first, then validate & rate-limit.
+  if (!OPENROUTER_API_KEY) {
+    throw new Error(
+      "The portfolio assistant is not configured right now. Please reach Shanmuga directly at shanmugaganesh1999@gmail.com."
+    );
+  }
   validateInput(query);
   checkRateLimit();
 
   const modelConfig = MODELS[modelId] || MODELS[DEFAULT_MODEL];
   const messages = buildMessages(query, conversationHistory);
 
-  // Route to appropriate provider
-  if (modelConfig.provider === "google") {
-    return callGoogleAPI(messages, modelConfig, onChunk, signal);
-  }
-
-  // OpenRouter path
-  if (!OPENROUTER_API_KEY) {
+  let response;
+  try {
+    response = await fetch(OPENROUTER_API_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": window.location.origin,
+        "X-Title": "Shanmuga Ganesh Portfolio",
+      },
+      body: JSON.stringify({
+        model: modelConfig.routerModel,
+        messages,
+        stream: !!onChunk,
+        max_tokens: modelConfig.maxTokens,
+        temperature: modelConfig.temperature,
+      }),
+      signal,
+    });
+  } catch (err) {
+    if (err.name === "AbortError") throw err;
     throw new Error(
-      "OpenRouter API key not configured. Add VITE_OPENROUTER_API_KEY to your .env file."
+      "Network error — the assistant could not be reached. Check your connection and try again."
     );
   }
-
-  const response = await fetch(OPENROUTER_API_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": window.location.origin,
-      "X-Title": "Shanmuga Ganesh Portfolio",
-    },
-    body: JSON.stringify({
-      model: modelConfig.routerModel,
-      messages,
-      stream: !!onChunk,
-      max_tokens: modelConfig.maxTokens,
-      temperature: modelConfig.temperature,
-    }),
-    signal,
-  });
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));

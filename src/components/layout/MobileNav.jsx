@@ -1,11 +1,16 @@
+// ============================================================
+// MOBILE NAV — compact bar below the header on small screens.
+// Hamburger (explorer drawer) + scrollable section tabs + prep
+// dropdown (portal) + palette search + copilot + theme toggle.
+// ============================================================
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Icon } from "../ui";
 import { PREP_COURSES } from "../../prep/prepData";
+import { useWorkspace } from "../../workspace/WorkspaceContext";
+import { useTheme } from "../../hooks/useTheme";
 
-/**
- * MOBILE_SECTIONS — Main portfolio sections for quick nav
- */
 const MOBILE_SECTIONS = [
   { id: "hero", label: "Home", icon: "terminal" },
   { id: "about", label: "About", icon: "person" },
@@ -15,29 +20,34 @@ const MOBILE_SECTIONS = [
   { id: "contact", label: "Contact", icon: "mail" },
 ];
 
-/**
- * MobileNav — VS Code-style mobile navigation bar
- * 
- * Renders below the header on mobile (md:hidden).
- * Contains: hamburger menu, scrollable section tabs, prep shortcut, copilot toggle.
- * Replaces the floating FABs for a cleaner mobile UX.
- */
-export default function MobileNav({
-  activeSection,
-  activeProject,
-  onOpenProject,
-  sidebarOpen,
-  onToggleSidebar,
-  chatOpen,
-  onToggleChat,
-  onOpenPrepTab,
-}) {
+/** Static color map — Tailwind can't see interpolated class names. */
+const COURSE_ICON_COLORS = {
+  success: "text-success",
+  accent: "text-accent",
+  keyword: "text-keyword",
+  variable: "text-variable",
+  func: "text-func",
+};
+
+export default function MobileNav({ activeSection }) {
+  const ws = useWorkspace();
+  const { theme, toggle } = useTheme();
   const [prepOpen, setPrepOpen] = useState(false);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
   const prepBtnRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  // Compute fixed position from button rect when opening
+  const { activeTabId, mobileDrawerOpen, chatOpen } = ws.state;
+  const activeTab = ws.state.tabs.find((t) => t.id === activeTabId);
+
+  // Which tab appears active in the section strip.
+  const active =
+    activeTab?.kind === "prep"
+      ? "prep"
+      : activeTab?.kind === "project"
+      ? "work"
+      : activeSection || "hero";
+
   const openDropdown = useCallback(() => {
     if (prepBtnRef.current) {
       const r = prepBtnRef.current.getBoundingClientRect();
@@ -46,7 +56,7 @@ export default function MobileNav({
     setPrepOpen((v) => !v);
   }, []);
 
-  // Close prep dropdown on outside click
+  // Close the prep dropdown on outside click or Escape.
   useEffect(() => {
     if (!prepOpen) return;
     const handleClick = (e) => {
@@ -57,53 +67,34 @@ export default function MobileNav({
         setPrepOpen(false);
       }
     };
+    const handleKey = (e) => {
+      if (e.key === "Escape") setPrepOpen(false);
+    };
     document.addEventListener("pointerdown", handleClick);
-    return () => document.removeEventListener("pointerdown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("pointerdown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
   }, [prepOpen]);
-
-  // Determine which tab is active
-  const getActiveTab = () => {
-    if (activeProject?.startsWith("prep:")) return "prep";
-    if (activeProject) return "work"; // viewing a project detail
-    return activeSection || "hero";
-  };
-
-  const active = getActiveTab();
-
-  const handleSectionClick = (sectionId) => {
-    // If currently viewing a project, clear it first
-    if (activeProject) {
-      onOpenProject?.(null);
-      setTimeout(() => {
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
-      }, 50);
-    } else {
-      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  const handlePrepClick = (courseId) => {
-    setPrepOpen(false);
-    onOpenPrepTab?.(courseId);
-  };
 
   return (
     <div className="md:hidden border-b border-border bg-sidebar shrink-0 relative">
       <div className="flex items-center h-10">
-        {/* ── Hamburger / Explorer Toggle ── */}
+        {/* Hamburger / Explorer drawer */}
         <button
-          onClick={onToggleSidebar}
+          onClick={ws.toggleMobileDrawer}
           className={`shrink-0 w-10 h-10 flex items-center justify-center border-r border-border transition-colors ${
-            sidebarOpen
+            mobileDrawerOpen
               ? "text-accent bg-border/30"
-              : "text-comment hover:text-white hover:bg-border/20"
+              : "text-comment hover:text-text hover:bg-border/20"
           }`}
-          aria-label={sidebarOpen ? "Close Explorer" : "Open Explorer"}
+          aria-label={mobileDrawerOpen ? "Close Explorer" : "Open Explorer"}
         >
-          <Icon name={sidebarOpen ? "close" : "menu"} size="text-[20px]" />
+          <Icon name={mobileDrawerOpen ? "close" : "menu"} size="text-[20px]" />
         </button>
 
-        {/* ── Scrollable Section Tabs ── */}
+        {/* Scrollable section tabs */}
         <div className="flex-1 overflow-x-auto flex items-center scrollbar-none">
           <div className="flex items-center">
             {MOBILE_SECTIONS.map((section) => {
@@ -111,8 +102,8 @@ export default function MobileNav({
               return (
                 <button
                   key={section.id}
-                  onClick={() => handleSectionClick(section.id)}
-                  className={`flex items-center gap-1.5 px-3 h-10 text-[11px] font-medium whitespace-nowrap border-b-2 transition-all ${
+                  onClick={() => ws.scrollToSection(section.id)}
+                  className={`flex items-center gap-1.5 px-3 h-10 text-[11px] font-medium whitespace-nowrap border-b-2 transition-colors ${
                     isActive
                       ? "border-accent text-accent bg-border/15"
                       : "border-transparent text-comment hover:text-text hover:bg-border/10"
@@ -124,12 +115,14 @@ export default function MobileNav({
               );
             })}
 
-            {/* ── Prep Dropdown ── */}
+            {/* Prep dropdown */}
             <div className="relative">
               <button
                 ref={prepBtnRef}
                 onClick={openDropdown}
-                className={`flex items-center gap-1.5 px-3 h-10 text-[11px] font-medium whitespace-nowrap border-b-2 transition-all ${
+                aria-expanded={prepOpen}
+                aria-haspopup="menu"
+                className={`flex items-center gap-1.5 px-3 h-10 text-[11px] font-medium whitespace-nowrap border-b-2 transition-colors ${
                   active === "prep"
                     ? "border-success text-success bg-success/5"
                     : "border-transparent text-comment hover:text-text hover:bg-border/10"
@@ -143,43 +136,65 @@ export default function MobileNav({
                 />
               </button>
 
-              {/* Dropdown rendered via portal with fixed positioning to escape overflow clip */}
-              {prepOpen && createPortal(
-                <div
-                  ref={dropdownRef}
-                  className="fixed bg-sidebar border border-border rounded-md shadow-xl shadow-black/40 z-[9999] min-w-[180px] py-1 animate-fade-in-up"
-                  style={{ top: dropdownPos.top, left: dropdownPos.left, animationDuration: "0.15s" }}
-                >
-                  {PREP_COURSES.map((course) => {
-                    const isActive = activeProject?.startsWith(`prep:${course.id}`);
-                    return (
-                      <button
-                        key={course.id}
-                        onClick={() => handlePrepClick(course.id)}
-                        className={`flex items-center gap-2.5 w-full px-3 py-2 text-xs transition-colors ${
-                          isActive
-                            ? "bg-border text-accent"
-                            : "text-text hover:bg-border/50"
-                        }`}
-                      >
-                        <Icon name={course.icon} size="text-[16px]" className={`text-${course.color}`} />
-                        <div className="text-left">
-                          <div className="font-medium">{course.title}</div>
-                          <div className="text-[10px] text-comment">{course.subtitle}</div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>,
-                document.body
-              )}
+              {prepOpen &&
+                createPortal(
+                  <div
+                    ref={dropdownRef}
+                    role="menu"
+                    className="fixed bg-sidebar border border-border rounded-md shadow-xl shadow-black/40 z-[9999] min-w-[180px] py-1 animate-fade-in-up"
+                    style={{
+                      top: dropdownPos.top,
+                      left: dropdownPos.left,
+                      animationDuration: "0.15s",
+                    }}
+                  >
+                    {PREP_COURSES.map((course) => {
+                      const isActive = activeTabId === `prep:${course.id}`;
+                      return (
+                        <button
+                          key={course.id}
+                          role="menuitem"
+                          onClick={() => {
+                            setPrepOpen(false);
+                            ws.openPrepPanel(course.id);
+                          }}
+                          className={`flex items-center gap-2.5 w-full px-3 py-2 text-xs transition-colors ${
+                            isActive
+                              ? "bg-border text-accent"
+                              : "text-text hover:bg-border/50"
+                          }`}
+                        >
+                          <Icon
+                            name={course.icon}
+                            size="text-[16px]"
+                            className={COURSE_ICON_COLORS[course.color] ?? "text-accent"}
+                          />
+                          <div className="text-left">
+                            <div className="font-medium">{course.title}</div>
+                            <div className="text-[10px] text-comment">{course.subtitle}</div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>,
+                  document.body
+                )}
             </div>
           </div>
         </div>
 
-        {/* ── Copilot Toggle ── */}
+        {/* Palette search */}
         <button
-          onClick={onToggleChat}
+          onClick={() => ws.openPalette("files")}
+          className="shrink-0 w-10 h-10 flex items-center justify-center border-l border-border text-comment hover:text-accent hover:bg-border/20 transition-colors"
+          aria-label="Search (command palette)"
+        >
+          <Icon name="search" size="text-[20px]" />
+        </button>
+
+        {/* Copilot */}
+        <button
+          onClick={ws.toggleChat}
           className={`shrink-0 w-10 h-10 flex items-center justify-center border-l border-border transition-colors ${
             chatOpen
               ? "text-success bg-success/10"
@@ -188,6 +203,15 @@ export default function MobileNav({
           aria-label={chatOpen ? "Close Copilot" : "Open Copilot"}
         >
           <Icon name="smart_toy" size="text-[20px]" />
+        </button>
+
+        {/* Theme toggle */}
+        <button
+          onClick={toggle}
+          className="shrink-0 w-10 h-10 flex items-center justify-center border-l border-border text-comment hover:text-accent hover:bg-border/20 transition-colors"
+          aria-label={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
+        >
+          <Icon name={theme === "dark" ? "light_mode" : "dark_mode"} size="text-[20px]" />
         </button>
       </div>
     </div>

@@ -1,197 +1,263 @@
-import { useState } from "react";
+// ============================================================
+// LAYOUT — the VS Code application shell.
+//   Header → ActivityBar | Explorer | PrepPanel | Editor(tabs,
+//   breadcrumbs, main) | Copilot → Panel(terminal/output) →
+//   StatusBar. Mobile swaps Explorer for a drawer + MobileNav.
+// ============================================================
+
+import {
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import PrepTabBar from "./PrepTabBar";
 import MobilePrepBar from "./MobilePrepBar";
-import StatusBar from "./StatusBar";
 import MobileNav from "./MobileNav";
+import ActivityBar from "./ActivityBar";
+import TabStrip from "./TabStrip";
+import Breadcrumbs from "./Breadcrumbs";
+import StatusBar from "./StatusBar";
+import Panel from "./Panel";
+import CommandPalette from "./CommandPalette";
 import CopilotChat from "../chat/CopilotChat";
-import { Icon, ResizeHandle } from "../ui";
-import useResizableRight from "../../hooks/useResizableRight";
+import { ResizeHandle } from "../ui";
+import usePanelResize from "../../hooks/usePanelResize";
+import useMediaQuery from "../../hooks/useMediaQuery";
 import useScrollSpy from "../../hooks/useScrollSpy";
+import { useWorkspace } from "../../workspace/WorkspaceContext";
+import { useGlobalShortcuts } from "../../workspace/useGlobalShortcuts";
+import { SECTION_IDS } from "../../workspace/registry";
+import EditorContent from "../../workspace/EditorContent";
+import { PREP_COURSES } from "../../prep/prepData";
 
-/**
- * Layout — Main application shell (header + sidebar + content + statusbar)
- * Mirrors a VS Code / Terminal IDE layout. Sidebar always visible, content area changes.
- */
-export default function Layout({ children, activeProject, onOpenProject }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [desktopSidebarVisible, setDesktopSidebarVisible] = useState(true);
-  const [chatOpen, setChatOpen] = useState(false);
-  const [prepTabCourse, setPrepTabCourse] = useState(null);
-  const [prepTabVisible, setPrepTabVisible] = useState(true);
-  const { width: chatWidth, isResizing, startResize } = useResizableRight(420, 320, 800, () => setChatOpen(false), 150);
+export default function Layout() {
+  const ws = useWorkspace();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  useGlobalShortcuts();
+  const { state } = ws;
 
-  // Scroll spy for mobile nav active state
-  const sectionIds = ["hero", "about", "expertise", "experience", "work", "contact"];
-  const activeSection = useScrollSpy(sectionIds);
+  const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
+  const activePrepCourseId = activeTab?.kind === "prep" ? activeTab.id.slice(5) : null;
+  const prepFile = activePrepCourseId
+    ? state.prepFiles[activePrepCourseId] ?? null
+    : null;
+  const activePrepCourse = activePrepCourseId
+    ? PREP_COURSES.find((c) => c.id === activePrepCourseId)
+    : null;
 
-  // Parse prep routes to extract course ID
-  const parsePrepRoute = (id) => {
-    if (!id?.startsWith("prep:")) return null;
-    const [, courseId, ...rest] = id.split(":");
-    return { courseId, filePath: rest.join(":") };
-  };
+  // Scroll-spy drives the active section marker on the Welcome tab.
+  const activeSection = useScrollSpy(SECTION_IDS);
 
-  const activePrep = parsePrepRoute(activeProject);
+  // Copilot panel resize (desktop only).
+  const chat = usePanelResize({
+    axis: "x",
+    invert: true,
+    defaultSize: 420,
+    minSize: 320,
+    maxSize: 800,
+    collapseBelow: 220,
+    onCollapse: () => ws.setChat(false),
+  });
+
+  // ── Editor content ──────────────────────────────────────────
+  // Memoized on the tab + prep file so unrelated workspace changes
+  // (panel toggles, log entries) never re-render the document tree.
+  const content = useMemo(
+    () => (
+      <EditorContent
+        tab={activeTab}
+        prepFile={prepFile}
+        onNavigatePrep={ws.openPrepFile}
+        onBack={ws.closeActiveTab}
+      />
+    ),
+    // Deliberately key on the tab *id*, not the tab object, so workspace
+    // state changes (panels, log) never re-render the document tree.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeTab?.id, prepFile, ws.openPrepFile, ws.closeActiveTab]
+  );
+
+  const mainRef = ws.editorScrollRef;
+
+  // ── Editor scroll events → StatusBar (rAF throttled) ────────
+  useEffect(() => {
+    const el = mainRef.current;
+    if (!el) return;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        ws.notifyEditorScroll({ scrollTop: el.scrollTop });
+      });
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Per-tab scroll persistence ──────────────────────────────
+  const prevTabIdRef = useRef(state.activeTabId);
+  useLayoutEffect(() => {
+    const el = mainRef.current;
+    if (!el) return;
+    const prev = prevTabIdRef.current;
+    if (prev !== state.activeTabId) {
+      ws.updateTabState(prev, { scrollY: el.scrollTop });
+      const saved = ws.getTabState(state.activeTabId);
+      prevTabIdRef.current = state.activeTabId;
+      el.scrollTop = saved.scrollY ?? 0;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.activeTabId]);
+
+  // ── Section scrolling (Welcome tab) ─────────────────────────
+  const pendingSectionRef = useRef(null);
+
+  const doScroll = useCallback((sectionId) => {
+    const el = mainRef.current;
+    const target = document.getElementById(sectionId);
+    if (!el || !target) return;
+    const top =
+      target.getBoundingClientRect().top -
+      el.getBoundingClientRect().top +
+      el.scrollTop -
+      8;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollTo({ top: Math.max(0, top), behavior: reduce ? "auto" : "smooth" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // After switching back to the Welcome tab, scroll to the requested section.
+  useLayoutEffect(() => {
+    if (pendingSectionRef.current && state.activeTabId === "welcome") {
+      const id = pendingSectionRef.current;
+      pendingSectionRef.current = null;
+      requestAnimationFrame(() => doScroll(id));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.activeTabId]);
+
+  // Register the implementation once; consumers call ws.scrollToSection(id).
+  useEffect(() => {
+    ws.registerScrollToSection((sectionId) => {
+      if (ws.stateRef.current.activeTabId !== "welcome") {
+        pendingSectionRef.current = sectionId;
+        ws.setActiveTab("welcome");
+      } else {
+        doScroll(sectionId);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-dvh flex flex-col">
       <Header />
 
-      {/* Mobile Navigation Bar — replaces floating FABs */}
-      <MobileNav
-        activeSection={activeSection}
-        activeProject={activeProject}
-        onOpenProject={onOpenProject}
-        sidebarOpen={sidebarOpen}
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-        chatOpen={chatOpen}
-        onToggleChat={() => setChatOpen(!chatOpen)}
-        onOpenPrepTab={(courseId) => {
-          setPrepTabCourse(courseId);
-          setPrepTabVisible(true);
-        }}
-      />
-
-      {/* Mobile Prep Bar — top nav for prep content on mobile */}
-      {prepTabCourse && prepTabVisible && (
-        <MobilePrepBar
-          courseId={prepTabCourse}
-          activePath={activePrep?.filePath}
-          onNavigate={(courseId, filePath) => {
-            onOpenProject?.(`prep:${courseId}:${filePath}`);
-          }}
-          onClose={() => {
-            setPrepTabCourse(null);
-            setPrepTabVisible(false);
-          }}
+      {/* Mobile navigation bar */}
+      {!isDesktop && (
+        <MobileNav
+          activeSection={activeTab?.kind === "welcome" ? activeSection : null}
         />
       )}
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Desktop sidebar toggle - show when sidebar is collapsed */}
-        {!desktopSidebarVisible && (
-          <button
-            className="hidden md:flex fixed bottom-8 left-4 z-50 bg-accent text-bg w-10 h-10 rounded-full items-center justify-center shadow-lg hover:bg-accent/90 transition-colors"
-            onClick={() => setDesktopSidebarVisible(true)}
-            aria-label="Open Explorer"
-            title="Open Explorer"
-          >
-            <Icon name="folder_open" size="text-[18px]" />
-          </button>
-        )}
+      {/* Mobile prep bar — shown while a prep tab is active */}
+      {!isDesktop && activePrepCourse && (
+        <MobilePrepBar course={activePrepCourse} activePath={prepFile} />
+      )}
 
-        {/* Mobile sidebar overlay backdrop */}
-        {sidebarOpen && (
+      <div className="flex flex-1 overflow-hidden min-h-0">
+        <ActivityBar />
+
+        {/* Mobile drawer backdrop */}
+        {!isDesktop && state.mobileDrawerOpen && (
           <div
-            className="md:hidden fixed inset-0 bg-black/60 z-40"
-            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 bg-black/60 z-40"
+            onClick={() => ws.setMobileDrawer(false)}
+            aria-hidden="true"
           />
         )}
 
-        {/* Mobile sidebar — slide-in from left */}
-        <div
-          className={`md:hidden ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } fixed z-50 transition-transform duration-200 h-full`}
-        >
-          <Sidebar 
-            activeProject={activeProject} 
-            onOpenProject={(id) => {
-              onOpenProject?.(id);
-              setSidebarOpen(false);
-            }}
-            onOpenPrepTab={(courseId) => {
-              setPrepTabCourse(courseId);
-              setPrepTabVisible(true);
-              setSidebarOpen(false);
-            }}
-            onRequestClose={() => setSidebarOpen(false)}
+        {/* Sidebar — single instance: static column on desktop, drawer on mobile */}
+        {(!isDesktop || state.explorerOpen) && (
+          <div
+            className={
+              isDesktop
+                ? "relative shrink-0"
+                : `fixed inset-y-0 left-0 z-50 transition-transform duration-200 ease-out ${
+                    state.mobileDrawerOpen ? "translate-x-0" : "-translate-x-full"
+                  }`
+            }
+          >
+            <Sidebar variant={isDesktop ? "desktop" : "mobile"} />
+          </div>
+        )}
+
+        {/* Prep side panel (desktop) */}
+        {isDesktop && state.prepPanel.courseId && state.prepPanel.visible && (
+          <PrepTabBar
+            courseId={state.prepPanel.courseId}
+            activePath={state.prepFiles[state.prepPanel.courseId]}
           />
+        )}
+
+        {/* Editor column */}
+        <div
+          id="editor-pane"
+          role="tabpanel"
+          aria-labelledby={`tab-${state.activeTabId}`}
+          className="flex-1 flex flex-col min-w-0"
+        >
+          <TabStrip />
+          <Breadcrumbs />
+          <main
+            ref={mainRef}
+            tabIndex={-1}
+            className={`flex-1 overflow-y-auto scroll-smooth min-h-0 ${
+              activePrepCourse
+                ? "px-3 pb-4 sm:px-6 sm:pb-6"
+                : "p-3 space-y-8 sm:p-6 sm:space-y-12"
+            }`}
+          >
+            {content}
+          </main>
         </div>
 
-        {/* Desktop sidebar — controlled by desktopSidebarVisible */}
-        {desktopSidebarVisible && (
-          <div className="hidden md:block relative z-auto">
-            <Sidebar 
-              activeProject={activeProject} 
-              onOpenProject={(id) => {
-                onOpenProject?.(id);
-                setSidebarOpen(false);
-              }}
-              onOpenPrepTab={(courseId) => {
-                setPrepTabCourse(courseId);
-                setPrepTabVisible(true);
-                setSidebarOpen(false);
-              }}
-              onRequestClose={() => setDesktopSidebarVisible(false)}
-            />
-          </div>
-        )}
-
-        {/* Reopen Sidebar Button (desktop only) */}
-        {!desktopSidebarVisible && (
-          <button
-            onClick={() => setDesktopSidebarVisible(true)}
-            className="hidden md:flex items-center justify-center w-8 h-full border-r border-border bg-sidebar hover:bg-border/30 transition-colors group shrink-0"
-            title="Open Explorer"
-          >
-            <Icon name="folder_open" size="text-[18px]" className="text-comment group-hover:text-accent transition-colors" />
-          </button>
-        )}
-
-        {/* Prep Tab Bar — desktop only side panel */}
-        {prepTabCourse && prepTabVisible && (
-          <div className="hidden md:block">
-            <PrepTabBar
-              courseId={prepTabCourse}
-              activePath={activePrep?.filePath}
-              onNavigate={(courseId, filePath) => {
-                onOpenProject?.(`prep:${courseId}:${filePath}`);
-              }}
-              onClose={() => {
-                setPrepTabCourse(null);
-                setPrepTabVisible(false);
-              }}
-              onRequestClose={() => setPrepTabVisible(false)}
-            />
-          </div>
-        )}
-
-        {/* Reopen Prep Tab Button (desktop only) */}
-        {prepTabCourse && !prepTabVisible && (
-          <button
-            onClick={() => setPrepTabVisible(true)}
-            className="hidden md:flex items-center justify-center w-8 h-full border-r border-border bg-sidebar hover:bg-border/30 transition-colors group shrink-0"
-            title={`Open ${prepTabCourse === 'dsa' ? 'DSA' : 'System Design'} Files`}
-          >
-            <Icon name="description" size="text-[18px]" className="text-comment group-hover:text-accent transition-colors" />
-          </button>
-        )}
-
-        <main className={`flex-1 overflow-y-auto scroll-smooth ${
-          activePrep ? 'px-3 pb-4 sm:px-6 sm:pb-6' : 'p-3 space-y-8 sm:p-6 sm:space-y-12'
-        }`}>
-          {children}
-        </main>
-
-        {/* Copilot Panel - part of layout on desktop, overlay on mobile */}
-        {chatOpen && (
+        {/* Copilot panel — inline pane on desktop, overlay on mobile */}
+        {state.chatOpen && (
           <div
-            className="transition-all duration-300 ease-out overflow-hidden border-l-2 border-accent/30 md:relative fixed top-0 right-0 bottom-0 z-50 shadow-2xl shadow-black/50"
-            style={{ width: typeof window !== 'undefined' && window.innerWidth >= 768 ? `${chatWidth}px` : '100%' }}
+            className={
+              isDesktop
+                ? "relative shrink-0 overflow-hidden border-l border-border shadow-lg"
+                : "fixed inset-0 z-50 shadow-2xl"
+            }
+            style={{ width: isDesktop ? `${chat.size}px` : "100%" }}
           >
-            <ResizeHandle onMouseDown={startResize} side="left" />
-            <CopilotChat isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+            {isDesktop && (
+              <ResizeHandle
+                side="left"
+                startResize={chat.startResize}
+                handlers={chat.handlers}
+                nudge={chat.nudge}
+                label="Resize Copilot panel"
+              />
+            )}
+            <CopilotChat isOpen onClose={() => ws.setChat(false)} />
           </div>
         )}
       </div>
 
-      {/* StatusBar — hidden on mobile (MobileNav replaces it) */}
-      <div className="hidden md:block">
-        <StatusBar onToggleChat={() => setChatOpen(!chatOpen)} chatOpen={chatOpen} />
-      </div>
+      <Panel />
+      <StatusBar />
+      {state.paletteOpen && <CommandPalette />}
     </div>
   );
 }

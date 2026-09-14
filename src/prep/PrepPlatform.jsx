@@ -256,6 +256,39 @@ function LoadingSkeleton() {
 // ══════════════════════════════════════════════════
 // PrepPlatform — Pure markdown reader for prep content
 // ══════════════════════════════════════════════════
+
+/** Module-level markdown cache — returning to a file never refetches it. */
+const mdCache = new Map();
+
+function fetchPrepMarkdown(url) {
+  if (mdCache.has(url)) return mdCache.get(url);
+  const promise = fetch(url)
+    .then((res) => {
+      if (!res.ok) throw new Error(`File not found: ${filePathLabel(url)}`);
+      return res.text();
+    })
+    .catch((err) => {
+      mdCache.delete(url); // allow retry after a failure
+      throw err;
+    });
+  mdCache.set(url, promise);
+  return promise;
+}
+
+function filePathLabel(url) {
+  const parts = url.split("/");
+  return parts.slice(-2).join("/");
+}
+
+/** Static color map — Tailwind can't see interpolated class names. */
+const COURSE_TEXT_COLORS = {
+  success: "text-success",
+  accent: "text-accent",
+  keyword: "text-keyword",
+  variable: "text-variable",
+  func: "text-func",
+};
+
 export default function PrepPlatform({ course, filePath, onBack, onNavigate }) {
   const [markdown, setMarkdown] = useState("");
   const [loading, setLoading] = useState(true);
@@ -293,11 +326,14 @@ export default function PrepPlatform({ course, filePath, onBack, onNavigate }) {
     }
   };
 
-  // Load markdown whenever course or filePath changes
+  // Load markdown whenever course or filePath changes.
+  // The synchronous loading transition is intentional: navigating between
+  // files must swap to the skeleton immediately, not one render late.
   useEffect(() => {
     if (!course || !filePath) return;
 
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setError(null);
 
@@ -313,11 +349,7 @@ export default function PrepPlatform({ course, filePath, onBack, onNavigate }) {
     const baseUrl = import.meta.env.BASE_URL || '/';
     const url = `${baseUrl}${encodedBase}/${encodedFile}`;
 
-    fetch(url)
-      .then((res) => {
-        if (!res.ok) throw new Error(`File not found: ${filePath}`);
-        return res.text();
-      })
+    fetchPrepMarkdown(url)
       .then((text) => {
         if (!cancelled) {
           setMarkdown(stripNavSection(text));
@@ -423,7 +455,7 @@ export default function PrepPlatform({ course, filePath, onBack, onNavigate }) {
               <Icon name="description" size="text-[12px]" />
               <span className="text-text/60 font-bold truncate max-w-[200px] sm:max-w-none">{filePath}</span>
             </div>
-            <div className={`text-[10px] font-bold text-${course.color} flex items-center gap-1`}>
+            <div className={`text-[10px] font-bold ${COURSE_TEXT_COLORS[course.color] ?? "text-accent"} flex items-center gap-1`}>
               <Icon name={course.icon} size="text-[12px]" />
               {course.title}
             </div>

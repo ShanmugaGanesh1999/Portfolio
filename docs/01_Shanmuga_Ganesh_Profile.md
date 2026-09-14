@@ -1,6 +1,6 @@
 # Shanmuga Ganesh
 
-**Full Stack Software Engineer**
+**Senior Full-Stack AI Software Engineer**
 
 ---
 
@@ -20,17 +20,17 @@
 
 ## Summary
 
-Full Stack Software Engineer with 5+ years of experience building scalable applications using **Java**, **Python**, **React**, **Angular**, and **AWS**. Experienced in **AI assisted data workflows**, **microbiome analytics**, backend APIs, cloud systems, and real time data processing.
+Full Stack AI Software Engineer with 8+ years of experience building scalable enterprise applications using **Java**, **Python**, **React**, **Next.js**, and cloud platforms. Experienced in **Generative AI**, **LLM workflows**, **RAG**, **Databricks**, backend APIs, distributed systems, and real time data pipelines.
 
-> 5+ years Full Stack Software Engineering experience. Open to full-time opportunities.
+> 8+ years Full Stack AI Software Engineering experience. Open to full-time opportunities.
 
 ---
 
 ## About
 
-Shanmuga builds scalable software and data systems across Java, Python, React, Angular, and AWS. His recent work spans AI assisted microbiome quality systems, Python HPC sequencing pipelines, Django/React fintech platforms, high-throughput CRM services, and automation workflows that improve data quality, performance, and reliability.
+Shanmuga builds scalable enterprise software, AI, and data systems across Java, Python, React, Next.js, and cloud platforms. His recent work spans the Cover the Codebase AI enablement platform and Databricks medallion pipelines at Sherwin Williams, AI assisted microbiome quality systems, Django/React fintech platforms, and high-throughput CRM services.
 
-He focuses on practical engineering outcomes: reducing false positive carryover, improving analysis turnaround, making pipelines reproducible, lowering API latency, improving database query performance, and making business workflows easier to operate at scale.
+He focuses on practical engineering outcomes: AI adoption and governance analytics across ~13k repositories, standardized engineering metrics and DORA measures, reducing false positive carryover, lowering API latency, improving database query performance, and making business workflows easier to operate at scale.
 
 ---
 
@@ -38,7 +38,8 @@ He focuses on practical engineering outcomes: reducing false positive carryover,
 
 | Metric | Value |
 | ------ | ----- |
-| Experience | 5+ Years |
+| Experience | 8+ Years |
+| Enterprise Repositories Measured | ~13k |
 | Microbiome False Positive Carryover | -35% |
 | Financial Query Performance | +41% |
 | Qualified Lead Retention | +60% |
@@ -69,43 +70,62 @@ He focuses on practical engineering outcomes: reducing false positive carryover,
 ### Frontend
 
 - React.js
+- Next.js
 - Angular
 - HTML5 / CSS3
 - Responsive UI / Component Based Architecture
 
 ### Backend and APIs
 
-- Spring Boot / Spring Security
-- Hibernate
-- Django REST Framework
+- Spring Boot
 - FastAPI
+- Django REST Framework
 - Node.js
+- Spring Security
+- Hibernate
 - REST APIs
 - GraphQL
 - WebSockets
 - API Versioning
 
-### Security
+### AI, GenAI and Machine Learning
 
-- OAuth 2.0
-- JWT
-- RBAC
-- IAM
-- Secure API Design
+- Generative AI
+- LLM Workflows
+- RAG
+- GPT
+- BERT
+- Prompt Engineering
+- Spec-Based Development (SDD) & Test-Driven Development (TDD)
+- scikit-learn
+- ML Pipelines
+- Anomaly Detection
+- AI Assisted Workflows
 
-### Databases and Messaging
+### Data Platforms and Databases
 
+- Databricks
 - PostgreSQL
 - MySQL
 - MongoDB
 - DynamoDB
 - Redis
+- Data Pipelines
+- Real Time Data Processing
+
+### Messaging and Distributed Systems
+
 - Kafka
 - RabbitMQ
+- Event Driven Processing
+- Microservices
+- Distributed Systems
+- Background Processing
 
-### Cloud, DevOps, Testing, AI, and Architecture
+### Cloud, DevOps and Testing
 
 - AWS
+- Azure
 - Docker
 - GitHub Actions
 - CI/CD
@@ -113,18 +133,27 @@ He focuses on practical engineering outcomes: reducing false positive carryover,
 - JUnit
 - React Testing Library
 - Integration Testing
-- scikit-learn
-- GPT
-- BERT
-- RAG
-- LLM Workflows
-- Prompt Engineering
-- ML Pipelines
-- Anomaly Detection
-- Microservices
-- Distributed Systems
+
+### Security and Identity
+
+- Microsoft Entra ID
+- OAuth 2.0
+- OIDC
+- JWT
+- RBAC
+- IAM
+- Secure API Design
+
+### Architecture and Engineering
+
 - System Design
+- AI Application Architecture
+- Data Architecture
+- ACID Transactions
 - Performance Tuning
+- Scalability
+- Reliability
+- Observability
 
 ---
 
@@ -136,6 +165,7 @@ He focuses on practical engineering outcomes: reducing false positive carryover,
 - REST / GraphQL APIs
 - Kafka / Redis
 - PyTest / JUnit / React Testing Library
+- Databricks / Azure
 
 ---
 
@@ -143,10 +173,11 @@ He focuses on practical engineering outcomes: reducing false positive carryover,
 
 | Period | Role | Company | Location |
 | ------ | ---- | ------- | -------- |
-| Mar 2026 - Present | Software Engineer (Biotech) | Case Western Reserve University | Cleveland, OH |
+| Aug 2026 - Present | Senior Full-Stack AI Software Engineer FDE | Sherwin Williams | Cleveland, OH |
 | Jun 2025 - Present | Software Engineer (Fintech) | Musk and Gale | Cleveland, OH |
+| Mar 2026 - Jul 2026 | Software Engineer (Biotech) | Case Western Reserve University | Cleveland, OH |
 | Jan 2022 - Dec 2023 | MTS (Full Stack Software Developer - CRM) | ZOHO Corporation | Chennai, India |
-| Nov 2020 - Dec 2021 | Junior Associate (Full Stack Software Developer) | Augusta Hitech Software Solution | Coimbatore, India |
+| Nov 2018 - Dec 2021 | Junior Associate (Full Stack Software Developer) | Augusta Hitech Software Solution | Coimbatore, India |
 
 ---
 
@@ -154,6 +185,7 @@ He focuses on practical engineering outcomes: reducing false positive carryover,
 
 | Project | Status | Tech Stack |
 | ------- | ------ | ---------- |
+| Cover the Codebase | RESTRICTED (proprietary) | Next.js, Microsoft Entra ID, Docker, Azure PostgreSQL, Databricks |
 | AI Assisted Microbiome Quality System | ACTIVE | Python, HPC, AI, ML, Microbiome Analytics |
 | Market Data Aggregation Platform | DEPLOYED | Java, Python, Django, React, WebSockets, PostgreSQL, AWS |
 | Tax Configuration Engine | PRODUCTION | Java, API Versioning, PostgreSQL, Redis, Kafka |

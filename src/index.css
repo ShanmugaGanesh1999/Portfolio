@@ -16,6 +16,16 @@
 }
 
 /* ═══════════════════════════════════════════════════
+   MOTION TOKENS — shared durations & easings
+   ═══════════════════════════════════════════════════ */
+:root {
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 300ms;
+  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ═══════════════════════════════════════════════════
    LIGHT THEME — VS Code Light+ inspired
    ═══════════════════════════════════════════════════ */
 [data-theme="light"] {
@@ -97,6 +107,54 @@ body {
 .animate-delay-600 { animation-delay: 600ms; }
 .animate-delay-700 { animation-delay: 700ms; }
 .animate-delay-800 { animation-delay: 800ms; }
+
+/* ═══════════════════════════════════════════════════
+   WORKSPACE MOTION — tabs, palette, panel, messages
+   (transform/opacity only — GPU friendly)
+   ═══════════════════════════════════════════════════ */
+@keyframes tabIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+.tab-in { animation: tabIn var(--dur-base) var(--ease-out-quad); }
+
+@keyframes paletteIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.palette-in { animation: paletteIn var(--dur-fast) var(--ease-out-quad); }
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.msg-in { animation: msgIn var(--dur-fast) var(--ease-out-quad); }
+
+/* Theme crossfade — useTheme adds this class to <html> transiently */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease,
+    color var(--dur-fast) ease,
+    fill var(--dur-fast) ease,
+    stroke var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease !important;
+}
+
+/* Reduced motion — respect the OS setting globally */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -380,18 +438,7 @@ body {
   color: #ffffff;
 }
 
-/* ── Light-theme hover text fix ──────────────── */
-/* In dark mode hover:text-white brightens text;
-   in light mode we darken it instead so it stays visible. */
-[data-theme="light"] .hover\:text-white:hover {
-  color: var(--color-text) !important;
-}
-[data-theme="light"] .group:hover .group-hover\:text-white {
-  color: var(--color-text) !important;
-}
-[data-theme="light"] .hover\:decoration-white\/60:hover {
-  text-decoration-color: var(--color-text) !important;
-}
+/* ── Light-theme link hover ──────────────────── */
 [data-theme="light"] .md-link:hover {
   color: #0550ae;
 }
@@ -493,4 +540,13 @@ html, body {
 }
 .scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+/* ── Scrollbar-thin utility (terminal panel) ── */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }

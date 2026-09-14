@@ -6,16 +6,16 @@
 
 export const PERSONAL = {
   name: "SHANMUGA GANESH",
-  role: "Full Stack Software Engineer",
-  specialty: ["Full Stack Engineering", "AI/Data Workflows", "Cloud Systems"],
-  focus: "Building scalable applications with Java, Python, React, Angular, and AWS across AI assisted data workflows, backend APIs, cloud systems, and real time processing",
+  role: "Senior Full-Stack AI Software Engineer",
+  specialty: ["Full Stack Engineering", "GenAI & LLM Workflows", "Data & Cloud Systems"],
+  focus: "Building scalable enterprise applications with Java, Python, React, Next.js, and cloud platforms across Generative AI, LLM workflows, RAG, Databricks, backend APIs, distributed systems, and real time data pipelines",
   email: import.meta.env.VITE_EMAIL || "shanmugaganesh1999@gmail.com",
   phone: import.meta.env.VITE_PHONE || "(216) 466-6648",
   location: "Cleveland, OH",
-  status: "5+ years Full Stack Software Engineering experience. Open to full-time opportunities.",
+  status: "8+ years Full Stack AI Software Engineering experience. Open to full-time opportunities.",
   resumeUrl: import.meta.env.VITE_RESUME_URL || "#",
   resumeLabel: "GET_RESUME.PDF",
-  resumeVersion: "v2026_06_PROFILE_REFRESH",
+  resumeVersion: "v2026_09_AI_REFRESH",
   calendlyUrl: import.meta.env.VITE_CALENDLY_URL || "#",
   socialLinks: {
     github: import.meta.env.VITE_GITHUB_URL || "https://github.com/ShanmugaGanesh1999",
@@ -26,7 +26,7 @@ export const PERSONAL = {
 };
 
 export const STATS = [
-  { label: "EXP_YEARS", value: "5+", unit: "YEARS", color: "accent" },
+  { label: "EXP_YEARS", value: "8+", unit: "YEARS", color: "accent" },
   { label: "MICRO_QA", value: "-35", unit: "% FP", color: "success" },
   { label: "DB_PERF", value: "+41", unit: "%", color: "variable" },
   { label: "LEAD_RET", value: "+60", unit: "%", color: "keyword" },
@@ -34,8 +34,8 @@ export const STATS = [
 
 export const ABOUT = {
   paragraphs: [
-    "Full Stack Software Engineer with 5+ years of experience building scalable applications using Java, Python, React, Angular, and AWS. Experienced in AI assisted data workflows, microbiome analytics, backend APIs, cloud systems, and real time data processing.",
-    "I focus on improving performance, automation, data quality, and system reliability across software and AI driven platforms, from Python HPC sequencing pipelines and ML ready data workflows to Django/React financial systems and high-throughput CRM services.",
+    "Full Stack AI Software Engineer with 8+ years of experience building scalable enterprise applications using Java, Python, React, Next.js, and cloud platforms. Experienced in Generative AI, LLM workflows, RAG, Databricks, backend APIs, distributed systems, and real time data pipelines.",
+    "I focus on delivering reliable AI enabled products, automation, analytics, and high performance software platforms, from Databricks medallion pipelines and AI governance analytics across ~13k repositories to Django/React financial systems and high-throughput CRM services processing millions of records per hour.",
   ],
 };
 
@@ -50,37 +50,63 @@ export const TECH_STACK = [
     title: "Frontend",
     status: "UI",
     statusColor: "accent",
-    items: ["React.js", "Angular", "HTML5 / CSS3", "Responsive UI / Component Architecture"],
+    items: ["React.js / Next.js", "Angular", "HTML5 / CSS3", "Responsive UI / Component Architecture"],
   },
   {
     title: "Backend_And_APIs",
     status: "SERVICES",
     statusColor: "variable",
-    items: ["Spring Boot / Spring Security", "Django REST Framework / FastAPI", "Node.js / Hibernate", "REST APIs / GraphQL / WebSockets"],
+    items: ["Spring Boot / Spring Security", "Django REST Framework / FastAPI", "Node.js / Hibernate", "REST APIs / GraphQL / WebSockets / API Versioning"],
+  },
+  {
+    title: "AI_GenAI_ML",
+    status: "CORE",
+    statusColor: "keyword",
+    items: ["Generative AI / GPT / BERT", "LLM Workflows / RAG / Prompt Engineering", "SDD & TDD / AI Assisted Workflows", "scikit-learn / ML Pipelines / Anomaly Detection"],
   },
   {
     title: "Security",
     status: "AUTH",
     statusColor: "keyword",
-    items: ["OAuth 2.0", "JWT", "RBAC / IAM", "Secure API Design"],
+    items: ["Microsoft Entra ID / OIDC", "OAuth 2.0 / JWT", "RBAC / IAM", "Secure API Design"],
   },
   {
     title: "Data_And_Messaging",
     status: "STREAMS",
     statusColor: "func",
-    items: ["PostgreSQL / MySQL", "MongoDB / DynamoDB", "Redis", "Kafka / RabbitMQ"],
+    items: ["Databricks / Data Pipelines", "PostgreSQL / MySQL", "MongoDB / DynamoDB / Redis", "Kafka / RabbitMQ / Event Driven"],
   },
   {
-    title: "Cloud_Testing_AI",
-    status: "AI_READY",
+    title: "Cloud_Testing",
+    status: "DEVOPS",
     statusColor: "success",
-    items: ["AWS / Docker / GitHub Actions", "PyTest / JUnit / React Testing Library", "GPT / BERT / RAG / LLM Workflows", "ML Pipelines / Anomaly Detection / Performance Tuning"],
+    items: ["AWS / Azure / Docker / GitHub Actions", "CI/CD / Integration Testing", "PyTest / JUnit / React Testing Library"],
+  },
+  {
+    title: "Architecture",
+    status: "DESIGN",
+    statusColor: "variable",
+    items: ["System Design / AI Application Architecture", "Data Architecture / ACID Transactions", "Performance Tuning / Scalability / Reliability", "Observability / Distributed Systems"],
   },
 ];
 
 export const EXPERIENCE = [
   {
-    period: "MAR 2026-PRES",
+    period: "AUG 2026-PRES",
+    title: "Senior Full-Stack AI Software Engineer FDE",
+    company: "Sherwin Williams",
+    location: "Cleveland, OH",
+    description: [
+      "Architecting the Cover the Codebase AI enablement platform using Next.js, Microsoft Entra ID, Docker, Azure PostgreSQL, and Databricks, supporting employee learning, AI adoption, engineering analytics, and gamification across approximately 50 change champions",
+      "Engineering Databricks medallion pipelines across GitHub, GitHub Copilot, and application data, transforming pull requests, commits, AI usage, and learning activity into 23 standardized metrics, DORA measures, user insights, and leadership dashboards",
+      "Building ACID transactional architecture with bidirectional delta synchronization between Azure PostgreSQL and Databricks Bronze and Gold, incorporating UTC timestamps, audit logging, batching, and failure recovery to strengthen consistency, traceability, scalability, and reliability",
+      "Developing AI governance and token analytics for monthly usage, allocation, and cost per user, while measuring adoption, throughput, efficiency, quality, and DORA performance for an enterprise landscape of approximately 13k repositories",
+    ],
+    tags: ["NEXT.JS", "AZURE", "DATABRICKS", "AI"],
+    tagColor: "accent",
+  },
+  {
+    period: "MAR 2026-JUL 2026",
     title: "Software Engineer (Biotech)",
     company: "Case Western Reserve University",
     location: "Cleveland, OH",
@@ -121,7 +147,7 @@ export const EXPERIENCE = [
     tagColor: "keyword",
   },
   {
-    period: "NOV 2020-DEC 2021",
+    period: "NOV 2018-DEC 2021",
     title: "Junior Associate (Full Stack Software Developer)",
     company: "Augusta Hitech Software Solution",
     location: "Coimbatore, India",
@@ -135,6 +161,17 @@ export const EXPERIENCE = [
 ];
 
 export const PROJECTS = [
+  {
+    title: "Cover the Codebase",
+    subtitle: "AI_ENABLEMENT_PLATFORM",
+    description:
+      "Sherwin Williams AI enablement platform built on Next.js, Microsoft Entra ID, Docker, Azure PostgreSQL, and Databricks. Medallion pipelines transform GitHub and Copilot activity into 23 standardized metrics, DORA measures, and leadership dashboards across approximately 13k repositories.",
+    status: "RESTRICTED",
+    statusColor: "keyword",
+    tags: ["NEXT.JS", "DATABRICKS", "AZURE", "GENAI"],
+    proprietary: true,
+    link: "#",
+  },
   {
     title: "AI Assisted Microbiome Quality System",
     description:
@@ -191,6 +228,7 @@ export const CERTIFICATIONS = [
   { name: "REST / GRAPHQL APIs", color: "variable" },
   { name: "KAFKA / REDIS", color: "func" },
   { name: "PYTEST / JUNIT / RTL", color: "comment" },
+  { name: "DATABRICKS / AZURE", color: "accent", icon: "database" },
 ];
 
 export const EDUCATION = [
@@ -203,17 +241,18 @@ export const EDUCATION = [
 ];
 
 export const NAV_ITEMS = [
-  { label: "index.sh", icon: "description", href: "#hero", section: "Root_Directory" },
-  { label: "bio.txt", icon: "person", href: "#about", section: "about_me" },
-  { label: "career.log", icon: "history", href: "#experience", section: "about_me" },
-  { label: "tech_stack.json", icon: "settings", href: "#expertise", section: "Lib_Modules" },
-  { label: "deployments.py", icon: "build", href: "#work", section: "Lib_Modules" },
-  { label: "rollup_summary.md", icon: "description", projectId: "rollup-summary", section: "Projects" },
-  { label: "tax_config.md", icon: "description", projectId: "tax-config", section: "Projects" },
-  { label: "record_validation.md", icon: "description", projectId: "record-validation", section: "Projects" },
-  { label: "recent_items.md", icon: "description", projectId: "recent-items", section: "Projects" },
-  { label: "market_data.md", icon: "description", projectId: "market-data", section: "Projects" },
-  { label: "campus_iam.md", icon: "description", projectId: "access-mgmt", section: "Projects" },
+  { label: "index.sh", icon: "description", sectionId: "hero", folder: "Root_Directory" },
+  { label: "bio.txt", icon: "person", sectionId: "about", folder: "about_me" },
+  { label: "career.log", icon: "history", sectionId: "experience", folder: "about_me" },
+  { label: "tech_stack.json", icon: "settings", sectionId: "expertise", folder: "Lib_Modules" },
+  { label: "deployments.py", icon: "build", sectionId: "work", folder: "Lib_Modules" },
+  { label: "rollup_summary.md", icon: "description", projectId: "rollup-summary", folder: "Projects" },
+  { label: "tax_config.md", icon: "description", projectId: "tax-config", folder: "Projects" },
+  { label: "record_validation.md", icon: "description", projectId: "record-validation", folder: "Projects" },
+  { label: "recent_items.md", icon: "description", projectId: "recent-items", folder: "Projects" },
+  { label: "market_data.md", icon: "description", projectId: "market-data", folder: "Projects" },
+  { label: "campus_iam.md", icon: "description", projectId: "access-mgmt", folder: "Projects" },
+  { label: "ml_lead_scoring.md", icon: "description", projectId: "ml-lead-scoring", folder: "Projects" },
 ];
 
 export const ASCII_ART = `  ██████  ██░ ██  ▄▄▄       ███▄    █  ███▄ ▄███▓ █    ██   ▄████  ▄▄▄      
