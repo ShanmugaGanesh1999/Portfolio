@@ -38,15 +38,18 @@ export function useGlobalShortcuts() {
       if (workspace.state.shellMode === "claude") return;
 
       // Escape closes the topmost overlay (works even while typing).
+      // The Copilot panel is a docked view on desktop — Esc only dismisses
+      // it where it's a full-screen overlay (mobile).
       if (e.key === "Escape") {
         const s = workspace.state;
+        const isMobile = window.matchMedia("(max-width: 767px)").matches;
         if (s.paletteOpen) {
           workspace.closePalette();
           e.preventDefault();
         } else if (s.mobileDrawerOpen) {
           workspace.setMobileDrawer(false);
           e.preventDefault();
-        } else if (s.chatOpen) {
+        } else if (s.chatOpen && isMobile) {
           workspace.setChat(false);
           e.preventDefault();
         }
