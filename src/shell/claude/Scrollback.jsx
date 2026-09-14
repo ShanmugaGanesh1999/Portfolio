@@ -6,7 +6,7 @@
 // ============================================================
 
 import { useEffect, useRef, forwardRef } from "react";
-import ClaudeMarkdown from "./markdown";
+import ClaudeMarkdown from "../shared/Markdown";
 import CliWelcome from "./CliWelcome";
 import CliFileView from "./CliFileView";
 import { SpinnerDone } from "./Spinner";

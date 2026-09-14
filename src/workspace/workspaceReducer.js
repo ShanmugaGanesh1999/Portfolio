@@ -10,7 +10,8 @@ const MAX_LOG_ENTRIES = 200;
 
 function readInitialShell() {
   try {
-    return localStorage.getItem("sg-shell") === "claude" ? "claude" : "vscode";
+    const saved = localStorage.getItem("sg-shell");
+    return saved === "claude" || saved === "codex" ? saved : "vscode";
   } catch {
     return "vscode";
   }
@@ -138,8 +139,11 @@ export function workspaceReducer(state, action) {
       };
     }
 
-    case "SET_SHELL":
-      return { ...state, shellMode: action.mode === "claude" ? "claude" : "vscode" };
+    case "SET_SHELL": {
+      const mode =
+        action.mode === "claude" || action.mode === "codex" ? action.mode : "vscode";
+      return { ...state, shellMode: mode };
+    }
 
     case "SET_PALETTE": {
       const open = action.open ?? !state.paletteOpen;

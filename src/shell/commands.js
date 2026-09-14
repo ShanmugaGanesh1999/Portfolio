@@ -20,6 +20,7 @@ export const HELP_LINES = [
   "  skills            Tech stack summary",
   "  theme <mode>      Switch theme (dark | light)",
   "  claude            Switch to the Claude Code shell",
+  "  codex             Switch to the OpenAI Codex shell",
   "  neofetch          System info",
   "  history           Command history",
   "  echo <text>       Print text",
@@ -211,6 +212,11 @@ export function createShellExecutor({ ws, theme, setTheme, print, confirm, exit 
       case "claude":
         ws.setShellMode("claude");
         out("switching to Claude Code shell …", "ok");
+        return;
+
+      case "codex":
+        ws.setShellMode("codex");
+        out("switching to Codex shell …", "ok");
         return;
 
       case "vscode":

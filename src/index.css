@@ -86,6 +86,56 @@
   background-color: rgba(217, 119, 87, 0.28);
 }
 
+/* ═══════════════════════════════════════════════════
+   OPENAI CODEX SHELL — the TUI style system: cyan
+   accent, dim secondary, green/red semantics, magenta
+   agent marks. Neutral charcoal (dark) / white (light).
+   ═══════════════════════════════════════════════════ */
+[data-shell="codex"] {
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-display: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-ui: 'Inter', system-ui, sans-serif;
+
+  /* dark (default toggle) — neutral charcoal terminal */
+  --color-bg: #0e0f10;
+  --color-sidebar: #17181b;
+  --color-text: #e6e6e3;
+  --color-border: #2a2c30;
+  --color-keyword: #f85149;   /* errors / deletions (red) */
+  --color-string: #a6e3a1;
+  --color-comment: #8f9092;   /* dim secondary */
+  --color-func: #cba6f7;      /* magenta — codex's own marks */
+  --color-variable: #f2cc60;
+  --color-success: #2ea043;   /* success / additions (green) */
+  --color-accent: #6fd0e2;    /* cyan — selection / status */
+}
+
+[data-shell="codex"][data-theme="light"] {
+  /* light toggle — clean white */
+  --color-bg: #ffffff;
+  --color-sidebar: #f7f7f8;
+  --color-text: #202124;
+  --color-border: #e5e5e7;
+  --color-keyword: #cf222e;
+  --color-string: #116329;
+  --color-comment: #6e6e73;
+  --color-func: #8250df;
+  --color-variable: #953800;
+  --color-success: #1a7f37;
+  --color-accent: #005f87;    /* light-mode cyan, per TUI source */
+}
+
+[data-shell="codex"] ::selection {
+  background-color: rgba(111, 208, 226, 0.30);
+}
+
+/* Codex working indicator — shimmering • bullet */
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.shimmer { animation: shimmer 1.2s ease-in-out infinite; }
+
 .font-display { font-family: var(--font-display); }
 .font-ui { font-family: var(--font-ui); }
 
