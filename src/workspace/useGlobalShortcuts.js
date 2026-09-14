@@ -33,6 +33,10 @@ export function useGlobalShortcuts() {
       const workspace = wsRef.current;
       const mod = e.metaKey || e.ctrlKey;
 
+      // The Claude Code shell owns its keyboard surface (its prompt handles
+      // Esc/slash/history). VS Code shortcuts don't apply there.
+      if (workspace.state.shellMode === "claude") return;
+
       // Escape closes the topmost overlay (works even while typing).
       if (e.key === "Escape") {
         const s = workspace.state;

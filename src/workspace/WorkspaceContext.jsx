@@ -152,6 +152,31 @@ export function WorkspaceProvider({ children }) {
     dispatch({ type: "SET_PALETTE", open: false });
   }, []);
 
+  // ── Shell mode (VS Code ⇄ Claude Code) ──────────────────────
+  const setShellMode = useCallback(
+    (mode) => {
+      const next = mode === "claude" ? "claude" : "vscode";
+      if (stateRef.current.shellMode === next) return;
+      // Crossfade the palette swap like the theme transition.
+      const root = document.documentElement;
+      root.classList.add("theme-transition");
+      window.setTimeout(() => root.classList.remove("theme-transition"), 250);
+      try {
+        localStorage.setItem("sg-shell", next);
+      } catch {
+        /* private mode */
+      }
+      dispatch({ type: "SET_SHELL", mode: next });
+      log("shell", `switched to ${next === "claude" ? "Claude Code" : "VS Code"} shell`);
+    },
+    [log]
+  );
+
+  // Reflect the shell on <html> for CSS token scoping.
+  useEffect(() => {
+    document.documentElement.setAttribute("data-shell", state.shellMode);
+  }, [state.shellMode]);
+
   const openPrepPanel = useCallback(
     (courseId) => {
       const file = stateRef.current.prepFiles[courseId] ?? defaultPrepFile(courseId);
@@ -252,6 +277,7 @@ export function WorkspaceProvider({ children }) {
       togglePanel,
       openPalette,
       closePalette,
+      setShellMode,
       openPrepPanel,
       closePrepPanel,
       togglePrepPanel,
@@ -270,7 +296,7 @@ export function WorkspaceProvider({ children }) {
       openPrepFile, updateTabState, getTabState,
       setExplorer, toggleExplorer, setMobileDrawer, toggleMobileDrawer,
       setChat, toggleChat, setPanel, togglePanel,
-      openPalette, closePalette, openPrepPanel, closePrepPanel, togglePrepPanel,
+      openPalette, closePalette, setShellMode, openPrepPanel, closePrepPanel, togglePrepPanel,
       scrollToSection, registerScrollToSection, subscribeEditorScroll,
       notifyEditorScroll, log,
     ]

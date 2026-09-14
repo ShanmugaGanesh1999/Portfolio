@@ -103,6 +103,7 @@ function buildFileItems() {
 
 function buildCommandItems({ ws, toggleTheme }) {
   return [
+    { id: "cmd-shell-claude", label: "Shell: Switch to Claude Code CLI", icon: "terminal", run: () => ws.setShellMode("claude") },
     { id: "cmd-theme", label: "Preferences: Toggle Dark/Light Theme", icon: "contrast", run: toggleTheme },
     { id: "cmd-explorer", label: "View: Toggle Explorer Sidebar", icon: "files", run: ws.toggleExplorer },
     { id: "cmd-terminal", label: "View: Toggle Terminal Panel", icon: "terminal", run: () => ws.togglePanel("terminal") },

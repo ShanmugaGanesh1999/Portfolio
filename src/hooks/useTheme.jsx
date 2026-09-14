@@ -97,12 +97,48 @@ const LIGHT_COLORS = {
   text:     "#1e1e1e",
 };
 
+/** Claude Code shell palettes (warm charcoal / ivory + terracotta). */
+const CLAUDE_DARK_COLORS = {
+  accent:   "#d97757",
+  success:  "#4eba65",
+  keyword:  "#ff6b80",
+  variable: "#d4a27f",
+  func:     "#a3b78c",
+  string:   "#b1b9f9",
+  comment:  "#a8a29a",
+  bg:       "#1f1e1d",
+  sidebar:  "#262624",
+  border:   "#3e3c37",
+  text:     "#faf9f5",
+};
+
+const CLAUDE_LIGHT_COLORS = {
+  accent:   "#d97757",
+  success:  "#2c7a39",
+  keyword:  "#ab2b3f",
+  variable: "#a9583e",
+  func:     "#788c5d",
+  string:   "#6a9bcc",
+  comment:  "#73726c",
+  bg:       "#faf9f5",
+  sidebar:  "#f0eee6",
+  border:   "#d1cfc5",
+  text:     "#141413",
+};
+
 /**
- * useThemeColors — Returns the colour hex map that matches the current theme.
- * Use this in SVG diagram components instead of hardcoded COLOR_HEX / C objects.
+ * useThemeColors — Returns the colour hex map that matches the current theme
+ * (and the active shell: VS Code or Claude Code). Use this in SVG diagram
+ * components instead of hardcoded hex values.
  */
 // eslint-disable-next-line react-refresh/only-export-components -- hook + provider co-located by design
 export function useThemeColors() {
   const { theme } = useTheme();
+  const isClaude =
+    typeof document !== "undefined" &&
+    document.documentElement.getAttribute("data-shell") === "claude";
+  if (isClaude) {
+    return theme === "light" ? CLAUDE_LIGHT_COLORS : CLAUDE_DARK_COLORS;
+  }
   return theme === "light" ? LIGHT_COLORS : DARK_COLORS;
 }

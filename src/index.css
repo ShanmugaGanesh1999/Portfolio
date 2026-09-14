@@ -35,12 +35,59 @@
   --color-border: #d1d5db;
   --color-keyword: #d32f2f;
   --color-string: #0451a5;
-  --color-comment: #6a737d;
+  --color-comment: #6a677d;
   --color-func: #7c3aed;
   --color-variable: #c2410c;
   --color-success: #16a34a;
   --color-accent: #0969da;
 }
+
+/* ═══════════════════════════════════════════════════
+   CLAUDE CODE SHELL — palette + typography overrides.
+   Applies on <html data-shell="claude"> on top of the
+   existing dark/light theme toggle. Warm charcoal +
+   terracotta (dark) / ivory + ink (light).
+   ═══════════════════════════════════════════════════ */
+[data-shell="claude"] {
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-display: 'Lora', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Space Grotesk', 'Space Mono', sans-serif;
+
+  /* dark (default toggle) — warm charcoal terminal */
+  --color-bg: #1f1e1d;
+  --color-sidebar: #262624;
+  --color-text: #faf9f5;
+  --color-border: #3e3c37;
+  --color-keyword: #ff6b80;
+  --color-string: #b1b9f9;
+  --color-comment: #a8a29a;
+  --color-func: #a3b78c;
+  --color-variable: #d4a27f;
+  --color-success: #4eba65;
+  --color-accent: #d97757;
+}
+
+[data-shell="claude"][data-theme="light"] {
+  /* light toggle — ivory cream */
+  --color-bg: #faf9f5;
+  --color-sidebar: #f0eee6;
+  --color-text: #141413;
+  --color-border: #d1cfc5;
+  --color-keyword: #ab2b3f;
+  --color-string: #6a9bcc;
+  --color-comment: #73726c;
+  --color-func: #788c5d;
+  --color-variable: #a9583e;
+  --color-success: #2c7a39;
+  --color-accent: #d97757;
+}
+
+[data-shell="claude"] ::selection {
+  background-color: rgba(217, 119, 87, 0.28);
+}
+
+.font-display { font-family: var(--font-display); }
+.font-ui { font-family: var(--font-ui); }
 
 * {
   scrollbar-width: thin;

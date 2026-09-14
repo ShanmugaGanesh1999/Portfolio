@@ -8,7 +8,16 @@ import { WELCOME_TAB, makeTab, defaultPrepFile } from "./registry";
 
 const MAX_LOG_ENTRIES = 200;
 
+function readInitialShell() {
+  try {
+    return localStorage.getItem("sg-shell") === "claude" ? "claude" : "vscode";
+  } catch {
+    return "vscode";
+  }
+}
+
 export const initialState = {
+  shellMode: readInitialShell(), // 'vscode' | 'claude'
   tabs: [WELCOME_TAB],
   activeTabId: WELCOME_TAB.id,
   prepFiles: {}, // courseId → filePath
@@ -128,6 +137,9 @@ export function workspaceReducer(state, action) {
         panelView: action.view ?? state.panelView,
       };
     }
+
+    case "SET_SHELL":
+      return { ...state, shellMode: action.mode === "claude" ? "claude" : "vscode" };
 
     case "SET_PALETTE": {
       const open = action.open ?? !state.paletteOpen;
