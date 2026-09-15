@@ -24,15 +24,18 @@ import CliWelcome from "./CliWelcome";
 import AgentPane from "./AgentPane";
 import OpenPicker from "./OpenPicker";
 import TerminalMarkdown from "../shared/Markdown";
-import { randomVerb } from "./verbs";
-import { playSections, PORTFOLIO_SECTIONS } from "./portfolioSequence";
+import { randomVerb, SPINNER_FRAMES } from "./verbs";
+import { streamOutput } from "./streamOutput";
+import { playSections, PORTFOLIO_SECTIONS, loadingDelay } from "./portfolioSequence";
 
 const CONFIG_KEY = "sg-claude-terminal:config:v1";
-const MODE_LABELS = ["default mode", "⏵⏵ accept edits on", "⏸ plan mode on"];
-const SPINNER_FRAMES = ["·", "✢", "✳", "✶", "✻", "✽"];
-const FRAME_MS = 140;
+const MODE_LABELS = ["Manual", "⏵⏵ Accept edits", "⏸ Plan", "⏵⏵ Bypass permissions"];
+const FRAME_MS = 110;
 
 const SLASH_COMMANDS = [
+  { name: "/mode", description: "Choose a permission mode" },
+  { name: "/history", description: "Search this session’s commands" },
+  { name: "/tasks", description: "Toggle the session checklist" },
   { name: "/help", description: "Show commands and keyboard shortcuts" },
   { name: "/open", description: "Open a project as a full-screen pane — no argument shows the picker" },
   { name: "/info", description: "Display basic information" },
@@ -54,15 +57,26 @@ const SLASH_COMMANDS = [
   { name: "/exit", description: "Back to the VS Code workspace" },
 ];
 
+const FILE_COMMANDS = [
+  ...PORTFOLIO_SECTIONS.map((section) => ({ name: `@${section}`, description: `Read ${section}` })),
+  ...Object.entries(PROJECT_TABS).map(([id, meta]) => ({ name: `@${id}`, description: `Read ${meta.title}` })),
+];
+
 const HELP_KEYS = [
   ["Enter", "Send a message or run a command"],
   ["Shift + Enter", "Insert a new line"],
   ["↑ / ↓", "Browse prompt history or command suggestions"],
-  ["Tab", "Complete the selected slash command"],
+  ["Tab", "Complete the selected command or @file"],
   ["Shift + Tab", "Cycle permission modes"],
   ["Esc", "Stop a response or dismiss a menu"],
   ["Ctrl + C", "Stop a response or clear the current input"],
   ["Ctrl + L", "Jump to the end of the transcript"],
+  ["Ctrl + R", "Search command history"],
+  ["Ctrl + O", "Toggle detailed transcript"],
+  ["Ctrl + T", "Toggle task checklist"],
+  ["Option/Alt + P", "Select model"],
+  ["Alt + M", "Cycle permission modes"],
+  ["Esc, Esc", "Rewind conversation when the input is empty"],
   ["?", "Show this help when the prompt is empty"],
 ];
 
@@ -85,10 +99,24 @@ function SpinnerGlyph({ active }) {
   );
 }
 
+function ThinkingRow({ busy }) {
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 100);
+    return () => clearInterval(timer);
+  }, []);
+  return <div className="ct-thinking" role="status" aria-live="polite">
+    <SpinnerGlyph active />
+    <span>{busy.label}</span>
+    <span className="ct-elapsed" aria-hidden="true">{Math.max(0, (now - busy.startedAt) / 1000).toFixed(1)}s</span>
+    <small>esc to interrupt</small>
+  </div>;
+}
+
 function ToolEntry({ name, path, output, defaultOpen = false }) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useState(false);
   return (
-    <details className="ct-tool-entry" open={open}>
+    <details className="ct-tool-entry" open={open || defaultOpen}>
       <summary onClick={(e) => { e.preventDefault(); setOpen(!open); }}>
         <span className="ct-tool-dot" aria-hidden="true">●</span>
         <span className="ct-tool-title">
@@ -96,7 +124,7 @@ function ToolEntry({ name, path, output, defaultOpen = false }) {
           <span className="ct-tool-path">({path})</span>
         </span>
         <span className="ct-tool-detail-hint">
-          {open ? "click to collapse" : "click to expand"}
+          {defaultOpen ? "detailed view" : open ? "click to collapse" : "click to expand"}
         </span>
       </summary>
       <div className="ct-tool-output">
@@ -150,7 +178,12 @@ export default function ClaudeShell() {
   const [histIdx, setHistIdx] = useState(0);
   const [savedDraft, setSavedDraft] = useState("");
   const [menuIdx, setMenuIdx] = useState(0);
-  const [mode, setMode] = useState(0);
+  const [mode, setMode] = useState(3);
+  const [verbose, setVerbose] = useState(false);
+  const [showTasks, setShowTasks] = useState(false);
+  const [historyQuery, setHistoryQuery] = useState("");
+  const [menuDismissed, setMenuDismissed] = useState(false);
+  const escapeTimeRef = useRef(0);
   const [model, setModel] = useState(getDefaultModelId());
   const [panel, setPanel] = useState(null); // {type, ...}
   const [toastMsg, setToastMsg] = useState(null);
@@ -161,6 +194,7 @@ export default function ClaudeShell() {
   const viewportRef = useRef(null);
   const inputRef = useRef(null);
   const abortRef = useRef(null);
+  const agentControllersRef = useRef(new Map());
   const portfolioCancelRef = useRef(null);
   const autoScrollRef = useRef(true);
   const toastTimerRef = useRef(null);
@@ -206,25 +240,40 @@ export default function ClaudeShell() {
 
   const runPortfolio = useCallback((sections, intro = false) => {
     portfolioCancelRef.current?.();
+    let sectionStartedAt = Date.now();
     portfolioCancelRef.current = playSections(sections, {
       intro,
       onCommand: (text) => {
         if (intro) pushBlock({ kind: "user", text });
       },
-      onStatus: (label) => setBusy({ label, startedAt: Date.now() }),
-      onSection: (section) => pushBlock({ kind: "section", section }),
+      onStatus: (label) => {
+        if (!label.startsWith("Loading")) sectionStartedAt = Date.now();
+        setBusy({ label, startedAt: sectionStartedAt });
+      },
+      onSection: (section, next) => {
+        const id = uid();
+        const startedAt = sectionStartedAt;
+        setBusy((previous) => ({ ...previous, label: `Writing ${section}…` }));
+        pushBlock({ id, kind: "section", section, streaming: true, onReveal: (visibleWords) => patchBlock(id, { visibleWords }), onComplete: () => {
+          patchBlock(id, { streaming: false });
+          pushBlock({ kind: "system", text: `Completed ${section} · ${((Date.now() - startedAt) / 1000).toFixed(1)}s` });
+          next();
+        } });
+      },
       onDone: () => {
         portfolioCancelRef.current = null;
         setBusy(null);
       },
     });
-  }, [pushBlock]);
+  }, [pushBlock, patchBlock]);
 
   useEffect(() => {
     runPortfolio(PORTFOLIO_SECTIONS, true);
+    const controllers = agentControllersRef.current;
     return () => {
       portfolioCancelRef.current?.();
       abortRef.current?.abort();
+      for (const controller of controllers.values()) controller.abort();
       clearTimeout(toastTimerRef.current);
     };
   }, [runPortfolio]);
@@ -236,18 +285,20 @@ export default function ClaudeShell() {
   const cancelRun = useCallback((showMessage = true) => {
     abortRef.current?.abort();
     abortRef.current = null;
+    for (const controller of agentControllersRef.current.values()) controller.abort();
     portfolioCancelRef.current?.();
     portfolioCancelRef.current = null;
     setBusy(null);
+    setBlocks((previous) => previous.map((block) => block.streaming ? { ...block, streaming: false, interrupted: true } : block));
     if (showMessage) pushBlock({ kind: "system", text: "Interrupted · the response was stopped." });
   }, [pushBlock]);
 
   // ── Slash menu ──
-  const menuOpen = /^\/[^\s]*$/.test(input) && !busy;
+  const menuOpen = /^[/@][^\s]*$/.test(input) && !busy && !menuDismissed;
   const menuMatches = useMemo(() => {
     if (!menuOpen) return [];
     const q = input.toLowerCase();
-    return SLASH_COMMANDS.filter(
+    return (input.startsWith("@") ? FILE_COMMANDS : SLASH_COMMANDS).filter(
       (c) => c.name.startsWith(q) || q.startsWith(c.name)
     );
   }, [menuOpen, input]);
@@ -264,11 +315,11 @@ export default function ClaudeShell() {
 
   // ── Permission gate (panel-styled) ──
   const confirmPermission = useCallback(
-    (request) =>
+    (request) => mode === 3 ? Promise.resolve(true) :
       new Promise((resolve) => {
         setPermission({ ...request, resolve });
       }),
-    []
+    [mode]
   );
   const answerPermission = (ok) => {
     permission?.resolve(ok);
@@ -288,19 +339,32 @@ export default function ClaudeShell() {
   }, [permission]);
 
   // ── Shell passthrough ("!" prefix) ──
-  const shellRun = useMemo(
-    () =>
-      createShellExecutor({
-        ws,
-        theme,
-        setTheme,
-        print: (type, text) =>
-          pushBlock({ kind: "tool-plain", text, tone: type }),
-        confirm: confirmPermission,
-        exit: () => ws.setShellMode("vscode"),
-      }),
-    [ws, theme, setTheme, pushBlock, confirmPermission]
-  );
+  const shellRun = useCallback(async (raw) => {
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const id = uid();
+    setBusyState(`Running ${raw.split(/\s+/)[0]}…`);
+    pushBlock({ id, kind: "tool-plain", text: "", streaming: true });
+    let result;
+    try {
+      await streamOutput(async (emit) => {
+        const execute = createShellExecutor({ ws, theme, setTheme,
+          print: (_type, text) => emit(`${text}\n`), confirm: confirmPermission,
+          exit: () => ws.setShellMode("vscode"),
+        });
+        result = await execute(raw);
+      }, (text) => patchBlock(id, { text }), {
+        signal: controller.signal, delay: loadingDelay(),
+        animate: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      });
+      patchBlock(id, { streaming: false });
+      if (result?.clear) setBlocks([]);
+    } catch (error) {
+      if (error.name !== "AbortError") patchBlock(id, { text: error.message, streaming: false });
+    } finally {
+      if (abortRef.current === controller) { abortRef.current = null; setBusy(null); }
+    }
+  }, [ws, theme, setTheme, pushBlock, patchBlock, confirmPermission]);
 
   // ── Natural language → portfolio assistant ──
   const ask = useCallback(
@@ -311,21 +375,20 @@ export default function ClaudeShell() {
       pushBlock({ id, kind: "assistant", content: "", streaming: true });
       const controller = new AbortController();
       abortRef.current = controller;
-      let acc = "";
       try {
-        await chatQuery(
+        await streamOutput((emit) => chatQuery(
           question,
           blocks
             .filter((b) => (b.kind === "assistant" && !b.streaming) || b.kind === "user")
             .slice(-10)
             .map((b) => (b.kind === "user" ? { role: "user", content: b.text } : { role: "assistant", content: b.content })),
-          (chunk) => {
-            acc += chunk;
-            patchBlock(id, { content: acc });
-          },
+          emit,
           controller.signal,
           model
-        );
+        ), (content) => patchBlock(id, { content }), {
+          signal: controller.signal, delay: loadingDelay(),
+          animate: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+        });
         patchBlock(id, { streaming: false });
       } catch (err) {
         if (err.name === "AbortError") {
@@ -347,19 +410,27 @@ export default function ClaudeShell() {
   const spawnAgent = useCallback(
     (name, task, fn) => {
       const id = uid();
-      setAgents((a) => [...a, { id, name, task, status: "running" }]);
+      const controller = new AbortController();
+      agentControllersRef.current.set(id, controller);
+      setAgents((a) => [...a, { id, name, task, status: "running", startedAt: Date.now() }]);
       ws.log("agent", `${name}: ${task}`);
       (async () => {
+        let status = "done";
         try {
           await fn({
+            signal: controller.signal,
             tool: (toolName, path, output) =>
               pushBlock({ kind: "tool", name: toolName, path, output }),
             system: (text) => pushBlock({ kind: "system", text }),
             pushBlock,
             patchBlock,
           });
+        } catch (error) {
+          status = error.name === "AbortError" ? "interrupted" : "failed";
         } finally {
-          setAgents((a) => a.map((x) => (x.id === id ? { ...x, status: "done" } : x)));
+          agentControllersRef.current.delete(id);
+          if (controller.signal.aborted) status = "interrupted";
+          setAgents((a) => a.map((x) => (x.id === id ? { ...x, status } : x)));
           window.setTimeout(() => setAgents((a) => a.filter((x) => x.id !== id)), 30000);
         }
       })();
@@ -374,17 +445,15 @@ export default function ClaudeShell() {
         const id = uid();
         ctx.pushBlock({ id, kind: "assistant", content: "", streaming: true, agent: true });
         try {
-          await chatQuery(
-            question,
-            [],
-            (chunk) => {
-              ctx.patchBlock(id, (b) => ({ content: b.content + chunk }));
-            },
-            null,
-            model
-          );
+          await streamOutput((emit) => chatQuery(question, [], emit, ctx.signal, model),
+            (content) => ctx.patchBlock(id, { content }), {
+              signal: ctx.signal, delay: loadingDelay(),
+              animate: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+            });
         } catch (err) {
-          ctx.patchBlock(id, { streaming: false, error: true, content: `⚠ ${err.message}` });
+          if (err.name === "AbortError") ctx.patchBlock(id, { streaming: false, interrupted: true });
+          else ctx.patchBlock(id, { streaming: false, error: true, content: `⚠ ${err.message}` });
+          throw err;
         }
         ctx.patchBlock(id, { streaming: false });
       });
@@ -396,10 +465,21 @@ export default function ClaudeShell() {
     (projectId) => {
       const meta = PROJECT_TABS[projectId];
       if (!meta) return;
+      const controller = new AbortController();
+      abortRef.current = controller;
+      setBusyState(`Reading ${meta.title}…`);
       spawnAgent("explorer", `open ${meta.title}`, async (ctx) => {
+        try {
+          await streamOutput(async (emit) => emit(meta.title), () => {}, { signal: controller.signal, delay: loadingDelay(), animate: false });
+          if (controller.signal.aborted) return;
         ctx.tool("Read", meta.title, `${meta.language} system-design deep dive — esc to return`);
         ws.openTab(projectId);
         setAgentPane({ tabId: projectId, agent: "explorer" });
+        } catch (error) {
+          if (error.name !== "AbortError") ctx.system(`Unable to open project: ${error.message}`);
+        } finally {
+          if (abortRef.current === controller) { abortRef.current = null; setBusy(null); }
+        }
       });
     },
     [spawnAgent, ws]
@@ -425,6 +505,9 @@ export default function ClaudeShell() {
       }
 
       switch (command.toLowerCase()) {
+        case "/mode": setPanel({ type: "mode" }); break;
+        case "/history": setHistoryQuery(""); setPanel({ type: "history" }); break;
+        case "/tasks": setShowTasks((value) => !value); break;
         case "/help":
           pushBlock({ kind: "help" });
           break;
@@ -463,6 +546,10 @@ export default function ClaudeShell() {
           break;
 
         case "/research":
+          if (mode === 2 && argument) {
+            setPanel({ type: "plan", text: `1. Read portfolio documents related to: ${argument}\n2. Ask the selected model to synthesize the evidence.\n3. Print the answer in this transcript.`, run: () => spawnResearcher(argument) });
+            break;
+          }
           if (!argument) {
             pushBlock({ kind: "system", text: "Usage: /research <question>" });
           } else {
@@ -471,6 +558,10 @@ export default function ClaudeShell() {
           break;
 
         case "/tour":
+          if (mode === 2) {
+            setPanel({ type: "plan", text: "1. Open the market-data project write-up.\n2. Research Shanmuga’s current work from portfolio documents.\n3. Show both results.", run: () => { spawnExplorer("market-data"); spawnResearcher("What is Shanmuga currently working on at Sherwin Williams?"); } });
+            break;
+          }
           pushBlock({ kind: "system", text: "Starting tour — 2 agents in parallel…" });
           spawnExplorer("market-data");
           spawnResearcher("What is Shanmuga currently working on at Sherwin Williams?");
@@ -512,7 +603,7 @@ export default function ClaudeShell() {
               `  Directory   ~/portfolio`,
               `  Model       ${currentModel.name}`,
               `  Theme       ${theme}`,
-              `  Permission  ${MODE_LABELS[mode]} (visual)`,
+              `  Permission  ${MODE_LABELS[mode]}`,
               `  Agents      ${agents.filter((a) => a.status === "running").length} running`,
               `  Backend     Portfolio RAG assistant (docs/*.md)`,
             ].join("\n"),
@@ -553,12 +644,15 @@ export default function ClaudeShell() {
     autoScrollRef.current = true;
 
     const silent = /^\/(clear|config|model|theme|exit)(\s|$)/i.test(message);
-    if (!silent && !message.startsWith("!")) pushBlock({ kind: "user", text: message });
+    if (!silent && message !== "!clear") pushBlock({ kind: "user", text: message });
 
-    if (message.startsWith("/")) runSlash(message);
+    if (message.startsWith("@")) {
+      const name = message.slice(1).toLowerCase();
+      runSlash(PORTFOLIO_SECTIONS.includes(name) ? `/${name}` : `/open ${name}`);
+    } else if (message.startsWith("/")) runSlash(message);
     else if (message.startsWith("!")) {
-      const result = shellRun(message.slice(1));
-      if (result?.clear) setBlocks([]);
+      if (message.trim() === "!clear") setBlocks([]);
+      else shellRun(message.slice(1));
     } else ask(message);
     focusPrompt();
     scrollToEnd(message.toLowerCase() !== "/clear");
@@ -570,6 +664,14 @@ export default function ClaudeShell() {
     const key = e.key;
     if (key === "Enter" && !e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey) {
       e.preventDefault(); submitInput(); return;
+    }
+    if ((e.ctrlKey || e.altKey) && !e.metaKey) {
+      const lower = e.altKey && e.code.startsWith("Key") ? e.code.slice(3).toLowerCase() : key.toLowerCase();
+      if (e.altKey && lower === "p") { e.preventDefault(); setPanel({ type: "model" }); return; }
+      if (e.altKey && lower === "m") { e.preventDefault(); cycleMode(); return; }
+      if (e.ctrlKey && lower === "r") { e.preventDefault(); setHistoryQuery(""); setPanel({ type: "history" }); return; }
+      if (e.ctrlKey && lower === "o") { e.preventDefault(); setVerbose((v) => !v); return; }
+      if (e.ctrlKey && lower === "t") { e.preventDefault(); setShowTasks((v) => !v); return; }
     }
     if (key === "Tab" && e.shiftKey) { e.preventDefault(); cycleMode(); return; }
     if (key === "Tab" && menuOpen && menuMatches.length) {
@@ -600,8 +702,9 @@ export default function ClaudeShell() {
     }
     if (key === "?" && !input) { e.preventDefault(); submitInput("/help"); return; }
     if (e.ctrlKey && key.toLowerCase() === "c") {
+      if (window.getSelection()?.toString() || e.target.selectionStart !== e.target.selectionEnd) return;
       e.preventDefault();
-      if (busy) cancelRun();
+      if (busy || agentControllersRef.current.size) cancelRun();
       else { setInput(""); }
       return;
     }
@@ -613,15 +716,47 @@ export default function ClaudeShell() {
   // Global keys: Esc handling (interrupt / dismiss menu / close panel).
   useEffect(() => {
     const onKey = (e) => {
-      if (e.isComposing) return;
-      if (!panel && e.key === "Escape") {
-        if (busy) { e.preventDefault(); cancelRun(); }
+      if (e.isComposing || e.defaultPrevented || panel || permission || agentPane) return;
+      if (e.key === "Escape") {
+        e.preventDefault();
+        if (menuOpen) { setMenuDismissed(true); return; }
+        if (busy || agentControllersRef.current.size) { cancelRun(); escapeTimeRef.current = 0; }
+        else if (!input && Date.now() - escapeTimeRef.current < 400) setPanel({ type: "rewind" });
+        else escapeTimeRef.current = Date.now();
         focusPrompt();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [panel, busy, cancelRun, focusPrompt]);
+  }, [panel, permission, agentPane, menuOpen, input, busy, cancelRun, focusPrompt]);
+
+  useEffect(() => {
+    if (!panel && !permission) return;
+    const dialog = [...document.querySelectorAll('.ct-panel')].at(-1);
+    if (!dialog) return;
+    const focusable = () => [...dialog.querySelectorAll('button, input, select, textarea, a[href]')].filter((element) => !element.disabled);
+    const frame = requestAnimationFrame(() => (dialog.querySelector('input') || focusable()[0])?.focus());
+    const onKey = (event) => {
+      if (event.isComposing) return;
+      if (event.key === 'Escape') {
+        event.preventDefault(); event.stopImmediatePropagation();
+        if (permission) { permission.resolve(false); setPermission(null); }
+        else setPanel(null);
+      } else if (event.key === 'Tab') {
+        event.preventDefault(); event.stopImmediatePropagation();
+        const items = focusable();
+        const index = items.indexOf(document.activeElement);
+        items[(index + (event.shiftKey ? -1 : 1) + items.length) % items.length]?.focus();
+      } else if (['ArrowUp', 'ArrowDown'].includes(event.key) && document.activeElement?.tagName === 'BUTTON') {
+        const items = focusable().filter((element) => element.tagName === 'BUTTON');
+        const index = items.indexOf(document.activeElement);
+        event.preventDefault();
+        items[(index + (event.key === 'ArrowUp' ? -1 : 1) + items.length) % items.length]?.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => { cancelAnimationFrame(frame); window.removeEventListener('keydown', onKey, true); focusPrompt(); };
+  }, [panel, permission, focusPrompt]);
 
   const cycleMode = () => {
     setMode((m) => (m + 1) % MODE_LABELS.length);
@@ -703,7 +838,7 @@ export default function ClaudeShell() {
                     <button type="button" className="ct-inline-command" onClick={() => submitInput(block.text)}>{block.text}</button>
                   ) : block.text}</Entry>;
                 case "section":
-                  return <Entry key={block.id} kind="assistant"><CliWelcome section={block.section} /></Entry>;
+                  return <Entry key={block.id} kind="assistant"><CliWelcome section={block.section} active={block.streaming} initialWords={block.visibleWords} onReveal={block.onReveal} onComplete={block.onComplete} onProgress={scrollToEnd} /></Entry>;
                 case "system":
                   return <Entry key={block.id} kind="system">{block.text}</Entry>;
                 case "assistant":
@@ -720,7 +855,7 @@ export default function ClaudeShell() {
                   );
                 case "tool":
                   return (
-                    <ToolEntry key={block.id} name={block.name} path={block.path} output={block.output} defaultOpen={false} />
+                    <ToolEntry key={block.id} name={block.name} path={block.path} output={block.output} defaultOpen={verbose} />
                   );
                 case "tool-plain":
                   return (
@@ -773,13 +908,7 @@ export default function ClaudeShell() {
           </div>
 
           {/* Thinking row */}
-          {busy && (
-            <div className="ct-thinking" role="status">
-              <SpinnerGlyph active />
-              <span>{busy.label}</span>
-              <small>esc to interrupt</small>
-            </div>
-          )}
+          {(busy || agents.some((agent) => agent.status === "running")) && <ThinkingRow busy={busy || { label: "Researching…", startedAt: agents.find((agent) => agent.status === "running").startedAt }} />}
         </div>
 
         </>
@@ -788,9 +917,19 @@ export default function ClaudeShell() {
 
         {/* ── Composer ── */}
         <footer className="ct-composer" style={agentPane ? { display: "none" } : undefined}>
+          {showTasks && <div className="ct-task-list" aria-label="Task checklist">
+            <strong>Session tasks</strong>
+            {PORTFOLIO_SECTIONS.map((section) => {
+              const entries = blocks.filter((block) => block.kind === "section" && block.section === section);
+              const last = entries.at(-1);
+              return <div key={section}>{last ? last.streaming ? "◌" : last.interrupted ? "■" : "✓" : "○"} /{section}{last?.streaming ? " · writing" : last?.interrupted ? " · interrupted" : ""}</div>;
+            })}
+            {busy && <div>{busy.label}</div>}
+            {agents.map((agent) => <div key={agent.id}>{agent.name}: {agent.task} · {agent.status}</div>)}
+          </div>}
           {/* Slash menu */}
           {menuOpen && menuMatches.length > 0 && (
-            <div className="ct-command-menu" role="listbox" aria-label="Slash commands" ref={menuRef}>
+            <div className="ct-command-menu" role="listbox" aria-label="Commands and files" id="ct-command-menu" ref={menuRef}>
               {menuMatches.map((c, i) => (
                 <button
                   key={c.name}
@@ -832,7 +971,7 @@ export default function ClaudeShell() {
                 autoCorrect="off"
                 placeholder='Try "what did he build at Zoho?"'
                 value={input}
-                onChange={(e) => { setInput(e.target.value); setMenuIdx(0); syncHeight(e.target); }}
+                onChange={(e) => { setMenuDismissed(false); setInput(e.target.value); setMenuIdx(0); syncHeight(e.target); }}
                 onKeyDown={onKeyDown}
                 aria-controls="ct-command-menu"
                 aria-expanded={menuOpen}
@@ -868,13 +1007,16 @@ export default function ClaudeShell() {
                 className="ct-text-button ct-mode-button"
                 data-mode={mode}
                 onClick={cycleMode}
-                title="Cycle visual permission mode (Shift+Tab)"
+                title="Cycle permission mode (Shift+Tab)"
               >
                 <span>{MODE_LABELS[mode]}</span>
                 <span className="ct-mode-hint"> · shift+tab to cycle</span>
               </button>
             </div>
             <div className="ct-status-right">
+              <button type="button" className="ct-text-button" onClick={() => setVerbose((value) => !value)} aria-pressed={verbose}>details</button>
+              <button type="button" className="ct-text-button" onClick={() => { setHistoryQuery(""); setPanel({ type: "history" }); }}>history</button>
+              <button type="button" className="ct-text-button" onClick={() => setShowTasks((value) => !value)} aria-pressed={showTasks}>tasks</button>
               <span title="Running agents">
                 {runningAgents > 0 ? `${runningAgents} agent${runningAgents > 1 ? "s" : ""} · ` : ""}
               </span>
@@ -905,7 +1047,24 @@ export default function ClaudeShell() {
         {/* ── Modal panels ── */}
         {panel && panel.type !== "open-picker" && (
           <div className="ct-panel-backdrop" onClick={(e) => { if (e.target === e.currentTarget) setPanel(null); }}>
-            <section className="ct-panel" role="dialog" aria-modal="true">
+            <section className="ct-panel" role="dialog" aria-modal="true" aria-label={permission?.title || panel?.type || "Terminal dialog"}>
+              {["history", "rewind"].includes(panel.type) && <>
+                <div className="ct-panel-header"><h2 className="ct-panel-title">{panel.type === "history" ? "Command history" : "Rewind conversation"}</h2><button type="button" className="ct-text-button" onClick={() => setPanel(null)}>esc to close</button></div>
+                {panel.type === "history" && <input className="ct-history-search" aria-label="Search command history" placeholder="Search history…" value={historyQuery} onChange={(e) => setHistoryQuery(e.target.value)} />}
+                <div className="ct-option-list">
+                  {panel.type === "history" ? history.filter((text) => text.toLowerCase().includes(historyQuery.toLowerCase())).slice().reverse().map((text, index) => <button key={index} type="button" className="ct-option-button" onClick={() => { setInput(text); setPanel(null); }}>{text}</button>) : blocks.filter((block) => block.kind === "user").map((block) => <button key={block.id} type="button" className="ct-option-button" onClick={() => { cancelRun(false); setBlocks((previous) => previous.slice(0, previous.findIndex((entry) => entry.id === block.id))); setInput(block.text); setPanel(null); }}>{block.text}</button>)}
+                  {panel.type === "history" && !history.some((text) => text.toLowerCase().includes(historyQuery.toLowerCase())) && <p>No matching commands.</p>}
+                </div>
+              </>}
+              {panel.type === "mode" && <>
+                <div className="ct-panel-header"><h2 className="ct-panel-title">Permission mode</h2><button type="button" className="ct-text-button" onClick={() => setPanel(null)}>esc to close</button></div>
+                <div className="ct-option-list">{MODE_LABELS.map((label, index) => <button key={label} type="button" className="ct-option-button" onClick={() => { setMode(index); setPanel(null); }}><span>{label}{mode === index ? " ✓" : ""}</span><span>{["Review local settings and external actions", "Apply local settings; confirm external actions", "Review multi-step work before running", "Run supported portfolio actions without prompts"][index]}</span></button>)}</div>
+              </>}
+              {panel.type === "plan" && <>
+                <div className="ct-panel-header"><h2 className="ct-panel-title">Plan</h2><button type="button" className="ct-text-button" onClick={() => setPanel(null)}>esc to cancel</button></div>
+                <pre className="ct-plan-text">{panel.text}</pre>
+                <button type="button" className="ct-terminal-button" onClick={() => { setPanel(null); panel.run(); }}>Run plan</button>
+              </>}
               {panel.type === "model" && (
                 <>
                   <div className="ct-panel-header">
@@ -942,13 +1101,14 @@ export default function ClaudeShell() {
                       e.preventDefault();
                       const name = e.target.elements["ct-setting-name"].value.trim() || "visitor";
                       const size = Number(e.target.elements["ct-setting-font"].value);
-                      persistConfig({ userName: name.slice(0, 50), fontSize: Math.min(20, Math.max(12, size)) });
-                      setPanel(null);
-                      toast("Settings saved locally.");
+                      const next = { userName: name.slice(0, 50), fontSize: Math.min(20, Math.max(12, size)) };
+                      const save = () => { persistConfig(next); toast("Settings saved locally."); };
+                      if (mode === 0 || mode === 2) setPanel({ type: "plan", text: `Apply local settings:\nName: ${next.userName}\nText size: ${next.fontSize}px`, run: save });
+                      else { setPanel(null); save(); }
                     }}
                   >
                     <label className="ct-setting">
-                      <span>Your name (for the greeting)</span>
+                      <span>Your session name</span>
                       <input id="ct-setting-name" type="text" defaultValue={config.userName} maxLength={50} required />
                     </label>
                     <div className="ct-settings-row">
@@ -981,6 +1141,7 @@ export default function ClaudeShell() {
                     </div>
                   </form>
                   <p style={{ marginTop: 17, fontSize: "0.77em", color: "var(--ct-faint)" }}>
+                    Manual and Plan review local settings before applying them. Accept edits applies local settings automatically; Bypass also skips portfolio action prompts.
                     The directory label stays ~/portfolio — this terminal is Shanmuga's portfolio.
                   </p>
                 </>
@@ -992,7 +1153,7 @@ export default function ClaudeShell() {
         {/* ── Permission dialog (panel-styled) ── */}
         {permission && (
           <div className="ct-panel-backdrop">
-            <section className="ct-panel" role="dialog" aria-modal="true">
+            <section className="ct-panel" role="dialog" aria-modal="true" aria-label={permission?.title || panel?.type || "Terminal dialog"}>
               <div className="ct-panel-header">
                 <h2 className="ct-panel-title">{permission.title}</h2>
                 <button type="button" className="ct-text-button ct-panel-close" onClick={() => answerPermission(false)}>esc to cancel</button>

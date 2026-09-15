@@ -10,19 +10,19 @@ test('commands precede delayed sections and complete in order', (t) => {
   playSections(['info', 'projects'], {
     onCommand: (value) => events.push(value),
     onStatus: (value) => events.push(value),
-    onSection: (value) => events.push(`output:${value}`),
+    onSection: (value, next) => { events.push(`output:${value}`); next(); },
     onDone: () => events.push('done'),
   });
   t.mock.timers.tick(0);
-  assert.deepEqual(events, ['/info', 'Thinking…']);
-  t.mock.timers.tick(500);
+  assert.deepEqual(events, ['/info', 'Accomplishing…']);
+  t.mock.timers.tick(250);
   assert.equal(events.at(-1), 'Loading info…');
-  t.mock.timers.tick(499);
+  t.mock.timers.tick(249);
   assert.ok(!events.includes('output:info'));
   t.mock.timers.tick(1);
-  assert.deepEqual(events.slice(-3), ['output:info', '/projects', 'Thinking…']);
-  t.mock.timers.tick(500);
-  t.mock.timers.tick(500);
+  assert.deepEqual(events.slice(-3), ['output:info', '/projects', 'Accomplishing…']);
+  t.mock.timers.tick(250);
+  t.mock.timers.tick(250);
   assert.deepEqual(events.slice(-2), ['output:projects', 'done']);
 });
 
@@ -47,21 +47,38 @@ test('a cancelled section can be requested again as a fresh run', (t) => {
   t.mock.timers.enable({ apis: ['setTimeout'] });
   t.mock.method(Math, 'random', () => 1);
   const output = [];
-  const callbacks = { onCommand() {}, onStatus() {}, onSection: (s) => output.push(s), onDone() {} };
+  const callbacks = { onCommand() {}, onStatus() {}, onSection: (s, next) => { output.push(s); next(); }, onDone() {} };
   const cancel = playSections(['projects'], callbacks);
   t.mock.timers.tick(0);
-  t.mock.timers.tick(1500);
+  t.mock.timers.tick(1000);
   cancel();
   playSections(['projects'], callbacks);
   t.mock.timers.tick(0);
-  t.mock.timers.tick(1500);
-  t.mock.timers.tick(1499);
+  t.mock.timers.tick(1000);
+  t.mock.timers.tick(999);
   assert.deepEqual(output, []);
   t.mock.timers.tick(1);
   assert.deepEqual(output, ['projects']);
   playSections(['projects'], callbacks);
   t.mock.timers.tick(0);
-  t.mock.timers.tick(1500);
-  t.mock.timers.tick(1500);
+  t.mock.timers.tick(1000);
+  t.mock.timers.tick(1000);
   assert.deepEqual(output, ['projects', 'projects']);
+});
+
+
+test('next section waits for progressive output and cannot resume after cancellation', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  t.mock.method(Math, 'random', () => 0);
+  const commands = [];
+  let complete;
+  const cancel = playSections(['projects', 'about'], {
+    onCommand: (c) => commands.push(c), onStatus() {}, onDone() {},
+    onSection: (_s, next) => { complete = next; },
+  });
+  t.mock.timers.tick(0); t.mock.timers.tick(250); t.mock.timers.tick(250);
+  t.mock.timers.tick(10000);
+  assert.deepEqual(commands, ['/projects']);
+  cancel(); complete();
+  assert.deepEqual(commands, ['/projects']);
 });

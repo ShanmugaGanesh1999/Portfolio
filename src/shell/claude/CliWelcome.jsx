@@ -16,20 +16,11 @@ import {
   EDUCATION,
 } from "../../data/portfolioData";
 
-function DocSection({ title, children }) {
-  return (
-    <section>
-      <h2 style={{ fontSize: "1.1em", fontWeight: 700, color: "var(--color-text)", margin: "2px 0 8px" }}>
-        {title}
-      </h2>
-      {children}
-    </section>
-  );
-}
+import ProgressiveOutput from "./ProgressiveOutput";
 
-export default function CliWelcome({ section }) {
+export default function CliWelcome({ section, ...reveal }) {
   return (
-    <div className="ct-portfolio" style={{ margin: "10px 0 20px" }}>
+    <ProgressiveOutput {...reveal}><div className="ct-portfolio" style={{ margin: "10px 0 20px" }}>
       {/* ── Identity ── */}
       {section === "info" && <section>
         <h2 style={{ margin: "2px 0 4px" }}>{PERSONAL.name}</h2>
@@ -69,19 +60,19 @@ export default function CliWelcome({ section }) {
       </section>}
 
       {/* ── About ── */}
-      {section === "about" && <DocSection title="About">
+      {section === "about" && <section><h2>About</h2>
         <div style={{ color: "var(--color-comment)", lineHeight: 1.7 }}>
           {ABOUT.paragraphs.map((p, i) => (
             <p key={i} style={{ margin: i ? "10px 0 0" : 0 }}>{p}</p>
           ))}
         </div>
-      </DocSection>}
+      </section>}
 
       {/* ── Tech stack ── */}
-      {section === "skills" && <DocSection title="Tech Stack">
+      {section === "skills" && <section><h2>Tech Stack</h2>
         <div style={{ fontSize: "0.93em" }}>
           {TECH_STACK.map((group) => (
-            <div key={group.title} style={{ display: "flex", gap: 14, margin: "5px 0", flexWrap: "wrap" }}>
+            <div data-reveal-item="true" key={group.title} style={{ display: "flex", gap: 14, margin: "5px 0", flexWrap: "wrap" }}>
               <span style={{ color: "var(--color-string)", minWidth: 150 }}>
                 <span style={{ color: "var(--ct-faint)" }}>├─ </span>
                 {group.title}
@@ -90,14 +81,14 @@ export default function CliWelcome({ section }) {
             </div>
           ))}
         </div>
-      </DocSection>}
+      </section>}
 
       {/* ── Experience ── */}
-      {section === "experience" && <DocSection title="Experience">
+      {section === "experience" && <section><h2>Experience</h2>
         <div>
           {EXPERIENCE.map((exp) => (
             <div
-              key={exp.period}
+              data-reveal-item="true" key={exp.period}
               style={{
                 borderLeft: "2px solid var(--color-border)", paddingLeft: 14,
                 margin: "14px 0", position: "relative",
@@ -121,14 +112,14 @@ export default function CliWelcome({ section }) {
             </div>
           ))}
         </div>
-      </DocSection>}
+      </section>}
 
       {/* ── Projects ── */}
-      {section === "projects" && <DocSection title="Projects">
+      {section === "projects" && <section><h2>Projects</h2>
         <div>
           {PROJECTS.map((project) => (
             <div
-              key={project.title}
+              data-reveal-item="true" key={project.title}
               style={{
                 border: "1px solid var(--color-border)", borderRadius: 4,
                 padding: "8px 10px", background: "var(--color-sidebar)", margin: "6px 0",
@@ -154,10 +145,10 @@ export default function CliWelcome({ section }) {
             </div>
           ))}
         </div>
-      </DocSection>}
+      </section>}
 
       {/* ── Credentials ── */}
-      {section === "credentials" && <DocSection title="Credentials">
+      {section === "credentials" && <section><h2>Credentials</h2>
         <div style={{ fontSize: "0.9em" }}>
           {EDUCATION.map((edu) => (
             <div key={edu.institution} style={{ margin: "4px 0" }}>
@@ -182,10 +173,10 @@ export default function CliWelcome({ section }) {
             ))}
           </div>
         </div>
-      </DocSection>}
+      </section>}
 
       {/* ── Contact ── */}
-      {section === "contact" && <DocSection title="Contact">
+      {section === "contact" && <section><h2>Contact</h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           <a href={`mailto:${PERSONAL.email}`} className="ct-terminal-button" style={{ textDecoration: "none", display: "inline-block" }}>
             ✉ Email Shanmuga
@@ -209,7 +200,7 @@ export default function CliWelcome({ section }) {
             ⏱ Schedule a sync
           </a>
         </div>
-      </DocSection>}
-    </div>
+      </section>}
+    </div></ProgressiveOutput>
   );
 }

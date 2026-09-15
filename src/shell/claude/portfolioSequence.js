@@ -1,23 +1,28 @@
+import { randomVerb } from "./verbs.js";
+
+export const loadingDelay = () => 500 + Math.round(Math.random() * 1500);
+
 export const PORTFOLIO_SECTIONS = ['info', 'stats', 'about', 'skills', 'experience', 'projects', 'credentials', 'contact'];
 
 // One timer owns the sequence, so interrupting cannot leave later sections queued.
 export function playSections(sections, { intro = false, onCommand, onStatus, onSection, onDone }) {
   let index = 0;
   let timer;
+  let cancelled = false;
   function next() {
+    if (cancelled) return;
     if (index === sections.length) {
       onDone();
       return;
     }
     const section = sections[index++];
-    const halfDelay = (1000 + Math.round(Math.random() * 2000)) / 2;
+    const halfDelay = loadingDelay() / 2;
     onCommand(`/${section}`);
-    onStatus('Thinking…');
+    onStatus(`${randomVerb()}…`);
     timer = setTimeout(() => {
       onStatus(`Loading ${section}…`);
       timer = setTimeout(() => {
-        onSection(section);
-        next();
+        onSection(section, next);
       }, halfDelay);
     }, halfDelay);
   }
@@ -25,8 +30,8 @@ export function playSections(sections, { intro = false, onCommand, onStatus, onS
     if (intro) {
       onCommand('claude --dangerously-skip-permissions');
       onStatus('executing…');
-      timer = setTimeout(next, 1000);
+      timer = setTimeout(next, loadingDelay());
     } else next();
   }, 0);
-  return () => clearTimeout(timer);
+  return () => { cancelled = true; clearTimeout(timer); };
 }
