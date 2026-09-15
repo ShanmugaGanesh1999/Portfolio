@@ -201,9 +201,23 @@ export default function ClaudeShell() {
     if (window.matchMedia("(min-width: 641px)").matches) focusPrompt();
   }, [focusPrompt]);
 
-  // Auto-scroll on new blocks while pinned near the bottom.
+  // Auto-scroll on new blocks while pinned near the bottom. The mount run
+  // is special: a fresh session opens the welcome document at the top (the
+  // scrollback is a document, not a live log); a deep link with initial
+  // blocks still lands on its content.
+  const mountedRef = useRef(false);
   useEffect(() => {
     const el = viewportRef.current;
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      if (blocks.length === 0) {
+        autoScrollRef.current = false;
+        el?.scrollTo({ top: 0 });
+      } else if (el) {
+        el.scrollTop = el.scrollHeight;
+      }
+      return;
+    }
     if (el && autoScrollRef.current) el.scrollTop = el.scrollHeight;
   }, [blocks, busy]);
 
