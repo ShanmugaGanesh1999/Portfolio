@@ -607,10 +607,18 @@ export default function ClaudeShell() {
       {/* ── Top bar — mirrors the VS Code header so the mode switcher
              stays in exactly the same place in both shells ── */}
       <header className="h-10 border-b border-border flex items-center px-2 sm:px-4 justify-between gap-2 shrink-0 bg-sidebar">
-        <div className="flex items-center gap-2 min-w-0 text-xs text-comment truncate">
+        <div className="flex items-center gap-2 min-w-0 text-xs text-comment">
           <span className="text-accent text-sm shrink-0 select-none" aria-hidden="true">✳</span>
-          <span className="hidden sm:inline">~/portfolio — claude</span>
-          <span className="sm:hidden">claude</span>
+          <span
+            className="truncate whitespace-nowrap"
+            title="portfolio git:(main) — claude Code v3"
+          >
+            <span className="text-text">portfolio</span>{" "}
+            <span>git:(</span>
+            <span style={{ color: "var(--color-success)" }}>main</span>
+            <span>)</span>
+            <span> — claude Code v3</span>
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <button

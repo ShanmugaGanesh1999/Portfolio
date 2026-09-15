@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Apply the saved theme before first paint (no flash of wrong theme) -->
+    <!-- Apply the saved theme + shell before first paint (no flash).
+         Claude Code terminal is the default shell. -->
     <script>
       (function () {
         try {
@@ -14,6 +15,13 @@
           t = "dark";
         }
         document.documentElement.setAttribute("data-theme", t);
+        try {
+          var s = localStorage.getItem("sg-shell");
+          if (s !== "vscode" && s !== "claude") s = "claude";
+        } catch (e) {
+          s = "claude";
+        }
+        document.documentElement.setAttribute("data-shell", s);
       })();
     </script>
     

@@ -9,10 +9,11 @@ import { WELCOME_TAB, makeTab, defaultPrepFile } from "./registry";
 const MAX_LOG_ENTRIES = 200;
 
 function readInitialShell() {
+  // Claude Code terminal is the default; a saved VS Code preference wins.
   try {
-    return localStorage.getItem("sg-shell") === "claude" ? "claude" : "vscode";
+    return localStorage.getItem("sg-shell") === "vscode" ? "vscode" : "claude";
   } catch {
-    return "vscode";
+    return "claude";
   }
 }
 
