@@ -51,13 +51,7 @@ export default function StatusBar() {
     return () => clearInterval(id);
   }, []);
 
-  // Line number tracks the editor's scroll position.
-  const [ln, setLn] = useState(1);
-  useEffect(
-    () => ws.subscribeEditorScroll(({ scrollTop }) => setLn(1 + Math.round(scrollTop / 24))),
-    [ws]
-  );
-
+  const line = ws.state.tabState[activeTabId]?.line;
   return (
     <footer className="h-6 bg-accent text-bg flex items-center justify-between text-[10px] font-bold shrink-0 px-1 sm:px-2 select-none gap-1">
       {/* Left cluster */}
@@ -69,39 +63,21 @@ export default function StatusBar() {
         >
           <span className="hidden sm:inline">SG-SYS</span>
         </StatusButton>
-        <span className="flex items-center gap-1" title="Source control: master">
-          <Icon name="account_tree" size="text-[12px]" />
-          master
-        </span>
-        <span className="hidden md:flex items-center gap-2" title="No problems detected">
-          <span className="flex items-center gap-0.5">
-            <Icon name="error" size="text-[12px]" /> 0
-          </span>
-          <span className="flex items-center gap-0.5">
-            <Icon name="warning" size="text-[12px]" /> 0
-          </span>
-        </span>
+        <span title="Portfolio workspace">portfolio</span>
+        <span className="hidden md:inline" title="Documents cannot be edited">Read-only</span>
       </div>
 
       {/* Right cluster */}
       <div className="flex items-center gap-2 sm:gap-3">
         <span className="hidden sm:inline" title="Editor position">
-          Ln {ln}, Col 1
+          {activeTab?.kind === "document" && line ? `Ln ${line}, Col 1` : `${tabs.length} open editors`}
         </span>
-        <span className="hidden lg:inline">Spaces: 2</span>
         <span className="hidden lg:inline">UTF-8</span>
         <span className="hidden xl:inline">LF</span>
         <span title="Language mode">{activeTab?.language ?? "Markdown"}</span>
         <span className="hidden sm:inline" title="Session uptime">
           {formatSession(elapsed)}
         </span>
-        <StatusButton
-          icon="bolt"
-          label="Cursor Tab — AI completions active"
-          onClick={() => ws.log("ai", "Cursor Tab snoozed for this session")}
-        >
-          <span className="hidden sm:inline">Cursor Tab</span>
-        </StatusButton>
         <StatusButton
           icon="terminal"
           label="Toggle Terminal (Ctrl+`)"

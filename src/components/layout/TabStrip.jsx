@@ -4,7 +4,7 @@
 // scroll horizontally, arrow keys to move between tabs.
 // ============================================================
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Icon } from "../ui";
 import { useWorkspace } from "../../workspace/WorkspaceContext";
 
@@ -12,7 +12,16 @@ export default function TabStrip() {
   const ws = useWorkspace();
   const { tabs, activeTabId } = ws.state;
 
+  const [menu, setMenu] = useState(null);
   const stripRef = useRef(null);
+  useEffect(() => {
+    if (!menu) return;
+    const close = () => setMenu(null);
+    window.addEventListener("click", close);
+    const escape = (event) => { if (event.key === "Escape") { close(); tabRefs.current[menu.tab.id]?.focus(); } };
+    window.addEventListener("keydown", escape);
+    return () => { window.removeEventListener("click", close); window.removeEventListener("keydown", escape); };
+  }, [menu]);
   const tabRefs = useRef({});
 
   const activeIdx = Math.max(
@@ -49,7 +58,11 @@ export default function TabStrip() {
   };
 
   const onTabKeyDown = (e, idx) => {
-    if (e.key === "ArrowRight") {
+    if (e.shiftKey && e.key === "F10") {
+      e.preventDefault();
+      const box = e.currentTarget.getBoundingClientRect();
+      setMenu({ tab: tabs[idx], x: Math.min(box.left, window.innerWidth - 200), y: box.bottom });
+    } else if (e.key === "ArrowRight") {
       e.preventDefault();
       focusTab(idx + 1);
     } else if (e.key === "ArrowLeft") {
@@ -64,6 +77,7 @@ export default function TabStrip() {
   };
 
   return (
+    <>
     <div
       ref={stripRef}
       role="tablist"
@@ -84,6 +98,8 @@ export default function TabStrip() {
             tabIndex={idx === activeIdx ? 0 : -1}
             id={`tab-${tab.id}`}
             onClick={() => ws.setActiveTab(tab.id)}
+            onDoubleClick={() => ws.keepTab(tab.id)}
+            onContextMenu={(event) => { event.preventDefault(); setMenu({ tab, x: Math.min(event.clientX, window.innerWidth - 200), y: event.clientY }); }}
             onAuxClick={(e) => {
               if (e.button === 1) ws.closeTab(tab.id);
             }}
@@ -99,7 +115,7 @@ export default function TabStrip() {
               size="text-[13px]"
               className={active ? "text-accent shrink-0" : "text-comment shrink-0"}
             />
-            <span className="truncate">{tab.title}</span>
+            <span className={`truncate ${tab.preview ? "italic" : ""}`}>{tab.pinned ? "⌖ " : ""}{tab.title}</span>
             {tab.closable !== false && (
               <button
                 onClick={(e) => {
@@ -112,7 +128,7 @@ export default function TabStrip() {
                   active
                     ? "text-comment hover:text-keyword hover:bg-border/50"
                     : "text-comment/60 hover:text-keyword hover:bg-border/50"
-                } ${"opacity-0 group-hover:opacity-100"}`}
+                } opacity-0 group-hover:opacity-100 group-focus-within:opacity-100`}
               >
                 <Icon name="close" size="text-[13px]" />
               </button>
@@ -121,5 +137,21 @@ export default function TabStrip() {
         );
       })}
     </div>
+    {menu && <div role="menu" aria-label="Editor tab actions" onKeyDown={(event) => {
+      if (!["ArrowDown", "ArrowUp"].includes(event.key)) return;
+      event.preventDefault();
+      const items = [...event.currentTarget.querySelectorAll("button")];
+      const index = items.indexOf(document.activeElement);
+      items[(index + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length]?.focus();
+    }} className="fixed z-[90] bg-sidebar border border-border rounded shadow-xl py-1 text-xs w-48" style={{ left: menu.x, top: menu.y }}>
+      {[
+        [menu.tab.pinned ? 'Unpin tab' : 'Pin tab', () => ws.pinTab(menu.tab.id)],
+        ['Keep open', () => ws.keepTab(menu.tab.id)],
+        ['Close', () => ws.closeTab(menu.tab.id)],
+        ['Close others', () => ws.closeOtherTabs(menu.tab.id)],
+        ['Close all', ws.closeAllTabs],
+      ].map(([label, action], index) => <button key={label} role="menuitem" autoFocus={index === 0} className="block w-full text-left px-3 py-2 hover:bg-border focus:bg-border" onClick={() => { action(); setMenu(null); }}>{label}</button>)}
+    </div>}
+    </>
   );
 }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { revealWords } from './revealWords';
 
 export default function ProgressiveOutput({ children, active, animate = true, initialWords, onComplete, onProgress, onReveal }) {
-  const [words, setWords] = useState(() => initialWords ?? (!animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? Infinity : 0));
+  const [words, setWords] = useState(() => initialWords ?? (!animate || (document.documentElement.dataset.motion === 'reduce' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? Infinity : 0));
   const completed = useRef(false);
   const { content, total } = revealWords(children, words);
   useEffect(() => {

@@ -3,7 +3,9 @@
 // Single source of truth for what can be opened as an editor tab.
 // ============================================================
 
-import { PREP_COURSES } from "../prep/prepData";
+import { PREP_COURSES } from "../prep/prepData.js";
+
+import { getDocument } from "./documents.js";
 
 /** The pinned, non-closable Welcome tab holding the portfolio sections. */
 export const WELCOME_TAB = {
@@ -28,6 +30,8 @@ export const PROJECT_TABS = {
 };
 
 /** Section ids on the Welcome tab that the scroll-spy observes. */
+export const SECTION_DOCUMENTS = { hero: "welcome", about: "doc:about", expertise: "doc:skills", experience: "doc:experience", work: "doc:projects", contact: "doc:contact" };
+
 export const SECTION_IDS = ["hero", "about", "expertise", "experience", "work", "contact"];
 
 /**
@@ -37,6 +41,8 @@ export const SECTION_IDS = ["hero", "about", "expertise", "experience", "work", 
  */
 export function makeTab(id) {
   if (id === WELCOME_TAB.id) return WELCOME_TAB;
+  const document = getDocument(id);
+  if (document) return { ...document, kind: "document", closable: true };
   if (PROJECT_TABS[id]) return { id, kind: "project", closable: true, ...PROJECT_TABS[id] };
   if (id?.startsWith("prep:")) {
     const courseId = id.slice(5);
@@ -64,6 +70,7 @@ export function defaultPrepFile(courseId) {
 /** Convert active workspace state → URL hash. */
 export function hashForTab(tabId, prepFiles) {
   if (!tabId || tabId === "welcome") return "#/";
+  if (tabId.startsWith("doc:")) return `#/documents/${tabId.slice(4)}`;
   if (tabId.startsWith("prep:")) {
     const courseId = tabId.slice(5);
     const file = prepFiles?.[courseId] ?? defaultPrepFile(courseId);
@@ -82,6 +89,10 @@ export function parseHash(hash) {
   const raw = (hash || "").replace(/^#\/?/, "");
   if (!raw || raw === "welcome") return { id: "welcome" };
   const parts = raw.split("/");
+  if (parts[0] === "documents" && parts.length === 2) {
+    const document = getDocument(`doc:${parts[1]}`);
+    return document ? { id: document.id } : null;
+  }
   if (parts[0] === "prep" && parts.length >= 3) {
     const courseId = parts[1];
     const filePath = parts.slice(2).join("/");

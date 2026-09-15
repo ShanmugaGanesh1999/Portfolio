@@ -5,7 +5,7 @@
 // prompt echo, history, keyboard handling, line rendering.
 // ============================================================
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useWorkspace } from "../../workspace/WorkspaceContext";
 import { useTheme } from "../../hooks/useTheme";
 import useMediaQuery from "../../hooks/useMediaQuery";
@@ -42,8 +42,8 @@ export default function Terminal({ active = true }) {
   }, []);
 
   // Shared executor — the same commands run in the Claude Code shell.
-  const runCommand = useCallback(
-    createShellExecutor({
+  const runCommand = useMemo(
+    () => createShellExecutor({
       ws,
       theme,
       setTheme,

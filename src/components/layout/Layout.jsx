@@ -8,7 +8,6 @@
 import {
   useEffect,
   useLayoutEffect,
-  useCallback,
   useMemo,
   useRef,
 } from "react";
@@ -28,10 +27,9 @@ import CopilotChat from "../chat/CopilotChat";
 import { ResizeHandle } from "../ui";
 import usePanelResize from "../../hooks/usePanelResize";
 import useMediaQuery from "../../hooks/useMediaQuery";
-import useScrollSpy from "../../hooks/useScrollSpy";
 import { useWorkspace } from "../../workspace/WorkspaceContext";
 import { useGlobalShortcuts } from "../../workspace/useGlobalShortcuts";
-import { SECTION_IDS } from "../../workspace/registry";
+import { SECTION_DOCUMENTS } from "../../workspace/registry";
 import EditorContent from "../../workspace/EditorContent";
 import { PREP_COURSES } from "../../prep/prepData";
 
@@ -50,8 +48,7 @@ export default function Layout() {
     ? PREP_COURSES.find((c) => c.id === activePrepCourseId)
     : null;
 
-  // Scroll-spy drives the active section marker on the Welcome tab.
-  const activeSection = useScrollSpy(SECTION_IDS);
+  const activeSection = Object.entries(SECTION_DOCUMENTS).find(([, id]) => id === state.activeTabId)?.[0] ?? null;
 
   // Copilot panel resize (desktop only).
   const chat = usePanelResize({
@@ -119,45 +116,14 @@ export default function Layout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.activeTabId]);
 
-  // ── Section scrolling (Welcome tab) ─────────────────────────
-  const pendingSectionRef = useRef(null);
-
-  const doScroll = useCallback((sectionId) => {
-    const el = mainRef.current;
-    const target = document.getElementById(sectionId);
-    if (!el || !target) return;
-    const top =
-      target.getBoundingClientRect().top -
-      el.getBoundingClientRect().top +
-      el.scrollTop -
-      8;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    el.scrollTo({ top: Math.max(0, top), behavior: reduce ? "auto" : "smooth" });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // After switching back to the Welcome tab, scroll to the requested section.
-  useLayoutEffect(() => {
-    if (pendingSectionRef.current && state.activeTabId === "welcome") {
-      const id = pendingSectionRef.current;
-      pendingSectionRef.current = null;
-      requestAnimationFrame(() => doScroll(id));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.activeTabId]);
-
-  // Register the implementation once; consumers call ws.scrollToSection(id).
+  const { registerScrollToSection, openTab } = ws;
+  // Legacy section links, mobile navigation and shell commands share document routes.
   useEffect(() => {
-    ws.registerScrollToSection((sectionId) => {
-      if (ws.stateRef.current.activeTabId !== "welcome") {
-        pendingSectionRef.current = sectionId;
-        ws.setActiveTab("welcome");
-      } else {
-        doScroll(sectionId);
-      }
+    registerScrollToSection((sectionId) => {
+      openTab(SECTION_DOCUMENTS[sectionId] ?? "welcome");
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return () => registerScrollToSection(null);
+  }, [openTab, registerScrollToSection]);
 
   return (
     <div className="h-dvh flex flex-col shell-in">
@@ -166,7 +132,7 @@ export default function Layout() {
       {/* Mobile navigation bar */}
       {!isDesktop && (
         <MobileNav
-          activeSection={activeTab?.kind === "welcome" ? activeSection : null}
+          activeSection={activeSection}
         />
       )}
 
@@ -190,6 +156,7 @@ export default function Layout() {
         {/* Sidebar — single instance: static column on desktop, drawer on mobile */}
         {(!isDesktop || state.explorerOpen) && (
           <div
+            inert={!isDesktop && !state.mobileDrawerOpen ? true : undefined}
             className={
               isDesktop
                 ? "relative shrink-0"
@@ -225,7 +192,9 @@ export default function Layout() {
             ref={mainRef}
             tabIndex={-1}
             className={`flex-1 overflow-y-auto scroll-smooth min-h-0 ${
-              activePrepCourse
+              activeTab?.kind === "document" || activeTab?.kind === "welcome"
+                ? "p-0"
+                : activePrepCourse
                 ? "px-3 pb-4 sm:px-6 sm:pb-6"
                 : "p-3 space-y-8 sm:p-6 sm:space-y-12"
             }`}
@@ -250,7 +219,7 @@ export default function Layout() {
                 startResize={chat.startResize}
                 handlers={chat.handlers}
                 nudge={chat.nudge}
-                label="Resize Copilot panel"
+                label="Resize Agent panel"
               />
             )}
             <CopilotChat isOpen onClose={() => ws.setChat(false)} />

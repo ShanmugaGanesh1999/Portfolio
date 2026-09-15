@@ -4,7 +4,7 @@
 // Pure reducer: timestamps are added by action creators, not here.
 // ============================================================
 
-import { WELCOME_TAB, makeTab, defaultPrepFile } from "./registry";
+import { WELCOME_TAB, makeTab, defaultPrepFile } from "./registry.js";
 
 const MAX_LOG_ENTRIES = 200;
 
@@ -63,7 +63,9 @@ export function workspaceReducer(state, action) {
       }
       return {
         ...state,
-        tabs: upsertTab(state.tabs, tab),
+        tabs: state.tabs.some((item) => item.id === tab.id)
+          ? state.tabs.map((item) => item.id === tab.id && !action.preview ? { ...item, preview: false } : item)
+          : [...state.tabs.filter((item) => !action.preview || !item.preview || item.pinned), { ...tab, preview: Boolean(action.preview) }],
         activeTabId: tab.id,
         prepFiles,
         mobileDrawerOpen: false,
@@ -75,8 +77,17 @@ export function workspaceReducer(state, action) {
       if (!result.activeTabId) return state;
       const tabState = { ...state.tabState };
       delete tabState[action.id];
-      return { ...state, ...result, tabState };
+      return { ...state, ...result, activeTabId: state.activeTabId === action.id ? result.activeTabId : state.activeTabId, tabState };
     }
+
+    case "PIN_TAB":
+      return { ...state, tabs: state.tabs.map((tab) => tab.id === action.id ? { ...tab, pinned: !tab.pinned, preview: false } : tab) };
+
+    case "KEEP_TAB":
+      return { ...state, tabs: state.tabs.map((tab) => tab.id === action.id ? { ...tab, preview: false } : tab) };
+
+    case "CLOSE_OTHER_TABS":
+      return { ...state, tabs: state.tabs.filter((tab) => tab.id === action.id || tab.closable === false || tab.pinned), activeTabId: action.id };
 
     case "CLOSE_ALL_TABS":
       return {

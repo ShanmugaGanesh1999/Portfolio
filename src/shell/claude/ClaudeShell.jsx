@@ -18,9 +18,12 @@ import {
   getDefaultModelId,
 } from "../../services/chatService";
 import { createShellExecutor, resolveProject, resolvePrep } from "../commands";
+import { PERSONAL, STATS } from "../../data/portfolioData";
+import { DOCUMENTS, getDocument } from "../../workspace/documents";
 import { PROJECT_TABS, defaultPrepFile } from "../../workspace/registry";
 import ModeSwitcher from "../../components/ui/ModeSwitcher";
 import CliWelcome from "./CliWelcome";
+import { createSession, getActiveSession, listSessions, saveSession, setActiveSession, exportSession } from "../../services/sessionStore";
 import AgentPane from "./AgentPane";
 import OpenPicker from "./OpenPicker";
 import TerminalMarkdown from "../shared/Markdown";
@@ -31,8 +34,22 @@ import { playSections, PORTFOLIO_SECTIONS, loadingDelay } from "./portfolioSeque
 const CONFIG_KEY = "sg-claude-terminal:config:v1";
 const MODE_LABELS = ["Manual", "⏵⏵ Accept edits", "⏸ Plan", "⏵⏵ Bypass permissions"];
 const FRAME_MS = 110;
+const restoreBlocks = (messages) => messages.filter((block) => {
+  if (block.kind === "section") return PORTFOLIO_SECTIONS.includes(block.section);
+  if (["user", "system", "tool-plain"].includes(block.kind)) return typeof block.text === "string";
+  if (block.kind === "assistant") return typeof block.content === "string";
+  if (block.kind === "tool") return typeof block.output === "string" && typeof block.path === "string";
+  return block.kind === "help";
+}).map((block) => ({ ...block,
+  streaming: false, interrupted: block.interrupted || !!block.streaming,
+  visibleWords: block.kind === "section" && !block.streaming && !block.interrupted ? Infinity : block.visibleWords ?? 0,
+}));
 
 const SLASH_COMMANDS = [
+  { name: "/resume", description: "Restore a saved conversation" },
+  { name: "/rename", description: "Rename this conversation: /rename <name>" },
+  { name: "/export", description: "Download this conversation as Markdown" },
+  { name: "/new", description: "Start a new conversation and introduction" },
   { name: "/mode", description: "Choose a permission mode" },
   { name: "/history", description: "Search this session’s commands" },
   { name: "/tasks", description: "Toggle the session checklist" },
@@ -53,11 +70,12 @@ const SLASH_COMMANDS = [
   { name: "/theme", description: "Switch between dark and light themes" },
   { name: "/config", description: "Edit the terminal display settings" },
   { name: "/status", description: "Show this session's configuration" },
-  { name: "/clear", description: "Clear the conversation and start fresh" },
-  { name: "/exit", description: "Back to the VS Code workspace" },
+  { name: "/clear", description: "Clear the current conversation" },
+  { name: "/exit", description: "Back to the Cursor workspace" },
 ];
 
 const FILE_COMMANDS = [
+  ...DOCUMENTS.map((document) => ({ name: `@${document.title}`, description: `Read ${document.title}` })),
   ...PORTFOLIO_SECTIONS.map((section) => ({ name: `@${section}`, description: `Read ${section}` })),
   ...Object.entries(PROJECT_TABS).map(([id, meta]) => ({ name: `@${id}`, description: `Read ${meta.title}` })),
 ];
@@ -88,7 +106,7 @@ function SpinnerGlyph({ active }) {
   const [frame, setFrame] = useState(0);
   useEffect(() => {
     if (!active) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if ((document.documentElement.dataset.motion === "reduce" || window.matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
     const id = setInterval(() => setFrame((f) => f + 1), FRAME_MS);
     return () => clearInterval(id);
   }, [active]);
@@ -171,11 +189,13 @@ export default function ClaudeShell() {
   }, []);
 
   // ── Session state ──
-  const [blocks, setBlocks] = useState([]);
+  const [initialSession] = useState(() => getActiveSession("claude"));
+  const sessionRef = useRef(initialSession);
+  const [blocks, setBlocks] = useState(() => restoreBlocks(initialSession?.messages || []));
   const [busy, setBusy] = useState(null); // { label, verb, startedAt }
   const [input, setInput] = useState("");
-  const [history, setHistory] = useState([]);
-  const [histIdx, setHistIdx] = useState(0);
+  const [history, setHistory] = useState(() => initialSession?.history || []);
+  const [histIdx, setHistIdx] = useState(() => initialSession?.history?.length || 0);
   const [savedDraft, setSavedDraft] = useState("");
   const [menuIdx, setMenuIdx] = useState(0);
   const [mode, setMode] = useState(3);
@@ -268,7 +288,7 @@ export default function ClaudeShell() {
   }, [pushBlock, patchBlock]);
 
   useEffect(() => {
-    runPortfolio(PORTFOLIO_SECTIONS, true);
+    if (!initialSession) runPortfolio(PORTFOLIO_SECTIONS, true);
     const controllers = agentControllersRef.current;
     return () => {
       portfolioCancelRef.current?.();
@@ -276,7 +296,22 @@ export default function ClaudeShell() {
       for (const controller of controllers.values()) controller.abort();
       clearTimeout(toastTimerRef.current);
     };
-  }, [runPortfolio]);
+  }, [runPortfolio, initialSession]);
+
+  const sessionSnapshot = useRef(null);
+  useEffect(() => {
+    const persist = () => { sessionRef.current = saveSession("claude", {
+      ...sessionRef.current, name: sessionRef.current?.name || "Portfolio conversation", messages: blocks, history: history.slice(-100),
+    }); };
+    sessionSnapshot.current = persist;
+    const timer = setTimeout(persist, 200);
+    return () => clearTimeout(timer);
+  }, [blocks, history]);
+  useEffect(() => {
+    const flush = () => sessionSnapshot.current?.();
+    window.addEventListener("pagehide", flush);
+    return () => { window.removeEventListener("pagehide", flush); flush(); };
+  }, []);
 
   const setBusyState = (label, verb) => {
     setBusy(label ? { label, verb: verb || "Thinking", startedAt: Date.now() } : null);
@@ -294,14 +329,15 @@ export default function ClaudeShell() {
   }, [pushBlock]);
 
   // ── Slash menu ──
-  const menuOpen = /^[/@][^\s]*$/.test(input) && !busy && !menuDismissed;
+  const mentionToken = input.match(/(?:^|\s)(@[\w.-]*)$/)?.[1];
+  const menuOpen = (!!mentionToken || /^\/[^\s]*$/.test(input)) && !busy && !menuDismissed;
   const menuMatches = useMemo(() => {
     if (!menuOpen) return [];
-    const q = input.toLowerCase();
-    return (input.startsWith("@") ? FILE_COMMANDS : SLASH_COMMANDS).filter(
+    const q = (mentionToken || input).toLowerCase();
+    return (mentionToken ? FILE_COMMANDS : SLASH_COMMANDS).filter(
       (c) => c.name.startsWith(q) || q.startsWith(c.name)
     );
-  }, [menuOpen, input]);
+  }, [menuOpen, input, mentionToken]);
   const clampedMenuIdx = Math.min(menuIdx, Math.max(0, menuMatches.length - 1));
 
   useEffect(() => setMenuIdx(0), [input]);
@@ -355,7 +391,7 @@ export default function ClaudeShell() {
         result = await execute(raw);
       }, (text) => patchBlock(id, { text }), {
         signal: controller.signal, delay: loadingDelay(),
-        animate: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+        animate: !(document.documentElement.dataset.motion === "reduce" || window.matchMedia("(prefers-reduced-motion: reduce)").matches),
       });
       patchBlock(id, { streaming: false });
       if (result?.clear) setBlocks([]);
@@ -384,10 +420,10 @@ export default function ClaudeShell() {
             .map((b) => (b.kind === "user" ? { role: "user", content: b.text } : { role: "assistant", content: b.content })),
           emit,
           controller.signal,
-          model
+          model, { mode: mode === 2 ? "plan" : "ask", documents: [...question.matchAll(/(?:^|\s)@([\w.-]+)/g)].map((match) => match[1]) }
         ), (content) => patchBlock(id, { content }), {
           signal: controller.signal, delay: loadingDelay(),
-          animate: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+          animate: !(document.documentElement.dataset.motion === "reduce" || window.matchMedia("(prefers-reduced-motion: reduce)").matches),
         });
         patchBlock(id, { streaming: false });
       } catch (err) {
@@ -403,7 +439,7 @@ export default function ClaudeShell() {
         }
       }
     },
-    [blocks, model, pushBlock, patchBlock]
+    [blocks, model, mode, pushBlock, patchBlock]
   );
 
   // ── Agents ──
@@ -448,7 +484,7 @@ export default function ClaudeShell() {
           await streamOutput((emit) => chatQuery(question, [], emit, ctx.signal, model),
             (content) => ctx.patchBlock(id, { content }), {
               signal: ctx.signal, delay: loadingDelay(),
-              animate: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+              animate: !(document.documentElement.dataset.motion === "reduce" || window.matchMedia("(prefers-reduced-motion: reduce)").matches),
             });
         } catch (err) {
           if (err.name === "AbortError") ctx.patchBlock(id, { streaming: false, interrupted: true });
@@ -491,20 +527,30 @@ export default function ClaudeShell() {
       let [command, ...args] = raw.trim().split(/\s+/);
       const argument = args.join(" ");
 
-      // Prefix matching (bidirectional): /project → /projects,
-      // /contacts → /contact. Catches abbreviations and plurals.
-      if (!SLASH_COMMANDS.some((c) => c.name === command.toLowerCase())) {
-        const q = command.toLowerCase();
-        const match = SLASH_COMMANDS.find(
-          (c) => c.name !== "/help" && (c.name.startsWith(q) || q.startsWith(c.name))
-        );
-        if (match) {
-          pushBlock({ kind: "system", text: `→ interpreting as ${match.name}` });
-          command = match.name;
-        }
+      if (!SLASH_COMMANDS.some((item) => item.name === command.toLowerCase())) {
+        const matches = SLASH_COMMANDS.filter((item) => item.name.startsWith(command.toLowerCase()));
+        if (matches.length === 1) command = matches[0].name;
       }
 
       switch (command.toLowerCase()) {
+        case "/resume": setPanel({ type: "resume" }); break;
+        case "/rename":
+          if (!argument) { pushBlock({ kind: "system", text: "Usage: /rename <conversation name>" }); break; }
+          sessionRef.current = saveSession("claude", { ...sessionRef.current, name: argument, messages: blocks, history });
+          toast(`Conversation renamed to ${argument.slice(0, 80)}.`);
+          break;
+        case "/export": {
+          const blob = new Blob([exportSession({ ...sessionRef.current, messages: blocks.map((block) => block.kind === "section" ? { ...block, content: getDocument(block.section)?.content || (block.section === "info" ? [PERSONAL.name, PERSONAL.role, PERSONAL.focus, PERSONAL.email, PERSONAL.phone, PERSONAL.location].join("\n\n") : STATS.map((stat) => `${stat.label}: ${stat.value} ${stat.unit}`).join("\n")) } : block) })], { type: "text/markdown;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a"); link.href = url; link.download = "portfolio-conversation.md"; link.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          break;
+        }
+        case "/new":
+          cancelRun(false); setBlocks([]); setHistory([]); setHistIdx(0);
+          sessionRef.current = createSession("claude", "Portfolio conversation");
+          runPortfolio(PORTFOLIO_SECTIONS, true);
+          break;
         case "/mode": setPanel({ type: "mode" }); break;
         case "/history": setHistoryQuery(""); setPanel({ type: "history" }); break;
         case "/tasks": setShowTasks((value) => !value); break;
@@ -625,7 +671,7 @@ export default function ClaudeShell() {
           pushBlock({ kind: "system", text: `Unknown command: ${command}. Type /help to see supported commands.` });
       }
     },
-    [pushBlock, spawnExplorer, spawnResearcher, models, config, currentModel, theme, setTheme, agents, mode, cancelRun, ws, runPortfolio, toast]
+    [blocks, history, pushBlock, spawnExplorer, spawnResearcher, models, config, currentModel, theme, setTheme, agents, mode, cancelRun, ws, runPortfolio, toast]
   );
 
   // ── Submit ──
@@ -636,7 +682,7 @@ export default function ClaudeShell() {
       return;
     }
     if (busy || portfolioCancelRef.current) cancelRun(false);
-    if (typeof raw !== "string" && menuOpen && menuMatches.length) message = menuMatches[clampedMenuIdx].name;
+    if (typeof raw !== "string" && menuOpen && menuMatches.length) message = mentionToken ? input.slice(0, -mentionToken.length) + menuMatches[clampedMenuIdx].name : menuMatches[clampedMenuIdx].name;
     setHistory((h) => [...h, message].slice(-100));
     setHistIdx(history.length + 1);
     setSavedDraft("");
@@ -646,17 +692,30 @@ export default function ClaudeShell() {
     const silent = /^\/(clear|config|model|theme|exit)(\s|$)/i.test(message);
     if (!silent && message !== "!clear") pushBlock({ kind: "user", text: message });
 
-    if (message.startsWith("@")) {
+    if (/^@[\w.-]+$/.test(message)) {
       const name = message.slice(1).toLowerCase();
-      runSlash(PORTFOLIO_SECTIONS.includes(name) ? `/${name}` : `/open ${name}`);
+      const document = getDocument(name);
+      if (document) {
+        pushBlock({ kind: "tool", name: "Read", path: document.title, output: document.content });
+        runSlash(`/${document.id.slice(4)}`);
+      } else if (FILE_COMMANDS.some((item) => item.name === message)) runSlash(PORTFOLIO_SECTIONS.includes(name) ? `/${name}` : `/open ${name}`);
+      else pushBlock({ kind: "system", text: `Unknown reference: ${message}. Type @ to choose a portfolio document.` });
     } else if (message.startsWith("/")) runSlash(message);
     else if (message.startsWith("!")) {
       if (message.trim() === "!clear") setBlocks([]);
       else shellRun(message.slice(1));
-    } else ask(message);
+    } else {
+      const references = [...new Set([...message.matchAll(/(?:^|\s)@([\w.-]+)/g)].map((match) => match[1]))];
+      const missing = references.filter((name) => !FILE_COMMANDS.some((item) => item.name === `@${name}`));
+      if (missing.length) pushBlock({ kind: "system", text: `Unknown references: ${missing.map((name) => `@${name}`).join(", ")}. Type @ to choose a portfolio document.` });
+      else {
+        references.forEach((name) => pushBlock({ kind: "tool", name: "Read", path: getDocument(name)?.title || name, output: getDocument(name)?.content || PROJECT_TABS[name]?.title || `Portfolio section: ${name}` }));
+        ask(message);
+      }
+    }
     focusPrompt();
     scrollToEnd(message.toLowerCase() !== "/clear");
-  }, [busy, input, menuOpen, menuMatches, clampedMenuIdx, history.length, runSlash, shellRun, ask, cancelRun, pushBlock, focusPrompt, scrollToEnd]);
+  }, [busy, input, mentionToken, menuOpen, menuMatches, clampedMenuIdx, history.length, runSlash, shellRun, ask, cancelRun, pushBlock, focusPrompt, scrollToEnd]);
 
   // ── Keyboard ──
   const onKeyDown = (e) => {
@@ -675,7 +734,7 @@ export default function ClaudeShell() {
     }
     if (key === "Tab" && e.shiftKey) { e.preventDefault(); cycleMode(); return; }
     if (key === "Tab" && menuOpen && menuMatches.length) {
-      e.preventDefault(); setInput(menuMatches[clampedMenuIdx].name); return;
+      e.preventDefault(); setInput(mentionToken ? input.slice(0, -mentionToken.length) + menuMatches[clampedMenuIdx].name + " " : menuMatches[clampedMenuIdx].name); return;
     }
     if ((key === "ArrowUp" || key === "ArrowDown") && menuOpen && menuMatches.length) {
       e.preventDefault();
@@ -784,13 +843,13 @@ export default function ClaudeShell() {
           <span className="text-accent text-sm shrink-0 select-none" aria-hidden="true">✳</span>
           <span
             className="truncate whitespace-nowrap"
-            title="portfolio git:(main) — claude Code v3"
+            title="portfolio — Claude Code"
           >
             <span className="text-text">portfolio</span>{" "}
             <span>git:(</span>
             <span style={{ color: "var(--color-success)" }}>main</span>
             <span>)</span>
-            <span> — claude Code v3</span>
+            <span> — Claude Code</span>
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -864,13 +923,6 @@ export default function ClaudeShell() {
                       <pre>{block.text}</pre>
                     </div>
                   );
-                case "file":
-                  return (
-                    <div key={block.id} className="ct-tool-output" style={{ display: "block" }}>
-                      <span className="stem" aria-hidden="true">⎿</span>
-                      <CliFileView tabId={block.tabId} />
-                    </div>
-                  );
                 case "help":
                   return (
                     <Entry key={block.id} kind="assistant">
@@ -927,6 +979,9 @@ export default function ClaudeShell() {
             {busy && <div>{busy.label}</div>}
             {agents.map((agent) => <div key={agent.id}>{agent.name}: {agent.task} · {agent.status}</div>)}
           </div>}
+          {[...new Set([...input.matchAll(/(?:^|\s)@([\w.-]+)/g)].map((match) => match[1]))].filter((name) => FILE_COMMANDS.some((item) => item.name === `@${name}`)).length > 0 && <div className="ct-reference-chips" aria-label="Selected document context">
+            {[...new Set([...input.matchAll(/(?:^|\s)@([\w.-]+)/g)].map((match) => match[1]))].filter((name) => FILE_COMMANDS.some((item) => item.name === `@${name}`)).map((name) => <button key={name} className="ct-text-button" type="button" aria-label={`Remove ${name} context`} onClick={() => setInput((value) => value.replace(`@${name}`, ""))}>@{name} ×</button>)}
+          </div>}
           {/* Slash menu */}
           {menuOpen && menuMatches.length > 0 && (
             <div className="ct-command-menu" role="listbox" aria-label="Commands and files" id="ct-command-menu" ref={menuRef}>
@@ -938,7 +993,7 @@ export default function ClaudeShell() {
                   aria-selected={i === clampedMenuIdx}
                   className="ct-command-option"
                   onMouseEnter={() => setMenuIdx(i)}
-                  onClick={() => submitInput(c.name)}
+                  onClick={() => { if (mentionToken) { setInput(input.slice(0, -mentionToken.length) + c.name + " "); focusPrompt(); } else submitInput(c.name); }}
                 >
                   <span className="command-name">{c.name}</span>
                   <span className="command-description">{c.description}</span>
@@ -1048,6 +1103,14 @@ export default function ClaudeShell() {
         {panel && panel.type !== "open-picker" && (
           <div className="ct-panel-backdrop" onClick={(e) => { if (e.target === e.currentTarget) setPanel(null); }}>
             <section className="ct-panel" role="dialog" aria-modal="true" aria-label={permission?.title || panel?.type || "Terminal dialog"}>
+              {panel.type === "resume" && <>
+                <div className="ct-panel-header"><h2 className="ct-panel-title">Resume conversation</h2><button type="button" className="ct-text-button" onClick={() => setPanel(null)}>esc to close</button></div>
+                <div className="ct-option-list">{listSessions("claude").map((session) => <button key={session.id} type="button" className="ct-option-button" onClick={() => {
+                  cancelRun(false); setActiveSession("claude", session.id); sessionRef.current = session;
+                  setBlocks(restoreBlocks(session.messages));
+                  setHistory(session.history || []); setHistIdx(session.history?.length || 0); setPanel(null);
+                }}><span>{session.name}</span><span>{new Date(session.updatedAt).toLocaleDateString()} · {session.messages.length} entries</span></button>)}</div>
+              </>}
               {["history", "rewind"].includes(panel.type) && <>
                 <div className="ct-panel-header"><h2 className="ct-panel-title">{panel.type === "history" ? "Command history" : "Rewind conversation"}</h2><button type="button" className="ct-text-button" onClick={() => setPanel(null)}>esc to close</button></div>
                 {panel.type === "history" && <input className="ct-history-search" aria-label="Search command history" placeholder="Search history…" value={historyQuery} onChange={(e) => setHistoryQuery(e.target.value)} />}

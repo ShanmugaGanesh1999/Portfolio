@@ -16,6 +16,9 @@ import {
   getAvailableModels,
   getDefaultModelId,
 } from "../../services/chatService";
+import { takeAgentContext, peekAgentContext } from "../../services/agentContext";
+import { createSession, getActiveSession, listSessions, saveSession, setActiveSession } from "../../services/sessionStore";
+import { DOCUMENTS, getDocument, searchDocuments } from "../../workspace/documents";
 import { Icon } from "../ui";
 import { useWorkspace } from "../../workspace/WorkspaceContext";
 
@@ -27,15 +30,6 @@ const MODES = [
 ];
 
 // ─── "@ Add context" chips (Cursor-style) ───
-const CONTEXT_CHIPS = [
-  { id: "resume", label: "@resume", insert: "Based on Shanmuga's resume, ", hint: "his experience + education" },
-  { id: "projects", label: "@projects", insert: "About his projects, ", hint: "system design deep-dives" },
-  { id: "skills", label: "@skills", insert: "About his tech stack, ", hint: "languages and tools" },
-];
-
-// ─── Auto model (Cursor router vibe) ───
-const AUTO_MODEL = { id: "auto", name: "Auto", icon: "bolt", description: "Picks the best model" };
-
 const SUGGESTION_ICONS = [
   "code",
   "account_tree",
@@ -241,11 +235,22 @@ function Popover({ open, onClose, children, align = "left" }) {
   );
 }
 
+const restoreMessages = (messages) => messages.filter((message) =>
+  ["user", "assistant", "error"].includes(message.role) && typeof message.content === "string"
+).map((message) => ({ ...message, isStreaming: false }));
+
 // ─── Main panel ───────────────────────────────────────────────
 export default function CopilotChat({ isOpen, onClose }) {
   const ws = useWorkspace();
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
+  const [session, setSession] = useState(() => getActiveSession("cursor") || createSession("cursor"));
+  const [messages, setMessages] = useState(() => restoreMessages(session.messages || []));
+  const [contextIds, setContextIds] = useState([]);
+  const [initialContext] = useState(peekAgentContext);
+  const [selection, setSelection] = useState(initialContext.selection || "");
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [pinned, setPinned] = useState(true);
+  const scrollRef = useRef(null);
+  const [input, setInput] = useState(initialContext.prompt || "");
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState("agent");
   const [selectedModel, setSelectedModel] = useState(getDefaultModelId);
@@ -258,45 +263,67 @@ export default function CopilotChat({ isOpen, onClose }) {
 
   const suggestions = getSuggestedQuestions();
   const models = getAvailableModels();
-  const currentModel =
-    selectedModel === "auto"
-      ? AUTO_MODEL
-      : models.find((m) => m.id === selectedModel) || models[0];
-  const resolvedModelId =
-    selectedModel === "auto" ? getDefaultModelId() : selectedModel;
+  const currentModel = models.find((m) => m.id === selectedModel) || models[0];
+  const resolvedModelId = currentModel.id;
   const activeMode = MODES.find((m) => m.id === mode) ?? MODES[0];
 
   // Auto-scroll while pinned to the bottom.
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (pinned) messagesEndRef.current?.scrollIntoView({ block: "end" });
+  }, [messages, pinned]);
+
+  useEffect(() => { saveSession("cursor", {...session, messages}); }, [messages, session]);
+  useEffect(() => () => abortRef.current?.abort(), []);
+  useEffect(() => {
+    takeAgentContext();
+    const receive = () => { const value = takeAgentContext(); setSelection(value.selection || ""); setInput(value.prompt || ""); };
+    window.addEventListener("portfolio:agent-context", receive);
+    return () => window.removeEventListener("portfolio:agent-context", receive);
+  }, []);
 
   useEffect(() => {
     if (isOpen) window.setTimeout(() => inputRef.current?.focus(), 200);
   }, [isOpen]);
 
+  useEffect(() => {
+    const stop = event => { if (event.key === "Escape" && isLoading) {event.preventDefault(); abortRef.current?.abort();} };
+    window.addEventListener("keydown", stop);
+    return () => window.removeEventListener("keydown", stop);
+  }, [isLoading]);
+
   const clearChat = () => {
+    setSession(createSession("cursor"));
+    setContextIds([]); setSelection("");
     setMessages([]);
     if (abortRef.current) abortRef.current.abort();
+    abortRef.current = null;
     setIsLoading(false);
   };
 
   // ── Send (streaming, abortable) ──
   const sendMessage = useCallback(
-    async (text) => {
+    async (text, requestedMode = mode) => {
       const userMessage = text.trim();
-      if (!userMessage || isLoading) return;
+      if (!userMessage || isLoading || abortRef.current) return;
       setInput("");
+      setPinned(true);
+      const mentions = [...userMessage.matchAll(/@([\w.-]+)/g)].map(match => getDocument(match[1])).filter(Boolean).map(doc => doc.id);
+      const searchIds = requestedMode === "agent" ? [...new Set(userMessage.split(/\s+/).filter(word => word.length > 3).flatMap(word => searchDocuments(word.replace(/[^\w]/g,""))).map(result => result.documentId))].slice(0,4) : [];
+      const resolvedContext = [...new Set([...contextIds, ...mentions, ...searchIds])].slice(0,12);
+      if (!messages.length) setSession(previous => ({...previous, name:userMessage.slice(0,60)}));
 
       const now = Date.now();
-      const userMsg = { role: "user", content: userMessage, id: now, timestamp: now };
+      const userMsg = { role: "user", content: userMessage, id: crypto.randomUUID(), timestamp: now };
       const assistantMsg = {
         role: "assistant",
         content: "",
-        id: now + 1,
+        id: crypto.randomUUID(),
         isStreaming: true,
         timestamp: now,
         model: currentModel.name,
+        mode: requestedMode,
+        query: userMessage,
+        sources: resolvedContext,
       };
       setMessages((prev) => [...prev, userMsg, assistantMsg]);
       setIsLoading(true);
@@ -314,48 +341,40 @@ export default function CopilotChat({ isOpen, onClose }) {
           userMessage,
           history,
           (chunk) => {
-            setMessages((prev) => {
-              const updated = [...prev];
-              const last = updated[updated.length - 1];
-              if (last.isStreaming) {
-                updated[updated.length - 1] = { ...last, content: last.content + chunk };
-              }
-              return updated;
-            });
+            if (abortRef.current !== controller || controller.signal.aborted) return;
+            setMessages((previous) => previous.map((message) => message.id === assistantMsg.id && message.isStreaming
+              ? { ...message, content: message.content + chunk } : message));
           },
           controller.signal,
-          resolvedModelId
+          resolvedModelId,
+          { mode: requestedMode, documents: resolvedContext, selection }
         );
-        setMessages((prev) => {
-          const updated = [...prev];
-          const last = updated[updated.length - 1];
-          if (last.isStreaming) {
-            updated[updated.length - 1] = { ...last, isStreaming: false, timestamp: Date.now() };
-          }
-          return updated;
-        });
+        if (abortRef.current !== controller) return;
+        setMessages((previous) => previous.map((message) => message.id === assistantMsg.id
+          ? { ...message, isStreaming: false, timestamp: Date.now() } : message));
         ws.log("copilot", `answered query with ${currentModel.name}`);
       } catch (err) {
-        if (err.name === "AbortError") return;
-        setMessages((prev) => {
-          const updated = [...prev];
-          updated[updated.length - 1] = {
-            role: "error",
-            content: err.message || "Something went wrong. Please try again.",
-            id: Date.now(),
-            timestamp: Date.now(),
-          };
-          return updated;
-        });
+        if (abortRef.current !== controller) return;
+        if (err.name === "AbortError") {
+          setMessages(prev => prev.map(m => m.id === assistantMsg.id ? {...m, isStreaming:false, content:m.content || "Response stopped."} : m));
+          return;
+        }
+        setMessages((previous) => previous.map((message) => message.id === assistantMsg.id
+          ? { ...message, role: "error", isStreaming: false, content: message.content ? `${message.content}\n\n${err.message || "Request failed. Please retry."}` : err.message || "Request failed. Please retry." } : message));
       } finally {
-        setIsLoading(false);
-        abortRef.current = null;
+        if (abortRef.current === controller) { setIsLoading(false); abortRef.current = null; }
       }
     },
-    [isLoading, messages, resolvedModelId, currentModel, ws]
+    [isLoading, messages, resolvedModelId, currentModel, ws, mode, contextIds, selection]
   );
 
   const handleKeyDown = (e) => {
+    if (e.key === "Tab" && e.shiftKey) { e.preventDefault(); setMode(MODES[(MODES.findIndex(m => m.id === mode) + 1) % MODES.length].id); return; }
+    if (e.key === "Escape" && isLoading) { e.preventDefault(); abortRef.current?.abort(); return; }
+    if (e.key === "Tab" && !e.shiftKey && input.match(/@([\w.-]*)$/)) {
+      const candidate = DOCUMENTS.find(doc => doc.title.toLowerCase().includes(input.match(/@([\w.-]*)$/)[1].toLowerCase()));
+      if(candidate) { e.preventDefault(); setContextIds(ids => [...new Set([...ids,candidate.id])]); setInput(value => value.replace(/@[\w.-]*$/,`@${candidate.title} `)); return; }
+    }
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage(input);
@@ -363,18 +382,21 @@ export default function CopilotChat({ isOpen, onClose }) {
   };
 
   const canSend = Boolean(input.trim()) && !isLoading;
+  const mention = input.match(/@([\w.-]*)$/)?.[1];
+  const mentionMatches = mention === undefined ? [] : DOCUMENTS.filter(doc => doc.title.toLowerCase().includes(mention.toLowerCase()));
 
   return (
     <div className="h-full flex flex-col bg-bg">
       {/* ── View header ── */}
       <div className="flex items-center h-9 px-3 border-b border-border shrink-0">
         <span className="text-[11px] font-bold uppercase tracking-widest text-comment">
-          Chat
+          Agent
         </span>
         <span className="ml-2 text-[10px] text-comment/60 hidden sm:inline">
           Cursor
         </span>
         <div className="ml-auto flex items-center gap-0.5">
+          <button aria-label="Conversation history" className="text-xs px-2" onClick={() => setHistoryOpen(v => !v)}>History</button>
           <button
             onClick={clearChat}
             className="w-7 h-7 flex items-center justify-center rounded text-comment hover:text-text hover:bg-border/40 transition-colors"
@@ -394,8 +416,9 @@ export default function CopilotChat({ isOpen, onClose }) {
         </div>
       </div>
 
+      {historyOpen && <div className="max-h-48 overflow-auto border-b border-border p-2" aria-label="Saved conversations">{listSessions("cursor").map(item => <button className="block w-full text-left text-xs p-2 hover:bg-border" key={item.id} disabled={isLoading} onClick={() => { setActiveSession("cursor", item.id); setSession(item); setMessages(restoreMessages(item.messages || [])); setHistoryOpen(false); }}>{item.name}</button>)}</div>}
       {/* ── Transcript ── */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin min-h-0">
+      <div ref={scrollRef} onScroll={e => { const el = e.currentTarget; setPinned(el.scrollHeight - el.scrollTop - el.clientHeight < 80); }} className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin min-h-0">
         {messages.length === 0 ? (
           <div className="flex flex-col items-start gap-5 pt-4">
             <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
@@ -405,7 +428,7 @@ export default function CopilotChat({ isOpen, onClose }) {
               <h3 className="text-base font-semibold text-text">Ask anything about this portfolio.</h3>
               <p className="text-[13px] text-comment leading-relaxed mt-1 max-w-[300px]">
                 I'm Shanmuga's portfolio agent — ask about his experience,
-                @projects for system designs, @resume for his background, or
+                @projects for system designs, @experience for his background, or
                 how to reach him.
               </p>
             </div>
@@ -436,7 +459,9 @@ export default function CopilotChat({ isOpen, onClose }) {
                 ) : msg.role === "error" ? (
                   <ErrorTurn message={msg} />
                 ) : (
-                  <CopilotTurn message={msg} />
+                  <><CopilotTurn message={msg} />
+                  {msg.sources?.length > 0 && <div className="flex gap-2 text-xs mt-2">{msg.sources.map(id => <button key={id} className="text-accent" onClick={() => ws.openTab(id)}>{id.replace("doc:", "")} ↗</button>)}</div>}
+                  {msg.mode === "plan" && !msg.isStreaming && <button className="text-xs border border-border rounded px-3 py-1 mt-2" disabled={isLoading} onClick={() => {setMode("agent"); sendMessage(msg.query, "agent");}}>Run exploration</button>}</>
                 )}
               </div>
             ))}
@@ -445,6 +470,9 @@ export default function CopilotChat({ isOpen, onClose }) {
         )}
       </div>
 
+      {!pinned && <button className="text-xs py-1 text-accent" onClick={() => {setPinned(true); messagesEndRef.current?.scrollIntoView({block:"end"});}}>Jump to latest ↓</button>}
+      {messages.length > 0 && !isLoading && <button className="text-xs text-comment py-1" onClick={() => { const last = [...messages].reverse().find(m => m.role === "user"); if(last) sendMessage(last.content); }}>Retry last question</button>}
+      {isLoading && <div role="status" className="text-xs text-comment px-3 py-2">{mode === "plan" ? "Preparing exploration plan…" : mode === "agent" ? "Searching portfolio sources…" : "Reading selected context…"}</div>}
       {/* ── Follow-up chips (after the latest response) ── */}
       {messages.length > 0 && !isLoading && (
         <div className="px-3 pb-2 shrink-0 flex flex-wrap gap-1.5">
@@ -466,18 +494,11 @@ export default function CopilotChat({ isOpen, onClose }) {
           {/* @ Add context chips (Cursor) */}
           <div className="flex flex-wrap items-center gap-1 px-3 pt-2">
             <span className="text-[11px] text-comment/70 font-ui">Add context</span>
-            {CONTEXT_CHIPS.map((chip) => (
-              <button
-                key={chip.id}
-                type="button"
-                onClick={() => setInput((v) => (v ? chip.insert + v : chip.insert))}
-                title={chip.hint}
-                className="text-[11px] px-2 py-0.5 rounded-full border border-border text-comment hover:text-accent hover:border-accent/50 transition-colors cursor-pointer"
-              >
-                {chip.label}
-              </button>
-            ))}
+            {contextIds.map(id => <button key={id} className="text-xs border border-border rounded px-2" onClick={() => setContextIds(ids => ids.filter(v => v !== id))}>{id.replace("doc:", "")} ×</button>)}
+            <select aria-label="Add document context" className="bg-sidebar text-xs max-w-36" value="" onChange={e => {if(e.target.value) setContextIds(ids => [...new Set([...ids,e.target.value])]);}}><option value="">@ Add file</option>{DOCUMENTS.map(doc => <option key={doc.id} value={doc.id}>{doc.title}</option>)}</select>
+            {selection && <button className="text-xs" onClick={() => setSelection("")}>Selected text ×</button>}
           </div>
+          {mentionMatches.length > 0 && <div className="px-3 pt-2 flex flex-wrap gap-2" aria-label="Document suggestions">{mentionMatches.map(doc => <button key={doc.id} className="text-xs text-accent border border-border rounded px-2" onClick={() => {setContextIds(ids => [...new Set([...ids,doc.id])]); setInput(value => value.replace(/@[\w.-]*$/,`@${doc.title} `)); inputRef.current?.focus();}}>{doc.title}</button>)}</div>}
           <textarea
             ref={inputRef}
             value={input}
@@ -543,25 +564,6 @@ export default function CopilotChat({ isOpen, onClose }) {
                 <Icon name="expand_more" size="text-[13px]" />
               </button>
               <Popover open={modelOpen} onClose={() => setModelOpen(false)}>
-                <button
-                  key="auto"
-                  role="menuitem"
-                  onClick={() => {
-                    setSelectedModel("auto");
-                    setModelOpen(false);
-                  }}
-                  className={`w-full flex items-start gap-2 px-3 py-1.5 text-left transition-colors ${
-                    selectedModel === "auto" ? "text-accent bg-accent/10" : "text-text hover:bg-border/30"
-                  }`}
-                >
-                  <span className="w-[13px] mt-0.5">
-                    {selectedModel === "auto" ? <Icon name="check" size="text-[13px]" /> : null}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-xs">Auto</span>
-                    <span className="block text-[10px] text-comment/70 truncate">Picks the best model for the task</span>
-                  </span>
-                </button>
                 {models.map((m) => (
                   <button
                     key={m.id}
@@ -590,9 +592,9 @@ export default function CopilotChat({ isOpen, onClose }) {
 
             {/* Send button — circular, accent when ready */}
             <button
-              onClick={() => canSend && sendMessage(input)}
-              disabled={!canSend}
-              aria-label="Send message"
+              onClick={() => isLoading ? abortRef.current?.abort() : canSend && sendMessage(input)}
+              disabled={!canSend && !isLoading}
+              aria-label={isLoading ? "Stop response" : "Send message"}
               title="Send (Enter)"
               className={`ml-auto w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
                 canSend
@@ -605,7 +607,7 @@ export default function CopilotChat({ isOpen, onClose }) {
           </div>
         </div>
         <p className="text-[10px] text-comment/50 mt-1.5 px-1 select-none">
-          Enter to send · Shift+Enter newline · @ context{mode !== "agent" && <span className="ml-1">· {activeMode.label} mode</span>}
+          Enter to send · Shift+Enter newline · Shift+Tab mode · @ context{mode !== "agent" && <span className="ml-1">· {activeMode.label} mode</span>}
         </p>
       </div>
     </div>

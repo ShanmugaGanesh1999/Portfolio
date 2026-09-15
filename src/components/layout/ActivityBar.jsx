@@ -20,7 +20,7 @@ function ActivityButton({ icon, label, active = false, onClick }) {
       }`}
     >
       {(active || undefined) && (
-        <span className="absolute left-0 top-1 bottom-1 w-0.5 bg-accent rounded-r" />
+        <span className="absolute left-0 top-1 bottom-1 w-0.5 bg-text rounded-r" />
       )}
       <Icon name={icon} size="text-[20px]" />
     </button>
@@ -46,14 +46,8 @@ export default function ActivityBar() {
       />
       <ActivityButton
         icon="search"
-        label="Search Files (Ctrl+Shift+P)"
-        onClick={() => ws.openPalette("files")}
-      />
-      <ActivityButton
-        icon="chat_bubble"
-        label="Chat (Ctrl+L)"
-        active={chatOpen}
-        onClick={ws.toggleChat}
+        label="Search documents (Ctrl+Shift+F)"
+        onClick={() => ws.openPalette("search")}
       />
       <ActivityButton
         icon="auto_awesome"
@@ -77,8 +71,8 @@ export default function ActivityBar() {
       <div className="mt-auto flex flex-col items-center">
         <ActivityButton
           icon="settings"
-          label="Cursor Settings — Command Palette (Ctrl+Shift+P)"
-          onClick={() => ws.openPalette("commands")}
+          label="Settings"
+          onClick={() => window.dispatchEvent(new Event("portfolio:settings"))}
         />
         <ActivityButton
           icon={theme === "dark" ? "light_mode" : "dark_mode"}

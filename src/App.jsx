@@ -2,6 +2,12 @@ import { lazy, Suspense } from "react";
 import { ThemeProvider } from "./hooks/useTheme";
 import { WorkspaceProvider, useWorkspace } from "./workspace/WorkspaceContext";
 import Layout from "./components/layout/Layout";
+import { readSettings } from "./components/layout/Settings";
+
+// Apply preferences before either shell renders, including direct Claude reloads.
+const editorSettings = readSettings();
+document.documentElement.dataset.motion = editorSettings.motion;
+document.documentElement.style.setProperty("--editor-font-size", `${editorSettings.fontSize}px`);
 
 // The Claude Code terminal loads on demand — first paint stays light,
 // and each shell mounts fresh on every switch (nothing stacks).

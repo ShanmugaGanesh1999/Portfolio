@@ -200,7 +200,7 @@ export default function MobileNav({ activeSection }) {
               ? "text-success bg-success/10"
               : "text-comment hover:text-success hover:bg-border/20"
           }`}
-          aria-label={chatOpen ? "Close Copilot" : "Open Copilot"}
+          aria-label={chatOpen ? "Close Agent" : "Open Agent"}
         >
           <Icon name="smart_toy" size="text-[20px]" />
         </button>

@@ -9,58 +9,8 @@
 //   5. Stream response back to the UI
 // ============================================================
 
-import { MASTER_SYSTEM_PROMPT, RAG_CHUNKS } from "../data/masterPrompt";
-
-const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
-
-// ─── Available Models (Fast & Cost-Effective Only) ───────────
-
-const MODELS = {
-  "gpt-4o-mini": {
-    id: "gpt-4o-mini",
-    name: "GPT-4o Mini",
-    routerModel: "openai/gpt-4o-mini",
-    provider: "openrouter",
-    maxTokens: 500,
-    temperature: 0.3,
-    tier: "fast",
-    icon: "bolt",
-    description: "OpenAI · Fast & affordable",
-  },
-  "claude-haiku": {
-    id: "claude-haiku",
-    name: "Claude 3.5 Haiku",
-    routerModel: "anthropic/claude-3.5-haiku",
-    provider: "openrouter",
-    maxTokens: 500,
-    temperature: 0.3,
-    tier: "fast",
-    icon: "electric_bolt",
-    description: "Anthropic · Lightning fast",
-  },
-  "deepseek-r1-distill": {
-    id: "deepseek-r1-distill",
-    name: "DeepSeek R1 Distill",
-    routerModel: "deepseek/deepseek-r1-distill-llama-70b",
-    provider: "openrouter",
-    maxTokens: 500,
-    temperature: 0.3,
-    tier: "fast",
-    icon: "speed",
-    description: "DeepSeek · Ultra budget",
-  },
-};
-
-const DEFAULT_MODEL = "claude-haiku";
-
-export function getAvailableModels() {
-  return Object.values(MODELS);
-}
-
-export function getDefaultModelId() {
-  return DEFAULT_MODEL;
-}
+import { MODELS, DEFAULT_MODEL } from "./chatModels.js";
+export { getAvailableModels, getDefaultModelId } from "./chatModels.js";
 
 // ─── Rate Limiting (client-side anti-exploitation) ───────────
 
@@ -106,121 +56,6 @@ function validateInput(query) {
   }
 }
 
-// ─── Keyword-Based RAG Retrieval ─────────────────────────────
-
-/**
- * Score a single RAG chunk against the user query.
- * Uses multi-signal scoring: heading match, topic keywords,
- * content overlap, and contextual boosts.
- */
-function scoreChunk(query, chunk) {
-  const queryLower = query.toLowerCase();
-  const queryWords = queryLower.split(/\s+/).filter((w) => w.length > 2);
-  const topicWords = chunk.topic.toLowerCase().split(/[,\s]+/).filter(Boolean);
-  const contentLower = chunk.content.toLowerCase();
-  const headingLower = chunk.heading.toLowerCase();
-
-  let score = 0;
-
-  // Exact query in heading (highest signal)
-  if (headingLower.includes(queryLower)) score += 15;
-
-  // Exact query in topic string
-  if (chunk.topic.toLowerCase().includes(queryLower)) score += 10;
-
-  // Word-level matching
-  for (const word of queryWords) {
-    if (topicWords.some((tw) => tw.includes(word) || word.includes(tw)))
-      score += 3;
-    if (headingLower.includes(word)) score += 4;
-    if (contentLower.includes(word)) score += 1;
-  }
-
-  // Contextual boosts for common question patterns
-  const boosts = {
-    "current|now|working|present|today": ["musk", "gale"],
-    "zoho|crm|tax|validation|rollup|recent items": ["zoho"],
-    "university|cwru|campus|iam|oauth|sso|access": ["case_western", "cwru"],
-    "augusta|hitech|ml|lead|scoring|junior|first": ["augusta"],
-    "skill|tech|stack|language|framework|tool|cloud": ["skills", "technical"],
-    "education|degree|gpa|masters|coursework": ["education"],
-    "contact|email|phone|linkedin|github|reach": ["contact"],
-    "project|built|build|architecture|system": ["project"],
-    "experience|work|job|role|career|history": ["experience", "accomplishments", "role"],
-    "metric|number|stat|performance|achievement|uptime": ["key", "metrics", "accomplishments"],
-    "about|who|summary|overview|introduce|background": ["summary", "about", "overview", "profile"],
-  };
-
-  for (const [pattern, sourceKeywords] of Object.entries(boosts)) {
-    if (new RegExp(pattern, "i").test(queryLower)) {
-      if (
-        sourceKeywords.some(
-          (kw) =>
-            chunk.source.toLowerCase().includes(kw) ||
-            chunk.id.toLowerCase().includes(kw) ||
-            chunk.heading.toLowerCase().includes(kw)
-        )
-      ) {
-        score += 5;
-      }
-    }
-  }
-
-  // Normalize to 0–1
-  return Math.min(score / (queryWords.length * 5 || 1), 1);
-}
-
-/**
- * Retrieve the top-K most relevant RAG chunks for a query.
- * Falls back to overview/summary chunks if nothing scores well.
- */
-function retrieveChunks(query, topK = 5) {
-  const scored = RAG_CHUNKS.map((chunk) => ({
-    ...chunk,
-    score: scoreChunk(query, chunk),
-  }));
-
-  scored.sort((a, b) => b.score - a.score);
-
-  const results = scored.filter((c) => c.score > 0).slice(0, topK);
-
-  // Fallback: if nothing scored, return overview / summary chunks
-  if (results.length === 0) {
-    return RAG_CHUNKS.filter(
-      (c) =>
-        c.heading.toLowerCase().includes("overview") ||
-        c.heading.toLowerCase().includes("summary") ||
-        c.id.includes("profile")
-    ).slice(0, 3);
-  }
-
-  return results;
-}
-
-// ─── Message Builder ─────────────────────────────────────────
-
-/**
- * Build the full messages array:
- *   [system (master prompt + retrieved context), ...history, user query]
- */
-function buildMessages(query, conversationHistory = []) {
-  const relevantChunks = retrieveChunks(query);
-
-  const contextBlock = relevantChunks
-    .map((c) => `### [Source: ${c.docTitle} — ${c.heading}]\n${c.content}`)
-    .join("\n\n---\n\n");
-
-  const systemMessage = {
-    role: "system",
-    content: `${MASTER_SYSTEM_PROMPT}\n\n---\n\n## RETRIEVED CONTEXT\nThe following sections were retrieved from Shanmuga's portfolio documents. Use ONLY this information to answer.\n\n${contextBlock}`,
-  };
-
-  // Keep last 10 messages for conversational context
-  const recentHistory = conversationHistory.slice(-10);
-
-  return [systemMessage, ...recentHistory, { role: "user", content: query }];
-}
-
 // ─── Chat API Call (OpenRouter) ───────────────────────────────
 
 /**
@@ -238,35 +73,26 @@ export async function chatQuery(
   onChunk = null,
   signal = null,
   modelId = DEFAULT_MODEL,
+  options = {},
 ) {
-  // Guard: config check first, then validate & rate-limit.
-  if (!OPENROUTER_API_KEY) {
-    throw new Error(
-      "The portfolio assistant is not configured right now. Please reach Shanmuga directly at shanmugaganesh1999@gmail.com."
-    );
-  }
   validateInput(query);
   checkRateLimit();
-
-  const modelConfig = MODELS[modelId] || MODELS[DEFAULT_MODEL];
-  const messages = buildMessages(query, conversationHistory);
-
+  const resolvedModel = MODELS[modelId] ? modelId : DEFAULT_MODEL;
   let response;
   try {
-    response = await fetch(OPENROUTER_API_URL, {
+    response = await fetch("/api/chat", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": window.location.origin,
-        "X-Title": "Shanmuga Ganesh Portfolio",
       },
       body: JSON.stringify({
-        model: modelConfig.routerModel,
-        messages,
+        query,
+        history: conversationHistory.slice(-10).map(({role, content}) => ({role, content: content.slice(0, 8000)})),
+        model: resolvedModel,
+        mode: options.mode || "ask",
+        documents: options.documents || [],
+        selection: options.selection?.slice(0, 4000) || "",
         stream: !!onChunk,
-        max_tokens: modelConfig.maxTokens,
-        temperature: modelConfig.temperature,
       }),
       signal,
     });
@@ -289,32 +115,27 @@ export async function chatQuery(
     let fullText = "";
     let buffer = "";
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
-
-      for (const line of lines) {
-        if (line.startsWith("data: ")) {
-          const data = line.slice(6).trim();
-          if (data === "[DONE]") continue;
-
-          try {
-            const parsed = JSON.parse(data);
-            const content = parsed.choices?.[0]?.delta?.content;
-            if (content) {
-              fullText += content;
-              onChunk(content);
-            }
-          } catch {
-            // Skip malformed SSE chunks
-          }
-        }
+    const consume = (line) => {
+      if (!line.startsWith("data:")) return;
+      const data = line.slice(5).trim();
+      if (!data || data === "[DONE]") return;
+      let parsed;
+      try { parsed = JSON.parse(data); } catch { throw new Error("The model returned an incomplete response. Please retry."); }
+      if (parsed.error) throw new Error("The model interrupted its response. Please retry or choose another model.");
+      const content = parsed.choices?.[0]?.delta?.content;
+      if (content) { fullText += content; onChunk(content); }
+    };
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) { buffer += decoder.decode(); if (buffer.trim()) consume(buffer); break; }
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        lines.forEach(consume);
       }
-    }
+    } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+    if (!fullText) throw new Error("The model returned no answer. Please retry or choose another model.");
 
     return fullText;
   }

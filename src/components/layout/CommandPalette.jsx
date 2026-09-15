@@ -13,7 +13,8 @@ import { useWorkspace } from "../../workspace/WorkspaceContext";
 import { useTheme } from "../../hooks/useTheme";
 import { fuzzyRank, highlightParts } from "../../workspace/fuzzySearch";
 import { NAV_ITEMS, PERSONAL } from "../../data/portfolioData";
-import { PROJECT_TABS } from "../../workspace/registry";
+import { DOCUMENTS, searchDocuments } from "../../workspace/documents";
+import { PROJECT_TABS, SECTION_DOCUMENTS } from "../../workspace/registry";
 import { PREP_COURSES } from "../../prep/prepData";
 
 function buildFileItems() {
@@ -27,16 +28,7 @@ function buildFileItems() {
     },
   ];
 
-  // Sections (scroll on the Welcome tab)
-  NAV_ITEMS.filter((n) => n.sectionId).forEach((n) =>
-    items.push({
-      id: `section-${n.sectionId}`,
-      label: n.label,
-      icon: n.icon,
-      hint: n.folder,
-      keywords: `section ${n.sectionId}`,
-    })
-  );
+  DOCUMENTS.forEach(doc => items.push({id:doc.id,label:doc.title,icon:"description",hint:"portfolio",keywords:doc.language}));
 
   // Project deep-dives
   NAV_ITEMS.filter((n) => n.projectId).forEach((n) =>
@@ -104,11 +96,12 @@ function buildFileItems() {
 function buildCommandItems({ ws, toggleTheme }) {
   return [
     { id: "cmd-shell-claude", label: "Shell: Switch to Claude Code Terminal", icon: "terminal", run: () => ws.setShellMode("claude") },
+    { id: "cmd-settings", label: "Preferences: Open Settings", icon: "settings", run: () => window.dispatchEvent(new Event("portfolio:settings")) },
     { id: "cmd-theme", label: "Preferences: Toggle Dark/Light Theme", icon: "contrast", run: toggleTheme },
     { id: "cmd-explorer", label: "View: Toggle Explorer Sidebar", icon: "files", run: ws.toggleExplorer },
     { id: "cmd-terminal", label: "View: Toggle Terminal Panel", icon: "terminal", run: () => ws.togglePanel("terminal") },
     { id: "cmd-output", label: "View: Toggle Output Panel", icon: "list_alt", run: () => ws.togglePanel("output") },
-    { id: "cmd-copilot", label: "View: Toggle Copilot Chat", icon: "smart_toy", run: ws.toggleChat },
+    { id: "cmd-copilot", label: "View: Toggle Agent", icon: "smart_toy", run: ws.toggleChat },
     { id: "cmd-welcome", label: "View: Show Welcome Tab", icon: "home", run: () => ws.setActiveTab("welcome") },
     { id: "cmd-close-all", label: "Editor: Close All Tabs", icon: "tab_close", run: ws.closeAllTabs },
     { id: "cmd-resume", label: "File: Download Resume", icon: "download", run: () => window.open(PERSONAL.resumeUrl, "_blank", "noopener") },
@@ -118,8 +111,10 @@ function buildCommandItems({ ws, toggleTheme }) {
 }
 
 function runFileItem(item, ws) {
+  if (item.documentId) { ws.updateTabState(item.documentId, {source:true, line:item.line, findQuery:item.query}); return ws.openTab(item.documentId, {preview:true}); }
+  if (item.id.startsWith("doc:")) return ws.openTab(item.id, {preview:true});
   if (item.id === "welcome") return ws.setActiveTab("welcome");
-  if (item.id.startsWith("section-")) return ws.scrollToSection(item.id.slice(8));
+  if (item.id.startsWith("section-")) return ws.openTab(SECTION_DOCUMENTS[item.id.slice(8)] || "welcome");
   if (item.id.startsWith("project-")) return ws.openTab(item.id.slice(8));
   if (item.prep) return ws.openPrepFile(item.prep.courseId, item.prep.filePath);
   if (item.id === "ext-resume") return window.open(PERSONAL.resumeUrl, "_blank", "noopener");
@@ -147,7 +142,7 @@ export default function CommandPalette() {
     ? "commands"
     : !query && paletteMode === "commands"
     ? "commands"
-    : "files";
+    : paletteMode === "search" ? "search" : "files";
   const effectiveQuery =
     mode === "commands" ? query.replace(/^>\s*/, "").trim() : query.trim();
 
@@ -158,8 +153,8 @@ export default function CommandPalette() {
   const items = mode === "commands" ? commandItems : fileItems;
 
   const results = useMemo(
-    () => fuzzyRank(items, effectiveQuery),
-    [items, effectiveQuery]
+    () => mode === "search" ? searchDocuments(effectiveQuery).map(result => ({...result,label:`${result.title}:${result.line} — ${result.text}`,query:effectiveQuery,icon:"search",_indices:[]})) : fuzzyRank(items, effectiveQuery),
+    [items, effectiveQuery, mode]
   );
 
   // Focus the input on open; restore focus to the trigger on close.
@@ -169,7 +164,6 @@ export default function CommandPalette() {
     return () => restoreFocusRef.current?.focus?.();
   }, []);
 
-  useEffect(() => setActiveIdx(0), [effectiveQuery, mode]);
 
   // Keep the active result in view while navigating with keys.
   useEffect(() => {
@@ -224,13 +218,13 @@ export default function CommandPalette() {
           <input
             ref={inputRef}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {setQuery(e.target.value); setActiveIdx(0);}}
             onKeyDown={onInputKeyDown}
             className="flex-1 bg-transparent outline-none py-2.5 text-sm text-text placeholder:text-comment"
             placeholder={
               mode === "commands"
                 ? "Type a command name…"
-                : "Search files by name… (type > for commands)"
+                : mode === "search" ? "Search portfolio document contents…" : "Search files by name… (type > for commands)"
             }
             aria-label="Command palette input"
             spellCheck={false}

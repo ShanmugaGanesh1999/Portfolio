@@ -14,7 +14,7 @@
   --color-variable: #ebc88d;
   --color-success: #a8cc7c;
   --color-accent: #81a1c1;
-  --font-mono: 'Space Mono', monospace;
+  --font-mono: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -992,3 +992,51 @@ html, body {
   [data-shell="claude"] .ct-status-right { display: flex; white-space: normal; }
   [data-shell="claude"] .ct-mode-hint { display: none; }
 }
+
+/* Editor chrome uses native UI type; documents retain terminal typography. */
+:root {
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: var(--font-ui);
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --editor-font-size: 14px;
+}
+[data-shell="vscode"] {
+  --font-mono: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+[data-shell="vscode"] body { font-family: var(--font-ui); font-size: 13px; }
+/* The Agent pane follows the editor column; prose uses UI type, code stays mono. */
+[data-shell="vscode"] #editor-pane + div { font-family: var(--font-ui); }
+[data-shell="vscode"] .document-editor { font-family: var(--font-mono); }
+[data-shell="vscode"] #editor-pane main { font-size: var(--editor-font-size); }
+[data-shell="vscode"] pre, [data-shell="vscode"] code { font-family: var(--font-mono); }
+[data-shell="vscode"] footer.bg-accent {
+  background: var(--color-sidebar); color: var(--color-comment);
+  border-top: 1px solid var(--color-border); font-weight: 400;
+}
+[data-shell="vscode"] [role="radiogroup"] [aria-checked="true"] {
+  background: color-mix(in srgb, var(--color-text) 12%, transparent); color: var(--color-text);
+}
+[data-shell="vscode"] [role="tablist"] { font-family: var(--font-ui); }
+[data-shell="vscode"] [role="tab"] { font-weight: 400; }
+.settings-trigger { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 4px; color: var(--color-comment); }
+.settings-trigger:hover { background: var(--color-border); color: var(--color-text); }
+.editor-settings { position: fixed; inset: 0; margin: auto; width: min(540px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); overflow: auto; padding: 24px; color: var(--color-text); background: var(--color-sidebar); border: 1px solid var(--color-border); border-radius: 10px; box-shadow: 0 18px 70px #0008; font: 13px/1.6 var(--font-ui); }
+.editor-settings::backdrop { background: #0008; }
+.settings-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.settings-heading h2 { font-size: 18px; font-weight: 600; }
+.settings-heading button { padding: 4px; }
+.settings-description { color: var(--color-comment); font-size: 12px; margin: 8px 0 20px; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--color-border); }
+.settings-row select { background: var(--color-bg); color: var(--color-text); padding: 5px 10px; border: 1px solid var(--color-border); border-radius: 4px; }
+.editor-settings h3 { font-size: 13px; font-weight: 600; margin: 24px 0 10px; }
+.settings-shortcuts > div { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0; }
+.settings-shortcuts kbd { font: 11px var(--font-mono); color: var(--color-comment); }
+.editor-settings footer { border-top: 1px solid var(--color-border); padding-top: 12px; color: var(--color-comment); font-size: 11px; }
+[data-motion="reduce"] *, [data-motion="reduce"] *::before, [data-motion="reduce"] *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+[data-motion="reduce"] .animate-fade-in-up { opacity: 1; transform: none; }
+[data-shell="claude"] .ct-entry { line-height: 1.55; }
+[data-shell="claude"] .ct-user-entry { border-radius: 3px; }
+[data-shell="claude"] .ct-tool-output { border-color: var(--ct-faint); }
+button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+[data-shell="claude"] .ct-app { font-family: var(--font-mono); }

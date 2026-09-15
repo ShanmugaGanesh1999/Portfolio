@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/build-worker-context.mjs && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node scripts/build-worker-context.mjs && node --test --test-timeout=10000 tests/*.test.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",

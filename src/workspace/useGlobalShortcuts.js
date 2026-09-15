@@ -66,12 +66,18 @@ export function useGlobalShortcuts() {
       if (mod && e.key.toLowerCase() === "k" && !e.shiftKey) {
         e.preventDefault();
         workspace.toggleInlineBar();
-      } else if (mod && e.key.toLowerCase() === "l") {
+      } else if (mod && ["l", "i"].includes(e.key.toLowerCase())) {
         e.preventDefault();
         workspace.toggleChat();
       } else if (mod && e.shiftKey && e.key.toLowerCase() === "p") {
         e.preventDefault();
         workspace.openPalette("commands");
+      } else if (mod && !e.shiftKey && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        workspace.openPalette("files");
+      } else if (mod && e.shiftKey && e.key.toLowerCase() === "f") {
+        e.preventDefault();
+        workspace.openPalette("search");
       } else if (mod && e.key.toLowerCase() === "b") {
         e.preventDefault();
         if (window.matchMedia("(min-width: 768px)").matches) {

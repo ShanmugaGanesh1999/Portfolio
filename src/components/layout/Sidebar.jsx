@@ -5,17 +5,17 @@
 // (static column on desktop, slide-in drawer on mobile).
 // ============================================================
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Icon, ResizeHandle } from "../ui";
-import { NAV_ITEMS, PERSONAL } from "../../data/portfolioData";
+import { PERSONAL } from "../../data/portfolioData";
 import { PREP_COURSES } from "../../prep/prepData";
-import useScrollSpy from "../../hooks/useScrollSpy";
 import usePanelResize from "../../hooks/usePanelResize";
 import useMediaQuery from "../../hooks/useMediaQuery";
 import { useWorkspace } from "../../workspace/WorkspaceContext";
-import { SECTION_IDS } from "../../workspace/registry";
+import { PROJECT_TABS } from "../../workspace/registry";
+import { DOCUMENTS } from "../../workspace/documents.js";
 
-const FOLDER_ORDER = ["Root_Directory", "about_me", "Lib_Modules", "Projects"];
+
 
 /**
  * FolderSection — collapsible directory group.
@@ -78,8 +78,6 @@ export default function Sidebar({ variant = "desktop" }) {
   const ws = useWorkspace();
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const { activeTabId } = ws.state;
-  const activeSection = useScrollSpy(SECTION_IDS);
-  const onWelcome = activeTabId === "welcome";
 
   const { size, startResize, handlers, nudge } = usePanelResize({
     axis: "x",
@@ -90,22 +88,6 @@ export default function Sidebar({ variant = "desktop" }) {
     onCollapse: () =>
       isDesktop ? ws.setExplorer(false) : ws.setMobileDrawer(false),
   });
-
-  // Group nav items by folder, preserving declaration order.
-  const sections = useMemo(
-    () =>
-      NAV_ITEMS.reduce((acc, item) => {
-        if (!acc[item.folder]) acc[item.folder] = [];
-        acc[item.folder].push(item);
-        return acc;
-      }, {}),
-    []
-  );
-
-  const handleSection = (sectionId) => {
-    ws.scrollToSection(sectionId);
-    if (!isDesktop) ws.setMobileDrawer(false);
-  };
 
   const handleProject = (projectId) => {
     ws.openTab(projectId);
@@ -135,31 +117,13 @@ export default function Sidebar({ variant = "desktop" }) {
 
       {/* File tree */}
       <nav className="flex-1 overflow-y-auto py-1" aria-label="Explorer file tree">
-        {FOLDER_ORDER.map((folder) =>
-          sections[folder] ? (
-            <FolderSection key={folder} label={folder} defaultOpen>
-              {sections[folder].map((item) =>
-                item.projectId ? (
-                  <FileLink
-                    key={item.label}
-                    label={item.label}
-                    icon={item.icon}
-                    active={activeTabId === item.projectId}
-                    onClick={() => handleProject(item.projectId)}
-                  />
-                ) : (
-                  <FileLink
-                    key={item.label}
-                    label={item.label}
-                    icon={item.icon}
-                    active={onWelcome && item.sectionId === activeSection}
-                    onClick={() => handleSection(item.sectionId)}
-                  />
-                )
-              )}
-            </FolderSection>
-          ) : null
-        )}
+        <FolderSection label="Portfolio">
+          <FileLink label="welcome.md" icon="home" active={activeTabId === 'welcome'} onClick={() => ws.openTab('welcome')} />
+          {DOCUMENTS.map((document) => <FileLink key={document.id} label={document.title} icon={document.icon} active={activeTabId === document.id} onClick={() => ws.openTab(document.id, { preview: true })} />)}
+        </FolderSection>
+        <FolderSection label="Projects">
+          {Object.entries(PROJECT_TABS).map(([id, project]) => <FileLink key={id} label={project.title} icon={project.icon} active={activeTabId === id} onClick={() => handleProject(id)} />)}
+        </FolderSection>
 
         {/* Prep — DSA & System Design courses */}
         <FolderSection label="Prep" defaultOpen={false}>

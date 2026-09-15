@@ -61,11 +61,11 @@ export function WorkspaceProvider({ children }) {
 
   // ── Tab actions ─────────────────────────────────────────────
   const openTab = useCallback(
-    (id) => {
+    (id, options = {}) => {
       const cur = stateRef.current;
       const tab = cur.tabs.find((t) => t.id === id);
-      if (tab && cur.activeTabId === id) return; // already active — no-op
-      dispatch({ type: "OPEN_TAB", id });
+      if (tab && cur.activeTabId === id && options.preview) return; // already active — no-op
+      dispatch({ type: "OPEN_TAB", id, preview: options.preview });
       log("tabs", `opened ${id}`);
     },
     [log]
@@ -79,6 +79,10 @@ export function WorkspaceProvider({ children }) {
     },
     [log]
   );
+
+  const pinTab = useCallback((id) => dispatch({ type: "PIN_TAB", id }), []);
+  const keepTab = useCallback((id) => dispatch({ type: "KEEP_TAB", id }), []);
+  const closeOtherTabs = useCallback((id) => dispatch({ type: "CLOSE_OTHER_TABS", id }), []);
 
   const closeActiveTab = useCallback(() => {
     closeTab(stateRef.current.activeTabId);
@@ -264,6 +268,7 @@ export function WorkspaceProvider({ children }) {
       stateRef,
       // tabs
       openTab,
+      pinTab, keepTab, closeOtherTabs,
       closeTab,
       closeActiveTab,
       setActiveTab,
@@ -300,7 +305,7 @@ export function WorkspaceProvider({ children }) {
     }),
     [
       state,
-      openTab, closeTab, closeActiveTab, setActiveTab, cycleTab, closeAllTabs,
+      openTab, pinTab, keepTab, closeOtherTabs, closeTab, closeActiveTab, setActiveTab, cycleTab, closeAllTabs,
       openPrepFile, updateTabState, getTabState,
       setExplorer, toggleExplorer, setMobileDrawer, toggleMobileDrawer,
       setChat, toggleChat, setPanel, togglePanel,
