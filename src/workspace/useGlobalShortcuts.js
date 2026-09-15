@@ -1,12 +1,14 @@
 // ============================================================
-// GLOBAL KEYBOARD SHORTCUTS — VS Code style
-//   Cmd/Ctrl+K        → Command palette (files mode)
+// GLOBAL KEYBOARD SHORTCUTS — Cursor style
+//   Cmd/Ctrl+K        → Inline AI bar (Cursor's signature edit prompt)
+//   Cmd/Ctrl+L        → Toggle Chat panel
 //   Cmd/Ctrl+Shift+P  → Command palette (commands mode)
 //   Cmd/Ctrl+B        → Toggle explorer (desktop) / drawer (mobile)
 //   Cmd/Ctrl+J        → Toggle bottom panel
 //   Ctrl+`            → Toggle terminal
 //   Alt+Left/Right    → Cycle editor tabs
-//   Escape            → Close topmost overlay (palette → drawer → chat)
+//   Escape            → Close topmost overlay (inline bar → palette →
+//                       drawer → chat-mobile)
 // ============================================================
 
 import { useEffect, useRef } from "react";
@@ -34,16 +36,19 @@ export function useGlobalShortcuts() {
       const mod = e.metaKey || e.ctrlKey;
 
       // The Claude Code shell owns its keyboard surface (its prompt handles
-      // Esc/slash/history). VS Code shortcuts don't apply there.
+      // Esc/slash/history). Cursor shortcuts don't apply there.
       if (workspace.state.shellMode === "claude") return;
 
       // Escape closes the topmost overlay (works even while typing).
-      // The Copilot panel is a docked view on desktop — Esc only dismisses
+      // The Chat panel is a docked view on desktop — Esc only dismisses
       // it where it's a full-screen overlay (mobile).
       if (e.key === "Escape") {
         const s = workspace.state;
         const isMobile = window.matchMedia("(max-width: 767px)").matches;
-        if (s.paletteOpen) {
+        if (s.inlineBarOpen) {
+          workspace.setInlineBar(false);
+          e.preventDefault();
+        } else if (s.paletteOpen) {
           workspace.closePalette();
           e.preventDefault();
         } else if (s.mobileDrawerOpen) {
@@ -60,7 +65,10 @@ export function useGlobalShortcuts() {
 
       if (mod && e.key.toLowerCase() === "k" && !e.shiftKey) {
         e.preventDefault();
-        workspace.openPalette("files");
+        workspace.toggleInlineBar();
+      } else if (mod && e.key.toLowerCase() === "l") {
+        e.preventDefault();
+        workspace.toggleChat();
       } else if (mod && e.shiftKey && e.key.toLowerCase() === "p") {
         e.preventDefault();
         workspace.openPalette("commands");

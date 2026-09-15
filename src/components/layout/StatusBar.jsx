@@ -96,14 +96,21 @@ export default function StatusBar() {
           {formatSession(elapsed)}
         </span>
         <StatusButton
+          icon="bolt"
+          label="Cursor Tab — AI completions active"
+          onClick={() => ws.log("ai", "Cursor Tab snoozed for this session")}
+        >
+          <span className="hidden sm:inline">Cursor Tab</span>
+        </StatusButton>
+        <StatusButton
           icon="terminal"
           label="Toggle Terminal (Ctrl+`)"
           active={panelOpen && panelView === "terminal"}
           onClick={() => ws.setPanel(!(panelOpen && panelView === "terminal"), "terminal")}
         />
         <StatusButton
-          icon="smart_toy"
-          label={chatOpen ? "Close Copilot Chat" : "Open Copilot Chat"}
+          icon="chat_bubble"
+          label={chatOpen ? "Close Chat (Ctrl+L)" : "Open Chat (Ctrl+L)"}
           active={chatOpen}
           onClick={ws.toggleChat}
         />

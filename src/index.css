@@ -1,17 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0d1117;
-  --color-sidebar: #161b22;
-  --color-text: #c9d1d9;
-  --color-border: #30363d;
-  --color-keyword: #ff7b72;
-  --color-string: #a5d6ff;
-  --color-comment: #8b949e;
-  --color-func: #d2a8ff;
-  --color-variable: #ffa657;
-  --color-success: #3fb950;
-  --color-accent: #58a6ff;
+  /* Cursor Dark — one flat chrome color, hairline alpha borders,
+     pastel nord syntax accents. */
+  --color-bg: #181818;
+  --color-sidebar: #141414;
+  --color-text: #f0f0f0;
+  --color-border: #f0f0f013;
+  --color-keyword: #e34671;
+  --color-string: #87c3ff;
+  --color-comment: #f0f0f099;
+  --color-func: #e394dc;
+  --color-variable: #ebc88d;
+  --color-success: #a8cc7c;
+  --color-accent: #81a1c1;
   --font-mono: 'Space Mono', monospace;
 }
 
@@ -29,17 +31,18 @@
    LIGHT THEME — VS Code Light+ inspired
    ═══════════════════════════════════════════════════ */
 [data-theme="light"] {
-  --color-bg: #ffffff;
+  /* Cursor Light */
+  --color-bg: #fcfcfc;
   --color-sidebar: #f3f3f3;
-  --color-text: #1e1e1e;
-  --color-border: #d1d5db;
-  --color-keyword: #d32f2f;
-  --color-string: #0451a5;
-  --color-comment: #6a677d;
-  --color-func: #7c3aed;
-  --color-variable: #c2410c;
-  --color-success: #16a34a;
-  --color-accent: #0969da;
+  --color-text: #141414;
+  --color-border: #14141414;
+  --color-keyword: #c02652;
+  --color-string: #005293;
+  --color-comment: #14141499;
+  --color-func: #7565cc;
+  --color-variable: #92156a;
+  --color-success: #2e7f3e;
+  --color-accent: #2778c1;
 }
 /* ═══════════════════════════════════════════════════
    CLAUDE CODE TERMINAL — ported from the reference
@@ -112,65 +115,27 @@
 .font-display { font-family: var(--font-display); }
 .font-ui { font-family: var(--font-ui); }
 
-/* ── Claude terminal window (ported layout) ── */
-.ct-stage {
-  min-height: 100vh;
-  min-height: 100dvh;
-  padding: var(--ct-page-gutter, 36px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--ct-desktop);
+@keyframes shellFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-.ct-terminal {
-  width: 100%;
-  max-width: 1320px;
-  height: calc(100vh - var(--ct-page-gutter, 36px) * 2);
-  height: calc(100dvh - var(--ct-page-gutter, 36px) * 2);
-  min-height: 460px;
-  display: grid;
-  grid-template-rows: 43px minmax(0, 1fr) auto;
-  overflow: hidden;
-  position: relative;
+.shell-in { animation: shellFade var(--dur-base, 200ms) var(--ease-out-quad, ease-out); }
+
+/* ── Claude terminal — full-bleed app column (no window chrome) ── */
+.ct-app {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
   background: var(--color-bg);
-  border: 1px solid var(--ct-window-border);
-  border-radius: 10px;
-  box-shadow: 0 18px 60px #00000038;
   font-size: var(--ct-font-size);
   line-height: 1.65;
   color: var(--color-text);
+  position: relative;
+  overflow: hidden;
 }
-.ct-terminal.ct-minimized {
-  height: 43px; min-height: 43px; grid-template-rows: 43px; align-self: flex-start;
-}
-.ct-terminal.ct-minimized > :not(.ct-titlebar) { display: none !important; }
-.ct-terminal.ct-maximized {
-  position: fixed; inset: 0; max-width: none;
-  height: 100vh; height: 100dvh; border-radius: 0; z-index: 20;
-}
-.ct-titlebar {
-  position: relative; display: flex; align-items: center; justify-content: center;
-  min-width: 0; padding: 0 130px; background: var(--ct-titlebar);
-  border-bottom: 1px solid #00000020; user-select: none;
-}
-.ct-window-controls { position: absolute; left: 16px; display: flex; gap: 8px; }
-.ct-window-control {
-  width: 12px; height: 12px; padding: 0; border: 0; border-radius: 50%;
-  display: grid; place-items: center; font: 11px/1 sans-serif; color: #24201fcc;
-  cursor: pointer;
-}
-.ct-window-control span { opacity: 0; }
-.ct-window-controls:hover span { opacity: 1; }
-.ct-window-close { background: #ed6a5e; }
-.ct-window-minimize { background: #f4bf4f; }
-.ct-window-maximize { background: #61c554; }
-.ct-window-title {
-  font-size: 12px; color: #c6c3bf; display: flex; gap: 9px;
-  align-items: center; min-width: 0;
-}
-.ct-window-title span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ct-window-meta { position: absolute; right: 17px; display: flex; align-items: center; gap: 8px; }
 .ct-viewport {
+  flex: 1;
   min-height: 0; overflow: auto; overscroll-behavior: contain;
   padding: 22px 30px 12px;
   scrollbar-width: thin; scrollbar-color: var(--color-border) transparent;
@@ -364,7 +329,7 @@
 
 /* Modal panels */
 .ct-panel-backdrop {
-  position: absolute; inset: 43px 0 0; z-index: 10;
+  position: absolute; inset: 40px 0 0; z-index: 10;
   display: flex; align-items: center; justify-content: center;
   padding: 28px; background: #00000055;
 }
@@ -414,15 +379,6 @@
 }
 .ct-terminal-button:hover { background: var(--ct-surface-hover); }
 
-/* End screen */
-.ct-session-ended {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 30px; text-align: center; gap: 15px;
-  grid-row: 2 / 4;
-}
-.ct-session-ended .ct-mascot { margin: 0 0 12px; }
-.ct-session-ended p { color: var(--color-comment); font-size: 0.9em; }
-
 /* Toast */
 .ct-toast {
   position: absolute; right: 30px; bottom: 108px;
@@ -465,18 +421,12 @@
 .ct-portfolio .cmd { color: var(--ct-faint); font-size: 0.85em; }
 
 /* Responsive (reference breakpoints) */
-@media (min-width: 1700px) { [data-shell="claude"] .ct-stage { padding: 56px; } }
 @media (max-width: 980px) {
-  [data-shell="claude"] .ct-stage { padding: 20px; }
   [data-shell="claude"] .ct-viewport, [data-shell="claude"] .ct-composer { padding-left: 23px; padding-right: 23px; }
   [data-shell="claude"] .ct-welcome { grid-template-columns: 46% 54%; }
   [data-shell="claude"] .ct-mode-hint { display: none; }
 }
 @media (max-width: 640px) {
-  [data-shell="claude"] .ct-stage { padding: 0; align-items: stretch; }
-  [data-shell="claude"] .ct-terminal { border: 0; border-radius: 0; min-height: 360px; }
-  [data-shell="claude"] .ct-titlebar { padding: 0 85px; }
-  [data-shell="claude"] .ct-window-title { font-size: 10px; gap: 6px; }
   [data-shell="claude"] .ct-viewport { padding-top: 19px; }
   [data-shell="claude"] .ct-shell-context { font-size: 0.78em; margin-bottom: 25px; }
   [data-shell="claude"] .ct-welcome { grid-template-columns: 1fr; }
@@ -520,13 +470,13 @@
 }
 
 ::selection {
-  background-color: rgba(88, 166, 255, 0.3);
-  color: white;
+  background-color: rgba(129, 161, 193, 0.32);
+  color: #f0f0f0;
 }
 
 [data-theme="light"] ::selection {
-  background-color: rgba(9, 105, 218, 0.25);
-  color: #1e1e1e;
+  background-color: rgba(39, 120, 193, 0.25);
+  color: #141414;
 }
 
 body {

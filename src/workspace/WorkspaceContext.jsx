@@ -152,6 +152,12 @@ export function WorkspaceProvider({ children }) {
     dispatch({ type: "SET_PALETTE", open: false });
   }, []);
 
+  // ── Cursor inline AI bar (Ctrl+K) ───────────────────────────
+  const setInlineBar = useCallback((open) => {
+    dispatch({ type: "SET_INLINE_BAR", open });
+  }, []);
+  const toggleInlineBar = useCallback(() => dispatch({ type: "SET_INLINE_BAR" }), []);
+
   // ── Shell mode (VS Code ⇄ Claude Code) ──────────────────────
   const setShellMode = useCallback(
     (mode) => {
@@ -277,6 +283,8 @@ export function WorkspaceProvider({ children }) {
       togglePanel,
       openPalette,
       closePalette,
+      setInlineBar,
+      toggleInlineBar,
       setShellMode,
       openPrepPanel,
       closePrepPanel,
@@ -296,7 +304,8 @@ export function WorkspaceProvider({ children }) {
       openPrepFile, updateTabState, getTabState,
       setExplorer, toggleExplorer, setMobileDrawer, toggleMobileDrawer,
       setChat, toggleChat, setPanel, togglePanel,
-      openPalette, closePalette, setShellMode, openPrepPanel, closePrepPanel, togglePrepPanel,
+      openPalette, closePalette, setInlineBar, toggleInlineBar, setShellMode,
+      openPrepPanel, closePrepPanel, togglePrepPanel,
       scrollToSection, registerScrollToSection, subscribeEditorScroll,
       notifyEditorScroll, log,
     ]

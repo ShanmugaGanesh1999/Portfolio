@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from "rea
 
 const ThemeContext = createContext({ theme: "dark", toggle: () => {}, setTheme: () => {} });
 
-const THEME_BG = { dark: "#0d1117", light: "#ffffff" };
+const THEME_BG = { dark: "#181818", light: "#fcfcfc" };
 
 /**
  * ThemeProvider — Manages dark/light theme via data-theme attribute on <html>.
@@ -70,31 +70,31 @@ export function useTheme() {
  * Components call useThemeColors() to get the right palette.
  */
 const DARK_COLORS = {
-  accent:   "#58a6ff",
-  success:  "#3fb950",
-  keyword:  "#ff7b72",
-  variable: "#ffa657",
-  func:     "#d2a8ff",
-  string:   "#a5d6ff",
-  comment:  "#8b949e",
-  bg:       "#0d1117",
-  sidebar:  "#161b22",
-  border:   "#30363d",
-  text:     "#c9d1d9",
+  accent:   "#81a1c1",
+  success:  "#a8cc7c",
+  keyword:  "#e34671",
+  variable: "#ebc88d",
+  func:     "#e394dc",
+  string:   "#87c3ff",
+  comment:  "#a0a0a0",
+  bg:       "#181818",
+  sidebar:  "#141414",
+  border:   "#3a3a3a",
+  text:     "#f0f0f0",
 };
 
 const LIGHT_COLORS = {
-  accent:   "#0969da",
-  success:  "#16a34a",
-  keyword:  "#d32f2f",
-  variable: "#c2410c",
-  func:     "#7c3aed",
-  string:   "#0451a5",
-  comment:  "#6a677d",
-  bg:       "#ffffff",
+  accent:   "#2778c1",
+  success:  "#2e7f3e",
+  keyword:  "#c02652",
+  variable: "#92156a",
+  func:     "#7565cc",
+  string:   "#005293",
+  comment:  "#14141499",
+  bg:       "#fcfcfc",
   sidebar:  "#f3f3f3",
-  border:   "#d1d5db",
-  text:     "#1e1e1e",
+  border:   "#d1cfc5",
+  text:     "#141414",
 };
 
 /** Claude Code shell palettes (warm charcoal / ivory + terracotta). */

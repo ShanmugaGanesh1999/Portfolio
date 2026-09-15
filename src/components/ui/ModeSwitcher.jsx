@@ -20,15 +20,15 @@ export default function ModeSwitcher({ compact = false }) {
       <button
         role="radio"
         aria-checked={!isClaude}
-        aria-label="Switch to VS Code shell"
+        aria-label="Switch to Cursor shell"
         onClick={() => ws.setShellMode("vscode")}
-        title="Switch to the VS Code workspace"
+        title="Switch to the Cursor workspace"
         className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded transition-colors cursor-pointer ${
           !isClaude ? "bg-accent text-bg" : "text-comment hover:text-text"
         }`}
       >
-        <span className="font-mono font-bold text-[11px] leading-none">{"{ }"}</span>
-        {!compact && <span>VS Code</span>}
+        <span className="font-mono font-bold text-[11px] leading-none">{"⌘"}</span>
+        {!compact && <span>Cursor</span>}
       </button>
       <button
         role="radio"

@@ -19,7 +19,7 @@ export const HELP_LINES = [
   "  whoami            Who is Shanmuga?",
   "  skills            Tech stack summary",
   "  theme <mode>      Switch theme (dark | light)",
-  "  claude            Switch to the Claude Code shell",
+  "  claude            Switch to the Claude Code terminal",
   "  neofetch          System info",
   "  history           Command history",
   "  echo <text>       Print text",
@@ -215,7 +215,7 @@ export function createShellExecutor({ ws, theme, setTheme, print, confirm, exit 
 
       case "vscode":
         ws.setShellMode("vscode");
-        out("switching to VS Code shell …", "ok");
+        out("switching to Cursor shell …", "ok");
         return;
 
       case "neofetch": {

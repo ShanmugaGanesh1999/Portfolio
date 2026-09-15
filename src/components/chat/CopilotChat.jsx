@@ -19,12 +19,22 @@ import {
 import { Icon } from "../ui";
 import { useWorkspace } from "../../workspace/WorkspaceContext";
 
-// ─── Modes (functional placeholders, like the real toolbar) ───
+// ─── Modes (Cursor set: Agent / Ask / Plan) ───
 const MODES = [
-  { id: "ask", label: "Ask", placeholder: "Ask Copilot" },
-  { id: "edit", label: "Edit", placeholder: "Ask Copilot to refine an answer…" },
-  { id: "agent", label: "Agent", placeholder: "Ask Copilot to build something…" },
+  { id: "agent", label: "Agent", placeholder: "Ask anything about Shanmuga's portfolio, or @ files for context" },
+  { id: "ask", label: "Ask", placeholder: "Ask a question about the codebase…" },
+  { id: "plan", label: "Plan", placeholder: "Describe what to explore — I'll outline it first…" },
 ];
+
+// ─── "@ Add context" chips (Cursor-style) ───
+const CONTEXT_CHIPS = [
+  { id: "resume", label: "@resume", insert: "Based on Shanmuga's resume, ", hint: "his experience + education" },
+  { id: "projects", label: "@projects", insert: "About his projects, ", hint: "system design deep-dives" },
+  { id: "skills", label: "@skills", insert: "About his tech stack, ", hint: "languages and tools" },
+];
+
+// ─── Auto model (Cursor router vibe) ───
+const AUTO_MODEL = { id: "auto", name: "Auto", icon: "bolt", description: "Picks the best model" };
 
 const SUGGESTION_ICONS = [
   "code",
@@ -237,7 +247,7 @@ export default function CopilotChat({ isOpen, onClose }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState("ask");
+  const [mode, setMode] = useState("agent");
   const [selectedModel, setSelectedModel] = useState(getDefaultModelId);
   const [modeOpen, setModeOpen] = useState(false);
   const [modelOpen, setModelOpen] = useState(false);
@@ -248,7 +258,12 @@ export default function CopilotChat({ isOpen, onClose }) {
 
   const suggestions = getSuggestedQuestions();
   const models = getAvailableModels();
-  const currentModel = models.find((m) => m.id === selectedModel) || models[0];
+  const currentModel =
+    selectedModel === "auto"
+      ? AUTO_MODEL
+      : models.find((m) => m.id === selectedModel) || models[0];
+  const resolvedModelId =
+    selectedModel === "auto" ? getDefaultModelId() : selectedModel;
   const activeMode = MODES.find((m) => m.id === mode) ?? MODES[0];
 
   // Auto-scroll while pinned to the bottom.
@@ -309,7 +324,7 @@ export default function CopilotChat({ isOpen, onClose }) {
             });
           },
           controller.signal,
-          selectedModel
+          resolvedModelId
         );
         setMessages((prev) => {
           const updated = [...prev];
@@ -337,7 +352,7 @@ export default function CopilotChat({ isOpen, onClose }) {
         abortRef.current = null;
       }
     },
-    [isLoading, messages, selectedModel, currentModel, ws]
+    [isLoading, messages, resolvedModelId, currentModel, ws]
   );
 
   const handleKeyDown = (e) => {
@@ -357,7 +372,7 @@ export default function CopilotChat({ isOpen, onClose }) {
           Chat
         </span>
         <span className="ml-2 text-[10px] text-comment/60 hidden sm:inline">
-          Copilot
+          Cursor
         </span>
         <div className="ml-auto flex items-center gap-0.5">
           <button
@@ -387,10 +402,11 @@ export default function CopilotChat({ isOpen, onClose }) {
               <Icon name="auto_awesome" size="text-[22px]" className="text-accent" />
             </div>
             <div>
-              <h3 className="text-base font-semibold text-text">Hi, I'm Copilot.</h3>
+              <h3 className="text-base font-semibold text-text">Ask anything about this portfolio.</h3>
               <p className="text-[13px] text-comment leading-relaxed mt-1 max-w-[300px]">
-                Ask me anything about Shanmuga's portfolio — his experience,
-                projects, skills, or how to reach him.
+                I'm Shanmuga's portfolio agent — ask about his experience,
+                @projects for system designs, @resume for his background, or
+                how to reach him.
               </p>
             </div>
             <div className="w-full space-y-1.5">
@@ -447,6 +463,21 @@ export default function CopilotChat({ isOpen, onClose }) {
       {/* ── Input box (VS Code style: toolbar inside the container) ── */}
       <div className="px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1 shrink-0 border-t-0">
         <div className="rounded-lg border border-border bg-bg focus-within:border-accent/60 transition-colors overflow-visible relative">
+          {/* @ Add context chips (Cursor) */}
+          <div className="flex flex-wrap items-center gap-1 px-3 pt-2">
+            <span className="text-[11px] text-comment/70 font-ui">Add context</span>
+            {CONTEXT_CHIPS.map((chip) => (
+              <button
+                key={chip.id}
+                type="button"
+                onClick={() => setInput((v) => (v ? chip.insert + v : chip.insert))}
+                title={chip.hint}
+                className="text-[11px] px-2 py-0.5 rounded-full border border-border text-comment hover:text-accent hover:border-accent/50 transition-colors cursor-pointer"
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
           <textarea
             ref={inputRef}
             value={input}
@@ -461,7 +492,7 @@ export default function CopilotChat({ isOpen, onClose }) {
               e.target.style.height = Math.min(e.target.scrollHeight, 140) + "px";
             }}
             disabled={isLoading}
-            aria-label="Ask Copilot"
+            aria-label="Ask Cursor"
           />
 
           {/* Toolbar row inside the input container */}
@@ -512,6 +543,25 @@ export default function CopilotChat({ isOpen, onClose }) {
                 <Icon name="expand_more" size="text-[13px]" />
               </button>
               <Popover open={modelOpen} onClose={() => setModelOpen(false)}>
+                <button
+                  key="auto"
+                  role="menuitem"
+                  onClick={() => {
+                    setSelectedModel("auto");
+                    setModelOpen(false);
+                  }}
+                  className={`w-full flex items-start gap-2 px-3 py-1.5 text-left transition-colors ${
+                    selectedModel === "auto" ? "text-accent bg-accent/10" : "text-text hover:bg-border/30"
+                  }`}
+                >
+                  <span className="w-[13px] mt-0.5">
+                    {selectedModel === "auto" ? <Icon name="check" size="text-[13px]" /> : null}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs">Auto</span>
+                    <span className="block text-[10px] text-comment/70 truncate">Picks the best model for the task</span>
+                  </span>
+                </button>
                 {models.map((m) => (
                   <button
                     key={m.id}
@@ -555,8 +605,7 @@ export default function CopilotChat({ isOpen, onClose }) {
           </div>
         </div>
         <p className="text-[10px] text-comment/50 mt-1.5 px-1 select-none">
-          Enter to send · Shift+Enter for newline
-          {mode !== "ask" && <span className="ml-1">· {activeMode.label} mode</span>}
+          Enter to send · Shift+Enter newline · @ context{mode !== "agent" && <span className="ml-1">· {activeMode.label} mode</span>}
         </p>
       </div>
     </div>

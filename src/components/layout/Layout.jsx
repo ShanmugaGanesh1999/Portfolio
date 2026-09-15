@@ -23,6 +23,7 @@ import Breadcrumbs from "./Breadcrumbs";
 import StatusBar from "./StatusBar";
 import Panel from "./Panel";
 import CommandPalette from "./CommandPalette";
+import InlineAIBar from "./InlineAIBar";
 import CopilotChat from "../chat/CopilotChat";
 import { ResizeHandle } from "../ui";
 import usePanelResize from "../../hooks/usePanelResize";
@@ -159,7 +160,7 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="h-dvh flex flex-col">
+    <div className="h-dvh flex flex-col shell-in">
       <Header />
 
       {/* Mobile navigation bar */}
@@ -214,10 +215,12 @@ export default function Layout() {
           id="editor-pane"
           role="tabpanel"
           aria-labelledby={`tab-${state.activeTabId}`}
-          className="flex-1 flex flex-col min-w-0"
+          className="flex-1 flex flex-col min-w-0 relative"
         >
           <TabStrip />
           <Breadcrumbs />
+          {/* Cursor's Ctrl+K inline AI bar */}
+          {state.inlineBarOpen && <InlineAIBar />}
           <main
             ref={mainRef}
             tabIndex={-1}

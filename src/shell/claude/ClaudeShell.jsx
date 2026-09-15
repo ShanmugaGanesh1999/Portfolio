@@ -157,8 +157,6 @@ export default function ClaudeShell() {
   const [mode, setMode] = useState(0);
   const [model, setModel] = useState(getDefaultModelId());
   const [panel, setPanel] = useState(null); // {type, ...}
-  const [windowState, setWindowState] = useState("normal"); // normal | minimized | maximized
-  const [ended, setEnded] = useState(false);
   const [toastMsg, setToastMsg] = useState(null);
   const [recent, setRecent] = useState({ text: "No recent activity", time: "" });
   const [agents, setAgents] = useState([]);
@@ -196,8 +194,8 @@ export default function ClaudeShell() {
   }, []);
 
   const focusPrompt = useCallback(() => {
-    if (!ended) inputRef.current?.focus({ preventScroll: true });
-  }, [ended]);
+    inputRef.current?.focus({ preventScroll: true });
+  }, []);
 
   useEffect(() => {
     if (window.matchMedia("(min-width: 641px)").matches) focusPrompt();
@@ -492,7 +490,7 @@ export default function ClaudeShell() {
           break;
 
         case "/exit":
-          pushBlock({ kind: "system", text: "switching to VS Code workspace …" });
+          pushBlock({ kind: "system", text: "switching to Cursor workspace …" });
           window.setTimeout(() => ws.setShellMode("vscode"), 350);
           break;
 
@@ -505,7 +503,6 @@ export default function ClaudeShell() {
 
   // ── Submit ──
   const submitInput = useCallback(() => {
-    if (ended) return;
     if (busy) { cancelRun(); return; }
     let message = input.trim();
     if (!message) return;
@@ -527,7 +524,7 @@ export default function ClaudeShell() {
     } else ask(message);
     focusPrompt();
     scrollToEnd(message.toLowerCase() !== "/clear");
-  }, [ended, busy, input, menuOpen, menuMatches, clampedMenuIdx, history.length, runSlash, shellRun, ask, cancelRun, pushBlock, focusPrompt, scrollToEnd]);
+  }, [busy, input, menuOpen, menuMatches, clampedMenuIdx, history.length, runSlash, shellRun, ask, cancelRun, pushBlock, focusPrompt, scrollToEnd]);
 
   // ── Keyboard ──
   const onKeyDown = (e) => {
@@ -601,80 +598,34 @@ export default function ClaudeShell() {
 
   const runningAgents = agents.filter((a) => a.status === "running").length;
 
-  // ── Window state helpers ──
-  const endSession = () => {
-    cancelRun(false);
-    setPanel(null);
-    setEnded(true);
-  };
-  const toggleMaximize = () => {
-    setWindowState((s) => (s === "maximized" ? "normal" : s === "minimized" ? "maximized" : "maximized"));
-  };
-
-  if (ended) {
-    return (
-      <div className="ct-stage">
-        <section className="ct-terminal" aria-label="Claude Code terminal">
-          <header className="ct-titlebar">
-            <div className="ct-window-controls" aria-label="Terminal window controls">
-              <button className="ct-window-control ct-window-close" onClick={endSession} aria-label="End session"><span aria-hidden="true">×</span></button>
-              <button className="ct-window-control ct-window-minimize" aria-label="Minimized" disabled><span aria-hidden="true">−</span></button>
-              <button className="ct-window-control ct-window-maximize" aria-label="Maximized" disabled><span aria-hidden="true">+</span></button>
-            </div>
-            <div className="ct-window-title"><span>~/portfolio — claude</span></div>
-          </header>
-          <section className="ct-session-ended">
-            <pre className="ct-mascot" aria-hidden="true">{MASCOT}</pre>
-            <h2 className="ct-greeting">See you next time.</h2>
-            <p>Your terminal session has ended.</p>
-            <button
-              className="ct-terminal-button"
-              onClick={() => { setEnded(false); setBlocks([]); focusPrompt(); }}
-            >
-              Restart session
-            </button>
-          </section>
-        </section>
-      </div>
-    );
-  }
-
   return (
-    <div className="ct-stage">
-      <section
-        className={`ct-terminal ${windowState === "minimized" ? "ct-minimized" : ""} ${
-          windowState === "maximized" ? "ct-maximized" : ""
-        } ${busy ? "ct-is-busy" : ""}`}
-        style={{ "--ct-font-size": `${config.fontSize}px` }}
-        aria-label="Claude Code terminal"
-      >
-        {/* ── Titlebar ── */}
-        <header className="ct-titlebar" onDoubleClick={(e) => { if (!e.target.closest("button")) toggleMaximize(); }}>
-          <div className="ct-window-controls" aria-label="Terminal window controls">
-            <button className="ct-window-control ct-window-close" onClick={endSession} title="End this session" aria-label="End session"><span aria-hidden="true">×</span></button>
-            <button
-              className="ct-window-control ct-window-minimize"
-              onClick={() => setWindowState((s) => (s === "minimized" ? "normal" : "minimized"))}
-              title="Minimize or restore"
-              aria-label="Minimize or restore terminal"
-            ><span aria-hidden="true">−</span></button>
-            <button
-              className="ct-window-control ct-window-maximize"
-              onClick={toggleMaximize}
-              title="Maximize or restore"
-              aria-label="Maximize or restore terminal"
-            ><span aria-hidden="true">+</span></button>
-          </div>
-          <div className="ct-window-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" style={{ color: "var(--ct-faint)", flexShrink: 0 }}>
-              <path d="M3 7.5V5a1 1 0 0 1 1-1h5l2 3h9a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7.5Z" />
-            </svg>
-            <span>portfolio — claude</span>
-          </div>
-          <span className="ct-window-meta">
-            <ModeSwitcher compact />
-          </span>
-        </header>
+    <div
+      className={`ct-app shell-in ${busy ? "ct-is-busy" : ""}`}
+      style={{ "--ct-font-size": `${config.fontSize}px` }}
+      aria-label="Claude Code terminal"
+    >
+      {/* ── Top bar — mirrors the VS Code header so the mode switcher
+             stays in exactly the same place in both shells ── */}
+      <header className="h-10 border-b border-border flex items-center px-2 sm:px-4 justify-between gap-2 shrink-0 bg-sidebar">
+        <div className="flex items-center gap-2 min-w-0 text-xs text-comment truncate">
+          <span className="text-accent text-sm shrink-0 select-none" aria-hidden="true">✳</span>
+          <span className="hidden sm:inline">~/portfolio — claude</span>
+          <span className="sm:hidden">claude</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            aria-label={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
+            title={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
+            className="w-8 h-8 flex items-center justify-center rounded-md text-comment hover:text-text hover:bg-border/30 transition-colors"
+          >
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+              {theme === "dark" ? "light_mode" : "dark_mode"}
+            </span>
+          </button>
+          <ModeSwitcher compact />
+        </div>
+      </header>
 
         {/* ── Viewport (scrollback) ── */}
         <div
@@ -1048,7 +999,6 @@ export default function ClaudeShell() {
 
         {/* ── Toast ── */}
         {toastMsg && <div className="ct-toast" role="status">{toastMsg}</div>}
-      </section>
     </div>
   );
 }

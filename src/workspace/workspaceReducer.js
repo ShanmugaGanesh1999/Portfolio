@@ -30,6 +30,7 @@ export const initialState = {
   paletteOpen: false,
   paletteMode: "files", // 'files' | 'commands'
   paletteQuery: "",
+  inlineBarOpen: false, // Cursor Ctrl+K inline AI bar (vscode shell only)
   prepPanel: { courseId: null, visible: true },
   outputLog: [],
 };
@@ -150,6 +151,9 @@ export function workspaceReducer(state, action) {
         paletteQuery: action.query ?? "",
       };
     }
+
+    case "SET_INLINE_BAR":
+      return { ...state, inlineBarOpen: action.open ?? !state.inlineBarOpen };
 
     case "SET_PREP_PANEL": {
       const courseId =
