@@ -18,7 +18,6 @@ import {
   getDefaultModelId,
 } from "../../services/chatService";
 import { createShellExecutor, resolveProject, resolvePrep } from "../commands";
-import { PERSONAL } from "../../data/portfolioData";
 import { PROJECT_TABS, defaultPrepFile } from "../../workspace/registry";
 import ModeSwitcher from "../../components/ui/ModeSwitcher";
 import CliWelcome from "./CliWelcome";
@@ -26,21 +25,25 @@ import AgentPane from "./AgentPane";
 import OpenPicker from "./OpenPicker";
 import TerminalMarkdown from "../shared/Markdown";
 import { randomVerb } from "./verbs";
+import { playSections, PORTFOLIO_SECTIONS } from "./portfolioSequence";
 
 const CONFIG_KEY = "sg-claude-terminal:config:v1";
 const MODE_LABELS = ["default mode", "⏵⏵ accept edits on", "⏸ plan mode on"];
-const MASCOT = " ▐▛███▜▌\n▝▜█████▛▘\n  ▘▘ ▝▝";
 const SPINNER_FRAMES = ["·", "✢", "✳", "✶", "✻", "✽"];
 const FRAME_MS = 140;
 
 const SLASH_COMMANDS = [
   { name: "/help", description: "Show commands and keyboard shortcuts" },
   { name: "/open", description: "Open a project as a full-screen pane — no argument shows the picker" },
-  { name: "/projects", description: "Jump to the projects section" },
-  { name: "/about", description: "Jump to the about section" },
-  { name: "/skills", description: "Jump to the tech stack" },
-  { name: "/experience", description: "Jump to the experience section" },
-  { name: "/contact", description: "Jump to the contact section" },
+  { name: "/info", description: "Display basic information" },
+  { name: "/stats", description: "Display portfolio highlights" },
+  { name: "/credentials", description: "Display education and certifications" },
+  { name: "/stacks", description: "Display the tech stack (alias for /skills)" },
+  { name: "/projects", description: "Display projects again" },
+  { name: "/about", description: "Display the about section" },
+  { name: "/skills", description: "Display the tech stack" },
+  { name: "/experience", description: "Display the experience section" },
+  { name: "/contact", description: "Display the contact section" },
   { name: "/research", description: "Spawn a research agent" },
   { name: "/tour", description: "Watch the agents work (multi-agent demo)" },
   { name: "/model", description: "Change the assistant model" },
@@ -140,14 +143,7 @@ export default function ClaudeShell() {
   }, []);
 
   // ── Session state ──
-  const [blocks, setBlocks] = useState(() => {
-    const initial = [];
-    const activeId = ws.state.activeTabId;
-    if (activeId && activeId !== "welcome") {
-      initial.push({ id: uid(), kind: "tool", name: "Read", path: activeId, output: "deep-dive — esc to return" });
-    }
-    return initial;
-  });
+  const [blocks, setBlocks] = useState([]);
   const [busy, setBusy] = useState(null); // { label, verb, startedAt }
   const [input, setInput] = useState("");
   const [history, setHistory] = useState([]);
@@ -158,7 +154,6 @@ export default function ClaudeShell() {
   const [model, setModel] = useState(getDefaultModelId());
   const [panel, setPanel] = useState(null); // {type, ...}
   const [toastMsg, setToastMsg] = useState(null);
-  const [recent, setRecent] = useState({ text: "No recent activity", time: "" });
   const [agents, setAgents] = useState([]);
   const [permission, setPermission] = useState(null);
   const [agentPane, setAgentPane] = useState(null); // { tabId, agent } — full-screen pane
@@ -166,6 +161,7 @@ export default function ClaudeShell() {
   const viewportRef = useRef(null);
   const inputRef = useRef(null);
   const abortRef = useRef(null);
+  const portfolioCancelRef = useRef(null);
   const autoScrollRef = useRef(true);
   const toastTimerRef = useRef(null);
   const menuRef = useRef(null);
@@ -203,25 +199,35 @@ export default function ClaudeShell() {
     if (window.matchMedia("(min-width: 641px)").matches) focusPrompt();
   }, [focusPrompt]);
 
-  // Auto-scroll on new blocks while pinned near the bottom. The mount run
-  // is special: a fresh session opens the welcome document at the top (the
-  // scrollback is a document, not a live log); a deep link with initial
-  // blocks still lands on its content.
-  const mountedRef = useRef(false);
+  // Follow new output only while the visitor is reading at the bottom.
   useEffect(() => {
-    const el = viewportRef.current;
-    if (!mountedRef.current) {
-      mountedRef.current = true;
-      if (blocks.length === 0) {
-        autoScrollRef.current = false;
-        el?.scrollTo({ top: 0 });
-      } else if (el) {
-        el.scrollTop = el.scrollHeight;
-      }
-      return;
-    }
-    if (el && autoScrollRef.current) el.scrollTop = el.scrollHeight;
-  }, [blocks, busy]);
+    scrollToEnd();
+  }, [blocks, busy, scrollToEnd]);
+
+  const runPortfolio = useCallback((sections, intro = false) => {
+    portfolioCancelRef.current?.();
+    portfolioCancelRef.current = playSections(sections, {
+      intro,
+      onCommand: (text) => {
+        if (intro) pushBlock({ kind: "user", text });
+      },
+      onStatus: (label) => setBusy({ label, startedAt: Date.now() }),
+      onSection: (section) => pushBlock({ kind: "section", section }),
+      onDone: () => {
+        portfolioCancelRef.current = null;
+        setBusy(null);
+      },
+    });
+  }, [pushBlock]);
+
+  useEffect(() => {
+    runPortfolio(PORTFOLIO_SECTIONS, true);
+    return () => {
+      portfolioCancelRef.current?.();
+      abortRef.current?.abort();
+      clearTimeout(toastTimerRef.current);
+    };
+  }, [runPortfolio]);
 
   const setBusyState = (label, verb) => {
     setBusy(label ? { label, verb: verb || "Thinking", startedAt: Date.now() } : null);
@@ -229,6 +235,9 @@ export default function ClaudeShell() {
 
   const cancelRun = useCallback((showMessage = true) => {
     abortRef.current?.abort();
+    abortRef.current = null;
+    portfolioCancelRef.current?.();
+    portfolioCancelRef.current = null;
     setBusy(null);
     if (showMessage) pushBlock({ kind: "system", text: "Interrupted · the response was stopped." });
   }, [pushBlock]);
@@ -325,8 +334,10 @@ export default function ClaudeShell() {
           patchBlock(id, { streaming: false, error: true, content: `⚠ ${err.message}` });
         }
       } finally {
-        setBusy(null);
-        abortRef.current = null;
+        if (abortRef.current === controller) {
+          setBusy(null);
+          abortRef.current = null;
+        }
       }
     },
     [blocks, model, pushBlock, patchBlock]
@@ -395,29 +406,6 @@ export default function ClaudeShell() {
   );
 
   // ── Slash command execution ──
-  // Disable auto-scroll FIRST (before the user-entry block renders) so the
-  // bottom-snap effect can't cancel the anchor scroll, then scroll on the
-  // next frame once the transcript has settled.
-  const scrollToAnchor = useCallback(
-    (id, label) => {
-      autoScrollRef.current = false;
-      requestAnimationFrame(() => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "start" });
-          window.setTimeout(() => (autoScrollRef.current = true), 900);
-        } else {
-          autoScrollRef.current = true;
-          pushBlock({
-            kind: "system",
-            text: `${label} not on screen — run /clear to restore the welcome document, then try again.`,
-          });
-        }
-      });
-    },
-    [pushBlock]
-  );
-
   const runSlash = useCallback(
     (raw) => {
       let [command, ...args] = raw.trim().split(/\s+/);
@@ -462,25 +450,16 @@ export default function ClaudeShell() {
           break;
         }
 
-        case "/projects":
-          pushBlock({ kind: "system", text: "→ projects" });
-          scrollToAnchor("cli-projects", "Projects");
-          break;
+        case "/info":
+        case "/stats":
         case "/about":
-          pushBlock({ kind: "system", text: "→ about" });
-          scrollToAnchor("cli-about", "About");
-          break;
         case "/skills":
-          pushBlock({ kind: "system", text: "→ skills" });
-          scrollToAnchor("cli-skills", "Skills");
-          break;
+        case "/stacks":
         case "/experience":
-          pushBlock({ kind: "system", text: "→ experience" });
-          scrollToAnchor("cli-experience", "Experience");
-          break;
+        case "/projects":
+        case "/credentials":
         case "/contact":
-          pushBlock({ kind: "system", text: "→ contact" });
-          scrollToAnchor("cli-contact", "Contact");
+          runPortfolio([command.toLowerCase() === "/stacks" ? "skills" : command.toLowerCase().slice(1)]);
           break;
 
         case "/research":
@@ -543,7 +522,6 @@ export default function ClaudeShell() {
         case "/clear":
           cancelRun(false);
           setBlocks([]);
-          setRecent({ text: "No recent activity", time: "" });
           viewportRef.current?.scrollTo({ top: 0 });
           break;
 
@@ -556,21 +534,23 @@ export default function ClaudeShell() {
           pushBlock({ kind: "system", text: `Unknown command: ${command}. Type /help to see supported commands.` });
       }
     },
-    [pushBlock, spawnExplorer, spawnResearcher, models, config, currentModel, theme, setTheme, agents, mode, cancelRun, ws, scrollToAnchor, toast]
+    [pushBlock, spawnExplorer, spawnResearcher, models, config, currentModel, theme, setTheme, agents, mode, cancelRun, ws, runPortfolio, toast]
   );
 
   // ── Submit ──
-  const submitInput = useCallback(() => {
-    if (busy) { cancelRun(); return; }
-    let message = input.trim();
-    if (!message) return;
-    if (menuOpen && menuMatches.length) message = menuMatches[clampedMenuIdx].name;
+  const submitInput = useCallback((raw) => {
+    let message = (typeof raw === "string" ? raw : input).trim();
+    if (!message) {
+      if (busy) cancelRun();
+      return;
+    }
+    if (busy || portfolioCancelRef.current) cancelRun(false);
+    if (typeof raw !== "string" && menuOpen && menuMatches.length) message = menuMatches[clampedMenuIdx].name;
     setHistory((h) => [...h, message].slice(-100));
     setHistIdx(history.length + 1);
     setSavedDraft("");
     setInput("");
     autoScrollRef.current = true;
-    setRecent({ text: message.replace(/\s+/g, " "), time: "just now" });
 
     const silent = /^\/(clear|config|model|theme|exit)(\s|$)/i.test(message);
     if (!silent && !message.startsWith("!")) pushBlock({ kind: "user", text: message });
@@ -618,7 +598,7 @@ export default function ClaudeShell() {
       setInput(next === history.length ? savedDraft : history[next]);
       return;
     }
-    if (key === "?" && !input) { e.preventDefault(); pushBlock({ kind: "help" }); scrollToEnd(true); return; }
+    if (key === "?" && !input) { e.preventDefault(); submitInput("/help"); return; }
     if (e.ctrlKey && key.toLowerCase() === "c") {
       e.preventDefault();
       if (busy) cancelRun();
@@ -714,75 +694,16 @@ export default function ClaudeShell() {
             if (!window.getSelection()?.toString()) focusPrompt();
           }}
         >
-          {/* Shell context */}
-          <div className="ct-shell-context" aria-hidden="true">
-            <div>
-              <span className="path">~/portfolio</span>
-              <span className="branch">git:(<span className="ct-branch-name" style={{ color: "var(--color-success)" }}>main</span>)</span>
-            </div>
-            <div className="ct-shell-command"><span className="chevron">❯</span><span>claude</span></div>
-          </div>
-
-          {/* Welcome panel */}
-          <section className="ct-welcome" aria-labelledby="ct-welcome-heading">
-            <h1 className="ct-welcome-heading" id="ct-welcome-heading">
-              Claude Code <span className="ct-version">v3.0</span>
-            </h1>
-            <div className="ct-welcome-identity">
-              <h2 className="ct-greeting">Welcome back, {config.userName}!</h2>
-              <pre className="ct-mascot" aria-label="Claude's pixel mascot" role="img">{MASCOT}</pre>
-              <div className="ct-identity-model">
-                <button type="button" className="ct-inline-command" onClick={() => setPanel({ type: "model" })} title="Change the model">
-                  {currentModel.name}
-                </button>
-                <span> · portfolio assistant</span>
-              </div>
-              <button type="button" className="ct-inline-command ct-identity-path" onClick={() => setPanel({ type: "config" })} title="Terminal settings">
-                ~/portfolio
-              </button>
-            </div>
-            <div className="ct-welcome-info">
-              <div>
-                <h3>Tips for getting started</h3>
-                <p>
-                  Run <button type="button" className="ct-inline-command" onClick={() => { pushBlock({ kind: "user", text: "/open market_data" }); runSlash("/open market_data"); }}>/open market_data</button> to read a system-design deep-dive.
-                </p>
-                <p>
-                  Ask <button type="button" className="ct-inline-command" onClick={() => { const q = "What did he build at Zoho?"; pushBlock({ kind: "user", text: q }); ask(q); }}>"what did he build at Zoho?"</button> — the assistant knows the resume.
-                </p>
-                <p style={{ color: "var(--color-comment)" }}>
-                  Type <button type="button" className="ct-inline-command" onClick={() => { pushBlock({ kind: "user", text: "/help" }); runSlash("/help"); }}>/help</button> for commands, or <span style={{ color: "var(--color-text)" }}>!ls</span> for the shell.
-                </p>
-              </div>
-              <div className="ct-recent-activity">
-                <h3>Recent activity</h3>
-                <div className="ct-recent-line">
-                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{recent.text}</span>
-                  <span style={{ flexShrink: 0, color: "var(--ct-faint)", fontSize: "0.93em" }}>{recent.time}</span>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Tip */}
-          <div className="ct-tip">
-            <span className="ct-tip-icon" aria-hidden="true">✻</span>
-            <span>
-              <strong>Tip:</strong> Type{" "}
-              <button type="button" className="ct-inline-command" onClick={() => { pushBlock({ kind: "user", text: "/tour" }); runSlash("/tour"); }}>/tour</button>{" "}
-              to watch the agents work.
-            </span>
-          </div>
-
-          {/* Portfolio document */}
-          <CliWelcome />
-
           {/* Conversation */}
           <div className="ct-conversation" role="log" aria-label="Conversation" aria-live="polite">
             {blocks.map((block) => {
               switch (block.kind) {
                 case "user":
-                  return <Entry key={block.id} kind="user">{block.text}</Entry>;
+                  return <Entry key={block.id} kind="user">{block.text.startsWith("/") ? (
+                    <button type="button" className="ct-inline-command" onClick={() => submitInput(block.text)}>{block.text}</button>
+                  ) : block.text}</Entry>;
+                case "section":
+                  return <Entry key={block.id} kind="assistant"><CliWelcome section={block.section} /></Entry>;
                 case "system":
                   return <Entry key={block.id} kind="system">{block.text}</Entry>;
                 case "assistant":
@@ -823,7 +744,7 @@ export default function ClaudeShell() {
                         <div className="ct-help-grid">
                           {SLASH_COMMANDS.map((c) => (
                             <span key={c.name} className="ct-help-row" style={{ display: "contents" }}>
-                              <button type="button" className="ct-inline-command key" onClick={() => { pushBlock({ kind: "user", text: c.name }); runSlash(c.name); }}>{c.name}</button>
+                              <button type="button" className="ct-inline-command key" onClick={() => submitInput(c.name)}>{c.name}</button>
                               <span style={{ color: "var(--color-comment)" }}>{c.description}</span>
                             </span>
                           ))}
@@ -878,7 +799,7 @@ export default function ClaudeShell() {
                   aria-selected={i === clampedMenuIdx}
                   className="ct-command-option"
                   onMouseEnter={() => setMenuIdx(i)}
-                  onClick={() => { setInput(c.name); }}
+                  onClick={() => submitInput(c.name)}
                 >
                   <span className="command-name">{c.name}</span>
                   <span className="command-description">{c.description}</span>
@@ -921,10 +842,10 @@ export default function ClaudeShell() {
             <button
               className="ct-send-button"
               type="submit"
-              title={busy ? "Stop response (Escape)" : "Send message (Enter)"}
-              aria-label={busy ? "Stop response" : "Send message"}
+              title={busy && !input.trim() ? "Stop response (Escape)" : "Send message (Enter)"}
+              aria-label={busy && !input.trim() ? "Stop response" : "Send message"}
             >
-              {busy ? (
+              {busy && !input.trim() ? (
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                   <rect x="6" y="6" width="12" height="12" rx="1" />
                 </svg>
@@ -939,7 +860,7 @@ export default function ClaudeShell() {
           {/* Statusline */}
           <div className="ct-statusline">
             <div className="ct-status-left">
-              <button type="button" className="ct-text-button" onClick={() => { pushBlock({ kind: "help" }); scrollToEnd(true); }}>
+              <button type="button" className="ct-text-button" onClick={() => submitInput("/help")}>
                 ? for shortcuts
               </button>
               <button

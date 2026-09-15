@@ -2,7 +2,7 @@
 // CLI WELCOME — the portfolio document inside the Claude Code
 // terminal scrollback. Same data as the VS Code Welcome tab
 // (portfolioData.js), styled to the reference terminal.
-// Anchored sections for /about /skills /experience etc.
+// Each section can be printed again as a fresh transcript entry.
 // ============================================================
 
 import {
@@ -16,10 +16,9 @@ import {
   EDUCATION,
 } from "../../data/portfolioData";
 
-function DocSection({ id, cmd, title, children }) {
+function DocSection({ title, children }) {
   return (
-    <section id={id} className="scroll-mt-4">
-      <div className="cmd" style={{ color: "var(--ct-faint)", fontSize: "0.85em" }}>❯ {cmd}</div>
+    <section>
       <h2 style={{ fontSize: "1.1em", fontWeight: 700, color: "var(--color-text)", margin: "2px 0 8px" }}>
         {title}
       </h2>
@@ -28,12 +27,11 @@ function DocSection({ id, cmd, title, children }) {
   );
 }
 
-export default function CliWelcome() {
+export default function CliWelcome({ section }) {
   return (
     <div className="ct-portfolio" style={{ margin: "10px 0 20px" }}>
       {/* ── Identity ── */}
-      <section id="cli-hero" className="scroll-mt-4">
-        <div style={{ color: "var(--ct-faint)", fontSize: "0.85em" }}>❯ whoami</div>
+      {section === "info" && <section>
         <h2 style={{ margin: "2px 0 4px" }}>{PERSONAL.name}</h2>
         <p style={{ margin: 0, color: "var(--color-accent)" }}>{PERSONAL.role}</p>
         <p style={{ margin: "8px 0", color: "var(--color-comment)", lineHeight: 1.7 }}>
@@ -47,11 +45,11 @@ export default function CliWelcome() {
           <a href={PERSONAL.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="ct-inline-command">linkedin</a>
           <a href={PERSONAL.socialLinks.website} target="_blank" rel="noopener noreferrer" className="ct-inline-command">website</a>
         </div>
-      </section>
+      </section>}
 
       {/* ── Stats ── */}
-      <section style={{ marginTop: 22 }}>
-        <div style={{ color: "var(--ct-faint)", fontSize: "0.85em" }}>❯ ./stats --summary</div>
+      {section === "stats" && <section>
+        <h2>Portfolio highlights</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8, marginTop: 8 }}>
           {STATS.map((stat) => (
             <div
@@ -68,19 +66,19 @@ export default function CliWelcome() {
             </div>
           ))}
         </div>
-      </section>
+      </section>}
 
       {/* ── About ── */}
-      <DocSection id="cli-about" cmd="cat about.txt" title="About">
+      {section === "about" && <DocSection title="About">
         <div style={{ color: "var(--color-comment)", lineHeight: 1.7 }}>
           {ABOUT.paragraphs.map((p, i) => (
             <p key={i} style={{ margin: i ? "10px 0 0" : 0 }}>{p}</p>
           ))}
         </div>
-      </DocSection>
+      </DocSection>}
 
       {/* ── Tech stack ── */}
-      <DocSection id="cli-skills" cmd="cat tech_stack.json | jq ." title="Tech Stack">
+      {section === "skills" && <DocSection title="Tech Stack">
         <div style={{ fontSize: "0.93em" }}>
           {TECH_STACK.map((group) => (
             <div key={group.title} style={{ display: "flex", gap: 14, margin: "5px 0", flexWrap: "wrap" }}>
@@ -92,10 +90,10 @@ export default function CliWelcome() {
             </div>
           ))}
         </div>
-      </DocSection>
+      </DocSection>}
 
       {/* ── Experience ── */}
-      <DocSection id="cli-experience" cmd="git log --career" title="Experience">
+      {section === "experience" && <DocSection title="Experience">
         <div>
           {EXPERIENCE.map((exp) => (
             <div
@@ -123,10 +121,10 @@ export default function CliWelcome() {
             </div>
           ))}
         </div>
-      </DocSection>
+      </DocSection>}
 
       {/* ── Projects ── */}
-      <DocSection id="cli-projects" cmd="ls ~/Projects/" title="Projects">
+      {section === "projects" && <DocSection title="Projects">
         <div>
           {PROJECTS.map((project) => (
             <div
@@ -156,10 +154,10 @@ export default function CliWelcome() {
             </div>
           ))}
         </div>
-      </DocSection>
+      </DocSection>}
 
       {/* ── Credentials ── */}
-      <DocSection id="cli-credentials" cmd="cat credentials.md" title="Credentials">
+      {section === "credentials" && <DocSection title="Credentials">
         <div style={{ fontSize: "0.9em" }}>
           {EDUCATION.map((edu) => (
             <div key={edu.institution} style={{ margin: "4px 0" }}>
@@ -184,10 +182,10 @@ export default function CliWelcome() {
             ))}
           </div>
         </div>
-      </DocSection>
+      </DocSection>}
 
       {/* ── Contact ── */}
-      <DocSection id="cli-contact" cmd="./contact.sh --reach-out" title="Contact">
+      {section === "contact" && <DocSection title="Contact">
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           <a href={`mailto:${PERSONAL.email}`} className="ct-terminal-button" style={{ textDecoration: "none", display: "inline-block" }}>
             ✉ Email Shanmuga
@@ -211,12 +209,7 @@ export default function CliWelcome() {
             ⏱ Schedule a sync
           </a>
         </div>
-      </DocSection>
-
-      <p style={{ marginTop: 24, fontSize: "0.75em", color: "var(--ct-faint)" }}>
-        ※ end of welcome.md — type <span style={{ color: "var(--color-accent)" }}>/help</span> for commands,{" "}
-        <span style={{ color: "var(--color-accent)" }}>!ls</span> for the shell, or ask anything about Shanmuga
-      </p>
+      </DocSection>}
     </div>
   );
 }
