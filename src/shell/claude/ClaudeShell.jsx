@@ -19,10 +19,11 @@ import {
 } from "../../services/chatService";
 import { createShellExecutor, resolveProject, resolvePrep } from "../commands";
 import { PERSONAL } from "../../data/portfolioData";
-import { PROJECT_TABS } from "../../workspace/registry";
+import { PROJECT_TABS, defaultPrepFile } from "../../workspace/registry";
 import ModeSwitcher from "../../components/ui/ModeSwitcher";
 import CliWelcome from "./CliWelcome";
-import CliFileView from "./CliFileView";
+import AgentPane from "./AgentPane";
+import OpenPicker from "./OpenPicker";
 import TerminalMarkdown from "../shared/Markdown";
 import { randomVerb } from "./verbs";
 
@@ -34,7 +35,7 @@ const FRAME_MS = 140;
 
 const SLASH_COMMANDS = [
   { name: "/help", description: "Show commands and keyboard shortcuts" },
-  { name: "/open", description: "Open a project deep-dive (e.g. /open market_data)" },
+  { name: "/open", description: "Open a project as a full-screen pane — no argument shows the picker" },
   { name: "/projects", description: "Jump to the projects section" },
   { name: "/about", description: "Jump to the about section" },
   { name: "/skills", description: "Jump to the tech stack" },
@@ -143,8 +144,7 @@ export default function ClaudeShell() {
     const initial = [];
     const activeId = ws.state.activeTabId;
     if (activeId && activeId !== "welcome") {
-      initial.push({ id: uid(), kind: "tool", name: "Read", path: activeId, output: "project deep-dive" });
-      initial.push({ id: uid(), kind: "file", tabId: activeId });
+      initial.push({ id: uid(), kind: "tool", name: "Read", path: activeId, output: "deep-dive — esc to return" });
     }
     return initial;
   });
@@ -161,12 +161,14 @@ export default function ClaudeShell() {
   const [recent, setRecent] = useState({ text: "No recent activity", time: "" });
   const [agents, setAgents] = useState([]);
   const [permission, setPermission] = useState(null);
+  const [agentPane, setAgentPane] = useState(null); // { tabId, agent } — full-screen pane
 
   const viewportRef = useRef(null);
   const inputRef = useRef(null);
   const abortRef = useRef(null);
   const autoScrollRef = useRef(true);
   const toastTimerRef = useRef(null);
+  const menuRef = useRef(null);
 
   const models = getAvailableModels();
   const currentModel = models.find((m) => m.id === model) || models[0];
@@ -235,11 +237,21 @@ export default function ClaudeShell() {
   const menuOpen = /^\/[^\s]*$/.test(input) && !busy;
   const menuMatches = useMemo(() => {
     if (!menuOpen) return [];
-    return SLASH_COMMANDS.filter((c) => c.name.startsWith(input.toLowerCase()));
+    const q = input.toLowerCase();
+    return SLASH_COMMANDS.filter(
+      (c) => c.name.startsWith(q) || q.startsWith(c.name)
+    );
   }, [menuOpen, input]);
   const clampedMenuIdx = Math.min(menuIdx, Math.max(0, menuMatches.length - 1));
 
   useEffect(() => setMenuIdx(0), [input]);
+
+  // Keep the keyboard-selected slash option scrolled into view.
+  useEffect(() => {
+    menuRef.current
+      ?.querySelector('[aria-selected="true"]')
+      ?.scrollIntoView({ block: "nearest" });
+  }, [clampedMenuIdx, menuMatches]);
 
   // ── Permission gate (panel-styled) ──
   const confirmPermission = useCallback(
@@ -374,31 +386,56 @@ export default function ClaudeShell() {
       const meta = PROJECT_TABS[projectId];
       if (!meta) return;
       spawnAgent("explorer", `open ${meta.title}`, async (ctx) => {
-        ctx.tool("Read", meta.title, `${meta.language} system-design deep dive`);
+        ctx.tool("Read", meta.title, `${meta.language} system-design deep dive — esc to return`);
         ws.openTab(projectId);
-        ctx.pushBlock({ kind: "file", tabId: projectId });
+        setAgentPane({ tabId: projectId, agent: "explorer" });
       });
     },
     [spawnAgent, ws]
   );
 
   // ── Slash command execution ──
+  // Disable auto-scroll FIRST (before the user-entry block renders) so the
+  // bottom-snap effect can't cancel the anchor scroll, then scroll on the
+  // next frame once the transcript has settled.
   const scrollToAnchor = useCallback(
-    (id) => {
-      const el = document.getElementById(id);
-      if (el) {
-        autoScrollRef.current = false;
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-        window.setTimeout(() => (autoScrollRef.current = true), 800);
-      }
+    (id, label) => {
+      autoScrollRef.current = false;
+      requestAnimationFrame(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+          window.setTimeout(() => (autoScrollRef.current = true), 900);
+        } else {
+          autoScrollRef.current = true;
+          pushBlock({
+            kind: "system",
+            text: `${label} not on screen — run /clear to restore the welcome document, then try again.`,
+          });
+        }
+      });
     },
-    []
+    [pushBlock]
   );
 
   const runSlash = useCallback(
     (raw) => {
-      const [command, ...args] = raw.trim().split(/\s+/);
+      let [command, ...args] = raw.trim().split(/\s+/);
       const argument = args.join(" ");
+
+      // Prefix matching (bidirectional): /project → /projects,
+      // /contacts → /contact. Catches abbreviations and plurals.
+      if (!SLASH_COMMANDS.some((c) => c.name === command.toLowerCase())) {
+        const q = command.toLowerCase();
+        const match = SLASH_COMMANDS.find(
+          (c) => c.name !== "/help" && (c.name.startsWith(q) || q.startsWith(c.name))
+        );
+        if (match) {
+          pushBlock({ kind: "system", text: `→ interpreting as ${match.name}` });
+          command = match.name;
+        }
+      }
+
       switch (command.toLowerCase()) {
         case "/help":
           pushBlock({ kind: "help" });
@@ -406,15 +443,7 @@ export default function ClaudeShell() {
 
         case "/open": {
           if (!argument) {
-            pushBlock({
-              kind: "tool-plain",
-              tone: "out",
-              text:
-                "projects: " +
-                Object.values(PROJECT_TABS)
-                  .map((m) => m.title.replace(/\.\w+$/, ""))
-                  .join("  "),
-            });
+            setPanel({ type: "open-picker" });
             break;
           }
           const projectId = resolveProject(argument);
@@ -423,21 +452,36 @@ export default function ClaudeShell() {
           } else {
             const course = resolvePrep(argument);
             if (course) {
-              ws.openPrepPanel(course.id);
-              pushBlock({ kind: "tool", name: "Read", path: `prep/${course.id}`, output: "prep reader" });
-              pushBlock({ kind: "file", tabId: `prep:${course.id}` });
+              ws.openPrepFile(course.id, defaultPrepFile(course.id));
+              pushBlock({ kind: "tool", name: "Read", path: `prep/${course.id}`, output: "prep reader — esc to return" });
+              setAgentPane({ tabId: `prep:${course.id}`, agent: "explorer" });
             } else {
-              pushBlock({ kind: "system", text: `No project named '${argument}'. Try /open market_data.` });
+              pushBlock({ kind: "system", text: `No project named '${argument}'. Run /open with no argument to pick from the list.` });
             }
           }
           break;
         }
 
-        case "/projects": scrollToAnchor("cli-projects"); break;
-        case "/about": scrollToAnchor("cli-about"); break;
-        case "/skills": scrollToAnchor("cli-skills"); break;
-        case "/experience": scrollToAnchor("cli-experience"); break;
-        case "/contact": scrollToAnchor("cli-contact"); break;
+        case "/projects":
+          pushBlock({ kind: "system", text: "→ projects" });
+          scrollToAnchor("cli-projects", "Projects");
+          break;
+        case "/about":
+          pushBlock({ kind: "system", text: "→ about" });
+          scrollToAnchor("cli-about", "About");
+          break;
+        case "/skills":
+          pushBlock({ kind: "system", text: "→ skills" });
+          scrollToAnchor("cli-skills", "Skills");
+          break;
+        case "/experience":
+          pushBlock({ kind: "system", text: "→ experience" });
+          scrollToAnchor("cli-experience", "Experience");
+          break;
+        case "/contact":
+          pushBlock({ kind: "system", text: "→ contact" });
+          scrollToAnchor("cli-contact", "Contact");
+          break;
 
         case "/research":
           if (!argument) {
@@ -649,6 +693,12 @@ export default function ClaudeShell() {
         </div>
       </header>
 
+        {/* ── Agent pane (full-screen project view) ── */}
+        {agentPane ? (
+          <AgentPane pane={agentPane} onClose={() => setAgentPane(null)} />
+        ) : (
+        <>
+
         {/* ── Viewport (scrollback) ── */}
         <div
           className="ct-viewport"
@@ -811,11 +861,15 @@ export default function ClaudeShell() {
           )}
         </div>
 
+        </>
+
+        )}
+
         {/* ── Composer ── */}
-        <footer className="ct-composer">
+        <footer className="ct-composer" style={agentPane ? { display: "none" } : undefined}>
           {/* Slash menu */}
           {menuOpen && menuMatches.length > 0 && (
-            <div className="ct-command-menu" role="listbox" aria-label="Slash commands">
+            <div className="ct-command-menu" role="listbox" aria-label="Slash commands" ref={menuRef}>
               {menuMatches.map((c, i) => (
                 <button
                   key={c.name}
@@ -909,8 +963,26 @@ export default function ClaudeShell() {
           </div>
         </footer>
 
+        {/* ── Open picker (/open with no argument) ── */}
+        {panel?.type === "open-picker" && (
+          <OpenPicker
+            onPick={(tabId) => {
+              setPanel(null);
+              pushBlock({ kind: "system", text: `→ opening ${tabId.startsWith("prep:") ? "prep reader" : "project"} …` });
+              if (tabId.startsWith("prep:")) {
+                ws.openPrepFile(tabId.slice(5), defaultPrepFile(tabId.slice(5)));
+                pushBlock({ kind: "tool", name: "Read", path: tabId, output: "prep reader — esc to return" });
+                setAgentPane({ tabId, agent: "explorer" });
+              } else {
+                spawnExplorer(tabId);
+              }
+            }}
+            onClose={() => setPanel(null)}
+          />
+        )}
+
         {/* ── Modal panels ── */}
-        {panel && (
+        {panel && panel.type !== "open-picker" && (
           <div className="ct-panel-backdrop" onClick={(e) => { if (e.target === e.currentTarget) setPanel(null); }}>
             <section className="ct-panel" role="dialog" aria-modal="true">
               {panel.type === "model" && (
