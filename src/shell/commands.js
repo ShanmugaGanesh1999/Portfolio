@@ -171,7 +171,7 @@ export function createShellExecutor({ ws, theme, setTheme, print, confirm, exit 
         if (file === "resume.pdf") {
           if (await ask({
             title: "Do you want to download resume.pdf?",
-            detail: "Opens the resume PDF from Google Drive in a new tab.",
+            detail: "Opens the resume PDF in a new tab.",
           })) {
             window.open(PERSONAL.resumeUrl, "_blank", "noopener");
             out("downloading resume.pdf …", "ok");

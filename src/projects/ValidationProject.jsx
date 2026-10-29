@@ -108,9 +108,8 @@ export default function ValidationProject({ onBack }) {
           </h1>
           <p className="text-sm text-comment leading-relaxed">
             Architecture deep dive into the NIO-based record validation engine
-            I built at Zoho — processing 2.3M records/hour via async workers
-            while maintaining &lt;100ms real-time validation latency at 210 QPS
-            peak.
+            I built at Zoho, processing 1.47+M records per day. The diagrams
+            and scale estimates below illustrate the design and its targets.
           </p>
         </div>
 

@@ -9,13 +9,12 @@ export default function Contact() {
   const [downloading, setDownloading] = useState(false);
 
   /**
-   * Handle resume download from Google Drive
+   * Open the published resume
    * Update PERSONAL.resumeUrl in portfolioData.js with your actual link
    */
   const handleResumeDownload = useCallback(() => {
     setDownloading(true);
 
-    // Open the Google Drive download link
     const link = document.createElement("a");
     link.href = PERSONAL.resumeUrl;
     link.target = "_blank";

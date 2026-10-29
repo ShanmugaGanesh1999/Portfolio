@@ -1,47 +1,39 @@
-# Sherwin Williams - Senior Full-Stack AI Software Engineer FDE
+# Sherwin-Williams - Senior Software Engineer - FullStack AI FDE
 
-**Period:** August 2026 - Present  
-**Location:** Cleveland, OH  
-**Tags:** `NEXT.JS` · `AZURE` · `DATABRICKS` · `AI`
+**Period:** August 2026 - Present
 
----
+**Location:** Cleveland, OH
 
-## Role Summary
+**Tags:** `PYSPARK` · `DATABRICKS` · `LAKEBASE` · `ENTITY MATCHING` · `AI`
 
-Senior Full-Stack AI Software Engineer (FDE) at Sherwin Williams, architecting the Cover the Codebase AI enablement platform and engineering Databricks medallion pipelines that turn GitHub, GitHub Copilot, and learning activity into engineering metrics, DORA measures, and leadership dashboards.
+## Key accomplishments
 
----
+- Led a team of 5 engineers on Cover the Codebase, an AI-SDLC platform for 2K+ learners. Owned design reviews, code reviews, and pipeline standards while building configurable intake across GitHub, Copilot, Claude, Codex, SonarQube/SonarCloud, ServiceNow, and Jira.
 
-## Key Accomplishments
+- Built an entity matching service that resolved 2M+ records from GitHub, Entra ID, Pluralsight, and Copilot into canonical learner IDs. Deterministic and fuzzy matching, deduplication, and identity mapping achieved a 98% match rate.
 
-- Architecting the **Cover the Codebase AI enablement platform** using **Next.js**, Microsoft Entra ID, Docker, Azure PostgreSQL, and Databricks, supporting employee learning, AI adoption, engineering analytics, and gamification across approximately **50 change champions**.
-- Engineering **Databricks medallion pipelines** across GitHub, GitHub Copilot, and application data, transforming pull requests, commits, AI usage, and learning activity into **23 standardized metrics**, DORA measures, user insights, and leadership dashboards.
-- Building **ACID transactional architecture** with bidirectional delta synchronization between Azure PostgreSQL and Databricks Bronze and Gold, incorporating UTC timestamps, audit logging, batching, and failure recovery to strengthen consistency, traceability, scalability, and reliability.
-- Developing **AI governance and token analytics** for monthly usage, allocation, and cost per user, while measuring adoption, throughput, efficiency, quality, and DORA performance for an enterprise landscape of approximately **13k repositories**.
+- Architected Databricks Medallion pipelines processing 1.3M+ daily events with PySpark, Delta Lake, Unity Catalog, and Lakeflow Jobs. Partitioning, broadcast joins, skew handling, and Z-ordering cut runtime by 33% across 23 adoption metrics.
 
----
+- Designed Lakebase PostgreSQL schemas with data quality scoring, status assignment, and correction-aware upserts for downstream dashboards. Load-tested at 5.4M rows and 2K concurrent queries.
 
 ## Project: Cover the Codebase
 
-**Status:** RESTRICTED  
-**Tech Stack:** Next.js, Microsoft Entra ID, Docker, Azure PostgreSQL, Databricks
+The AI-SDLC platform supports 2K+ learners and 23 adoption metrics.
 
-> Sherwin Williams AI enablement platform supporting employee learning, AI adoption, engineering analytics, and gamification across ~50 change champions, with medallion pipelines producing 23 standardized metrics, DORA measures, and leadership dashboards across ~13k repositories.
+### Configurable data intake
 
-### Functional Scope
+Sources include GitHub, Copilot, Claude, Codex, SonarQube/SonarCloud, ServiceNow, and Jira.
 
-| Area | Description |
-| ---- | ----------- |
-| AI Enablement Platform | Employee learning, AI adoption, engineering analytics, and gamification for change champions |
-| Medallion Data Pipelines | Bronze/Gold transformation of pull requests, commits, AI usage, and learning activity into standardized metrics |
-| Metrics and DORA | 23 standardized metrics, DORA measures, user insights, and leadership dashboards |
-| AI Governance | Monthly token usage, allocation, and cost per user analytics |
-| Data Synchronization | Bidirectional delta sync between Azure PostgreSQL and Databricks with ACID guarantees |
+### Entity resolution
 
-### Engineering Focus
+The matching service resolves GitHub, Entra ID, Pluralsight, and Copilot records into canonical learner IDs. Deterministic and fuzzy matching, deduplication, and identity mapping achieved a 98% match rate across 2M+ records.
 
-- Keep bidirectional Azure PostgreSQL and Databricks synchronization consistent, traceable, and recoverable using ACID transactions, UTC timestamps, audit logging, batching, and failure recovery.
-- Measure adoption, throughput, efficiency, quality, and DORA performance across the enterprise repository landscape.
-- Strengthen AI governance with monthly usage, allocation, and cost per user analytics.
+### Data engineering
 
-> Note: Detailed architecture and implementation of this platform are proprietary to Sherwin Williams and are not shared publicly.
+Databricks Medallion pipelines process 1.3M+ events daily with PySpark, Delta Lake, Unity Catalog, and Lakeflow Jobs. Spark partitioning, broadcast joins, skew handling, and Z-ordering reduced runtime by 33%.
+
+### Lakebase data model
+
+Lakebase PostgreSQL schemas support data quality scoring, status assignment, and correction-aware upserts. Resolved entities sync to downstream dashboards. Load tests covered 5.4M rows and 2K concurrent queries.
+
+Detailed implementation remains proprietary to Sherwin-Williams.

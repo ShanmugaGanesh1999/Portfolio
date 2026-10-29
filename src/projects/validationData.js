@@ -463,7 +463,7 @@ export const OPTIMIZATIONS = [
   {
     title: "NIO Concurrent Processing",
     detail:
-      "asyncio.gather validates 1,000 records in parallel batches. Non-blocking I/O prevents thread starvation on external API calls — achieving 2.3M records/hour.",
+      "asyncio.gather validates 1,000 records in parallel batches. Non-blocking I/O prevents thread starvation on external API calls. This example illustrates the concurrent processing approach.",
     icon: "🔄",
   },
   {
@@ -506,4 +506,4 @@ export const BOTTLENECKS = {
 };
 
 export const SUMMARY =
-  "This system processes 2.3M records/hour for bulk validation and handles 210 QPS peak real-time requests at <100ms latency. The NIO worker architecture — using asyncio for non-blocking concurrent processing — is the key differentiator, enabling horizontal scaling via Kafka partition assignment while maintaining constant memory footprint through S3 streaming. Strong consistency for rule updates (Redis pub/sub invalidation) ensures workers never apply stale validation logic, while eventual consistency for telemetry keeps the critical path fast.";
+  "The Java NIO Custom Validation Rules system processed 1.47+M records per day for CRM record creation and edit flows. Non-blocking validation supported high-throughput execution. The architecture diagrams, Python examples, and capacity estimates on this page illustrate the design, rather than measured production benchmarks.";

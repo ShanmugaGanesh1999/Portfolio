@@ -1,60 +1,33 @@
-# Case Western Reserve University - Software Engineer (Biotech)
+# Case Western Reserve University - Software Engineer (Healthcare Research)
 
-**Period:** March 2026 - July 2026  
-**Location:** Cleveland, OH  
-**Tags:** `PYTHON` · `HPC` · `MICROBIOME` · `AI` · `ML`
+**Period:** March 2026 - July 2026
 
----
+**Location:** Cleveland, OH
 
-## Role Summary
+**Tags:** `PYTHON` · `HPC` · `QIIME2` · `DADA2` · `DATA QUALITY`
 
-Software Engineer (Biotech) at Case Western Reserve University, building AI assisted microbiome quality systems, Python HPC sequencing pipelines, and ML ready microbiome data workflows.
+## Key accomplishments
 
----
+- Built an AI-assisted quality system for clinical microbiome research data. Feature validation, statistical filtering, and metadata anomaly detection reduced false-positive carryover by 35% across 32K+ HMP samples totaling 48+ TB.
 
-## Education
+- Engineered a Python HPC sequencing pipeline with QIIME2 and DADA2 for clinical sample ingestion, quality control, and taxonomy profiling. Scalable, reproducible execution cut analysis turnaround by 30%.
 
-- **Degree:** Master's in Computer Science
-- **GPA:** 3.78 / 4.0
-- **Completed:** January 2025
-- **Location:** Cleveland, OH
-
----
-
-## Key Accomplishments
-
-- Built an **AI assisted microbiome quality system**, reducing **false positive carryover by 35%** through automated feature validation, statistical filtering, and metadata anomaly detection.
-- Engineered a **Python HPC sequencing pipeline**, reducing **analysis turnaround by 30%** across ingestion, quality control, taxonomy profiling, and microbiome analytics.
-- Designed **ML ready microbiome data workflows**, improving **pipeline reproducibility by 40%** through standardized metadata validation, automated quality checks, and structured execution logic.
-
----
+- Standardized clinical metadata and sample records across research cohorts with validation rules, deduplication, and automated quality checks. Improved pipeline reproducibility by 40% and produced ML-ready healthcare datasets.
 
 ## Project: AI Assisted Microbiome Quality System
 
-**Tech Stack:** Python, HPC workflows, statistical filtering, metadata validation, ML ready data processing
+The clinical microbiome research system processes 32K+ samples totaling 48+ TB from the Human Microbiome Project (HMP). Python HPC sequencing pipelines use QIIME2 and DADA2 for ingestion, quality control, and taxonomy profiling.
 
-> AI assisted microbiome analytics workflow for quality validation, carryover detection, standardized execution, and reproducible downstream analysis.
+### Data quality
 
-### Functional Scope
+Feature validation, statistical filtering, and metadata anomaly detection reduced false-positive carryover by 35%. Clinical metadata and sample records use validation rules, deduplication, and automated quality checks across research cohorts.
 
-| Area | Description |
-| ---- | ----------- |
-| Microbiome Quality Validation | Automated feature validation and statistical filtering to reduce false positive carryover |
-| Metadata Anomaly Detection | Structured metadata checks to identify suspicious or inconsistent sample annotations |
-| HPC Sequencing Pipeline | Python pipeline covering ingestion, quality control, taxonomy profiling, and microbiome analytics |
-| Reproducibility Controls | Standardized metadata validation, automated quality checks, and structured execution logic |
+### Results
 
-### Measured Outcomes
+- Analysis turnaround decreased by 30%.
+- Pipeline reproducibility improved by 40%.
+- The pipelines produced ML-ready healthcare datasets.
 
-| Metric | Impact |
-| ------ | ------ |
-| False Positive Carryover | Reduced by 35% |
-| Analysis Turnaround | Reduced by 30% |
-| Pipeline Reproducibility | Improved by 40% |
+## Education
 
-### Engineering Focus
-
-- Build reliable Python data workflows for sequencing and microbiome analytics.
-- Make validation and quality checks repeatable across pipeline runs.
-- Prepare microbiome data outputs for downstream ML ready analysis.
-- Improve data quality and reduce manual review overhead through automation.
+Master's in Computer Science, Case Western Reserve University, Cleveland, OH, 2025. GPA 3.78.

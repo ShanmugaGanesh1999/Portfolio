@@ -155,7 +155,7 @@ export default function CliWelcome({ section, ...reveal }) {
               <span style={{ fontWeight: 600 }}>{edu.degree}</span>
               <span style={{ color: "var(--ct-faint)" }}> — {edu.institution}</span>
               <div style={{ fontSize: "0.8em", color: "var(--color-comment)", marginTop: 2 }}>
-                {edu.detail} · {edu.coursework}
+                {edu.detail}{edu.coursework ? ` · ${edu.coursework}` : ""}
               </div>
             </div>
           ))}

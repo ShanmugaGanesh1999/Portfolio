@@ -1,32 +1,35 @@
 # Musk and Gale - Software Engineer (Fintech)
 
-**Period:** June 2025 - Present  
-**Location:** Cleveland, OH  
-**Tags:** `JAVA` · `PYTHON` · `DJANGO` · `REACT` · `AWS`
+**Period:** June 2025 - Present
 
----
+**Location:** Cleveland, OH
 
-## Role Summary
+**Tags:** `JAVA` · `PYTHON` · `DJANGO` · `REACT` · `MDM`
 
-Software Engineer (Fintech) building a Java and Python based Market Data Aggregation Platform, focusing on market data processing, backend APIs, governance/compliance workflows, React integration, and secure financial data models.
+## Key accomplishments
 
----
+- Led a 3-engineer team on a Java and Python Market Data Aggregation Platform, owning architecture and design reviews. Built a security master matching 3.1M+ instruments across 40 vendor feeds by CUSIP, ISIN, and ticker into canonical IDs.
 
-## Key Accomplishments
+- Built Django REST APIs and React interfaces for customer-facing and internal self-service tools. Query optimization, payload tuning, and cleaner service calls reduced API latency by 32%.
 
-- Led a **Java and Python based Market Data Aggregation Platform**, achieving **95% sprint feature clarity** by translating market data, compliance, governance, and business rules into scalable engineering deliverables.
-- Built a **Python Django REST backend** with React, reducing **API latency by 32%** through query optimization, payload tuning, and cleaner frontend service calls.
-- Engineered **real time API data streams** using WebSockets and Celery, reaching **1.8M records per hour** with reliable ingestion, retry handling, and timeout resilient integrations.
-- Designed **PostgreSQL data models** for secure financial aggregation, improving **query performance by 41%** through indexing, normalized schemas, and encrypted data handling.
+- Engineered configurable ingestion with WebSockets and Celery to onboard vendor feeds through schema reconciliation without code changes. Processed 1.8M records per hour, or 43M+ daily, with retry handling and fault tolerance.
 
----
+- Designed PostgreSQL data models over 45M+ rows with validation and quality scoring rules. Improved query performance by 41% and set data-modeling standards for the team.
 
 ## Project: Market Data Aggregation Platform
 
-**Status:** DEPLOYED  
+**Status:** DEPLOYED
 **Tech Stack:** Java, Python, Django, React, WebSockets, Celery, PostgreSQL, AWS
 
-> Java and Python based fintech platform with a Python Django REST backend and React frontend. Reaches 1.8M records per hour via WebSockets and Celery, reduces API latency by 32%, and improves PostgreSQL query performance by 41%.
+Java and Python fintech platform with a security master matching 3.1M+ instruments across 40 vendor feeds. The platform processes 1.8M records per hour, or 43M+ daily. PostgreSQL models cover 45M+ rows. API latency decreased by 32%, and query performance improved by 41%.
+
+### Security master and configurable ingestion
+
+The security master matches instruments by CUSIP, ISIN, and ticker into canonical IDs. Vendor feeds use schema reconciliation for onboarding without code changes. WebSockets and Celery provide ingestion, retry handling, and fault tolerance. Validation and quality scoring rules support the PostgreSQL data model.
+
+### Illustrative system design
+
+The design targets and scale estimates below explain architecture tradeoffs. They are not measured production results from the resume.
 
 ### Functional Requirements
 

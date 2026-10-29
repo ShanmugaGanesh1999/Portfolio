@@ -1,199 +1,124 @@
 # Shanmuga Ganesh
 
-**Senior Full-Stack AI Software Engineer**
-
----
+Senior Full-Stack AI and Data Engineer
 
 ## Contact
 
-| Field    | Details |
-| -------- | ------- |
-| Email    | shanmugaganesh1999@gmail.com |
-| Phone    | 216-466-6648 |
-| Location | Cleveland, OH |
-| GitHub   | [github.com/ShanmugaGanesh1999](https://github.com/ShanmugaGanesh1999) |
-| LinkedIn | [linkedin.com/in/shanmuga-ganesh](https://linkedin.com/in/shanmuga-ganesh) |
-| LeetCode | [leetcode.com/u/Shanmuga_Ganesh](https://leetcode.com/u/Shanmuga_Ganesh/) |
-| Website  | [shanmugaganesh.dev](https://shanmugaganesh.dev) |
-
----
+- Email: 1999ganesh2@gmail.com
+- Phone: 216-466-6648
+- Location: Cleveland, OH
+- LinkedIn: https://linkedin.com/in/shanmuga-ganesh
+- Website: https://shanmugaganesh.dev
+- GitHub: https://github.com/ShanmugaGanesh1999
+- Resume: /Shanmuga_Ganesh_Resume.pdf
 
 ## Summary
 
-Full Stack AI Software Engineer with 8+ years of experience building scalable enterprise applications using **Java**, **Python**, **React**, **Next.js**, and cloud platforms. Experienced in **Generative AI**, **LLM workflows**, **RAG**, **Databricks**, backend APIs, distributed systems, and real time data pipelines.
+Senior Full-Stack AI and Data Engineer with 8+ years of experience building enterprise, fintech, healthcare, and AI platforms. I work with Java, Python, PySpark, React, Next.js, and AWS.
 
-> 8+ years Full Stack AI Software Engineering experience. Open to full-time opportunities.
+I lead engineering teams on Sherwin-Williams' AI-SDLC platform for 2K+ learners. My work spans Databricks Medallion pipelines, Spark performance tuning, and entity matching that resolves records into canonical IDs.
 
----
-
-## About
-
-Shanmuga builds scalable enterprise software, AI, and data systems across Java, Python, React, Next.js, and cloud platforms. His recent work spans the Cover the Codebase AI enablement platform and Databricks medallion pipelines at Sherwin Williams, AI assisted microbiome quality systems, Django/React fintech platforms, and high-throughput CRM services.
-
-He focuses on practical engineering outcomes: AI adoption and governance analytics across ~13k repositories, standardized engineering metrics and DORA measures, reducing false positive carryover, lowering API latency, improving database query performance, and making business workflows easier to operate at scale.
-
----
-
-## Key Metrics
-
-| Metric | Value |
-| ------ | ----- |
-| Experience | 8+ Years |
-| Enterprise Repositories Measured | ~13k |
-| Microbiome False Positive Carryover | -35% |
-| Financial Query Performance | +41% |
-| Qualified Lead Retention | +60% |
-
----
+I built a security master for fintech market data and clinical research pipelines with record linkage, deduplication, and data quality scoring. I focus on distributed systems, big data engineering, customer-facing APIs, and technical leadership.
 
 ## Education
 
-### Case Western Reserve University
+- Degree: Master's in Computer Science
+- Institution: Case Western Reserve University
+- Location: Cleveland, OH
+- Year: 2025
+- GPA: 3.78
 
-- **Degree:** Master's in Computer Science
-- **GPA:** 3.78 / 4.0
-- **Location:** Cleveland, OH
-- **Completed:** January 2025
-- **Coursework:** Distributed Systems, Advanced Algorithms, OS, Networking, Database Management, Software Engineering
-
----
-
-## Technical Skills
+## Technical skills
 
 ### Languages
 
 - Java
 - Python
-- JavaScript / TypeScript
+- TypeScript / JavaScript
 - SQL
 
 ### Frontend
 
-- React.js
-- Next.js
+- React / Next.js
 - Angular
 - HTML5 / CSS3
-- Responsive UI / Component Based Architecture
 
-### Backend and APIs
+### Backend And APIs
 
-- Spring Boot
-- FastAPI
-- Django REST Framework
-- Node.js
-- Spring Security
-- Hibernate
-- REST APIs
-- GraphQL
-- WebSockets
-- API Versioning
+- Spring Boot / Spring Security / Hibernate
+- Django REST / FastAPI / Node.js / Celery
+- REST / GraphQL / WebSockets / API Versioning
+- Prisma / Drizzle ORM
 
-### AI, GenAI and Machine Learning
+### Data Engineering
 
-- Generative AI
-- LLM Workflows
-- RAG
-- GPT
-- BERT
-- Prompt Engineering
-- Spec-Based Development (SDD) & Test-Driven Development (TDD)
-- scikit-learn
-- ML Pipelines
-- Anomaly Detection
-- AI Assisted Workflows
+- Databricks / Lakeflow Jobs / SQL / Dashboards / Unity Catalog
+- Apache Spark / PySpark / Spark SQL / Spark Performance Tuning
+- Delta Lake / Medallion Lakehouse / ETL / ELT
+- Batch and Incremental Ingestion / Configurable Data Intake
+- Parquet / Avro / Data Modeling / Data Quality / Data Quality Scoring
 
-### Data Platforms and Databases
+### Entity Resolution And MDM
 
-- Databricks
-- PostgreSQL
-- MySQL
-- MongoDB
-- DynamoDB
-- Redis
-- Data Pipelines
-- Real Time Data Processing
+- Entity Matching / Record Linkage / Deduplication
+- Fuzzy Matching / Canonical ID Assignment
+- Master Data Management / Reference Data Management
 
-### Messaging and Distributed Systems
+### Databases And Messaging
 
-- Kafka
-- RabbitMQ
-- Event Driven Processing
-- Microservices
-- Distributed Systems
-- Background Processing
+- PostgreSQL / Lakebase / MySQL
+- MongoDB / DynamoDB / Redis
+- Kafka / RabbitMQ
+- Indexing / Transactions / Query Optimization
 
-### Cloud, DevOps and Testing
+### AI And ML
 
-- AWS
-- Azure
-- Docker
-- GitHub Actions
-- CI/CD
-- PyTest
-- JUnit
-- React Testing Library
-- Integration Testing
+- PyTorch / CUDA / scikit-learn
+- GPT / BERT / RAG / LLM Workflows
+- Prompt Engineering / OpenAI APIs
+- ML Pipelines / Anomaly Detection
 
-### Security and Identity
+### Cloud And DevOps
 
-- Microsoft Entra ID
-- OAuth 2.0
-- OIDC
-- JWT
-- RBAC
-- IAM
-- Secure API Design
+- AWS / Azure
+- Docker / Kubernetes
+- GitHub Actions / CI/CD
 
-### Architecture and Engineering
+### Security And Testing
 
-- System Design
-- AI Application Architecture
-- Data Architecture
-- ACID Transactions
-- Performance Tuning
-- Scalability
-- Reliability
-- Observability
-
----
-
-## Certifications & Expertise
-
-- Java / Spring Boot
-- Python / Django
-- AI / RAG / LLM Workflows
-- REST / GraphQL APIs
-- Kafka / Redis
+- OAuth 2.0 / OIDC / PKCE / JWT / RBAC / IAM
+- Microsoft Entra ID / Better Auth / SSO
 - PyTest / JUnit / React Testing Library
-- Databricks / Azure
+- Integration / E2E / API / Performance Testing
 
----
+### Tools
 
-## Experience Overview
+- Git / GitHub Copilot / Claude / OpenAI Codex
+- SonarQube / SonarCloud
+- ServiceNow / Jira
+
+### Architecture
+
+- Microservices / Distributed Systems / Event-Driven Architecture
+- System Design / Technical Leadership
+- Design Reviews / Mentoring
+
+## Experience overview
 
 | Period | Role | Company | Location |
 | ------ | ---- | ------- | -------- |
-| Aug 2026 - Present | Senior Full-Stack AI Software Engineer FDE | Sherwin Williams | Cleveland, OH |
-| Jun 2025 - Present | Software Engineer (Fintech) | Musk and Gale | Cleveland, OH |
-| Mar 2026 - Jul 2026 | Software Engineer (Biotech) | Case Western Reserve University | Cleveland, OH |
-| Jan 2022 - Dec 2023 | MTS (Full Stack Software Developer - CRM) | ZOHO Corporation | Chennai, India |
-| Nov 2018 - Dec 2021 | Junior Associate (Full Stack Software Developer) | Augusta Hitech Software Solution | Coimbatore, India |
+| August 2026 - Present | Senior Software Engineer - FullStack AI FDE | Sherwin-Williams | Cleveland, OH |
+| March 2026 - July 2026 | Software Engineer (Healthcare Research) | Case Western Reserve University | Cleveland, OH |
+| June 2025 - Present | Software Engineer (Fintech) | Musk and Gale | Cleveland, OH |
+| January 2022 - December 2023 | MTS (Full Stack Software Developer - CRM) | ZOHO Corporation | Chennai, India |
+| November 2018 - December 2021 | Junior Associate (Full Stack Software Developer) | Augusta Hitech Software Solution | Coimbatore, India |
 
----
+## Selected results
 
-## Projects Overview
-
-| Project | Status | Tech Stack |
-| ------- | ------ | ---------- |
-| Cover the Codebase | RESTRICTED (proprietary) | Next.js, Microsoft Entra ID, Docker, Azure PostgreSQL, Databricks |
-| AI Assisted Microbiome Quality System | ACTIVE | Python, HPC, AI, ML, Microbiome Analytics |
-| Market Data Aggregation Platform | DEPLOYED | Java, Python, Django, React, WebSockets, PostgreSQL, AWS |
-| Tax Configuration Engine | PRODUCTION | Java, API Versioning, PostgreSQL, Redis, Kafka |
-| Record Validation System | PRODUCTION | Java, NIO, Kafka, Redis |
-| Rollup Summary Field System | PRODUCTION | Java, Kafka, Redis, Microservices |
-| Recent Items Feature | PRODUCTION | Java, Kafka, Redis, Microservices |
-| CRM Lead Allocation Workflow | OPERATIONAL | Angular, Node.js, CRM Workflows |
-
----
-
-> _See individual organization files for detailed experience, projects, and system designs._
+- Led 5 engineers on an AI-SDLC platform for 2K+ learners.
+- Resolved 2M+ learner records with a 98% match rate.
+- Processed 1.3M+ daily events and reduced Spark pipeline runtime by 33%.
+- Built a security master matching 3.1M+ instruments across 40 vendor feeds.
+- Reduced clinical microbiome false-positive carryover by 35% across 32K+ samples and 48+ TB.
+- Improved financial query performance by 41% across 45M+ rows.
+- Increased qualified lead retention by 60%.

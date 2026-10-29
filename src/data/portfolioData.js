@@ -1,21 +1,21 @@
 // ============================================================
 // PORTFOLIO DATA — Single source of truth for all content
-// External links are loaded from .env (VITE_ prefixed vars)
-// Update .env to change URLs, or this file for other content
+// Social and scheduling links are loaded from .env (VITE_ prefixed vars)
+// Resume and email follow the published resume
 // ============================================================
 
 export const PERSONAL = {
   name: "SHANMUGA GANESH",
-  role: "Senior Full-Stack AI Software Engineer",
-  specialty: ["Full Stack Engineering", "GenAI & LLM Workflows", "Data & Cloud Systems"],
-  focus: "Building scalable enterprise applications with Java, Python, React, Next.js, and cloud platforms across Generative AI, LLM workflows, RAG, Databricks, backend APIs, distributed systems, and real time data pipelines",
-  email: import.meta.env?.VITE_EMAIL || "shanmugaganesh1999@gmail.com",
+  role: "Senior Full-Stack AI and Data Engineer",
+  specialty: ["Full Stack AI Engineering", "Data Engineering & Lakehouse", "Entity Resolution & MDM"],
+  focus: "Building enterprise, fintech, healthcare, and AI platforms with Java, Python, PySpark, React, Next.js, and AWS. Leading engineering teams on data pipelines, entity resolution, and customer-facing APIs.",
+  email: "1999ganesh2@gmail.com",
   phone: import.meta.env?.VITE_PHONE || "(216) 466-6648",
   location: "Cleveland, OH",
-  status: "8+ years Full Stack AI Software Engineering experience. Open to full-time opportunities.",
-  resumeUrl: import.meta.env?.VITE_RESUME_URL || "#",
+  status: "8+ years of full-stack AI and data engineering experience. Open to full-time opportunities.",
+  resumeUrl: "/Shanmuga_Ganesh_Resume.pdf",
   resumeLabel: "GET_RESUME.PDF",
-  resumeVersion: "v2026_09_AI_REFRESH",
+  resumeVersion: "v2026_10_AI_DATA",
   calendlyUrl: import.meta.env?.VITE_CALENDLY_URL || "#",
   socialLinks: {
     github: import.meta.env?.VITE_GITHUB_URL || "https://github.com/ShanmugaGanesh1999",
@@ -34,8 +34,9 @@ export const STATS = [
 
 export const ABOUT = {
   paragraphs: [
-    "Full Stack AI Software Engineer with 8+ years of experience building scalable enterprise applications using Java, Python, React, Next.js, and cloud platforms. Experienced in Generative AI, LLM workflows, RAG, Databricks, backend APIs, distributed systems, and real time data pipelines.",
-    "I focus on delivering reliable AI enabled products, automation, analytics, and high performance software platforms, from Databricks medallion pipelines and AI governance analytics across ~13k repositories to Django/React financial systems and high-throughput CRM services processing millions of records per hour.",
+    "Senior Full-Stack AI and Data Engineer with 8+ years of experience building enterprise, fintech, healthcare, and AI platforms. I work with Java, Python, PySpark, React, Next.js, and AWS.",
+    "I lead engineering teams on Sherwin-Williams' AI-SDLC platform for 2K+ learners. My work spans Databricks Medallion pipelines, Spark performance tuning, and entity matching that resolves records into canonical IDs.",
+    "I built a security master for fintech market data and clinical research pipelines with record linkage, deduplication, and data quality scoring. I focus on distributed systems, big data engineering, customer-facing APIs, and technical leadership.",
   ],
 };
 
@@ -44,78 +45,96 @@ export const TECH_STACK = [
     title: "Languages",
     status: "CORE",
     statusColor: "success",
-    items: ["Java", "Python", "JavaScript / TypeScript", "SQL"],
+    items: ["Java", "Python", "TypeScript / JavaScript", "SQL"],
   },
   {
     title: "Frontend",
     status: "UI",
     statusColor: "accent",
-    items: ["React.js / Next.js", "Angular", "HTML5 / CSS3", "Responsive UI / Component Architecture"],
+    items: ["React / Next.js", "Angular", "HTML5 / CSS3"],
   },
   {
     title: "Backend_And_APIs",
     status: "SERVICES",
     statusColor: "variable",
-    items: ["Spring Boot / Spring Security", "Django REST Framework / FastAPI", "Node.js / Hibernate", "REST APIs / GraphQL / WebSockets / API Versioning"],
+    items: ["Spring Boot / Spring Security / Hibernate", "Django REST / FastAPI / Node.js / Celery", "REST / GraphQL / WebSockets / API Versioning", "Prisma / Drizzle ORM"],
   },
   {
-    title: "AI_GenAI_ML",
-    status: "CORE",
+    title: "Data_Engineering",
+    status: "LAKEHOUSE",
+    statusColor: "func",
+    items: ["Databricks / Lakeflow Jobs / SQL / Dashboards / Unity Catalog", "Apache Spark / PySpark / Spark SQL / Spark Performance Tuning", "Delta Lake / Medallion Lakehouse / ETL / ELT", "Batch and Incremental Ingestion / Configurable Data Intake", "Parquet / Avro / Data Modeling / Data Quality / Data Quality Scoring"],
+  },
+  {
+    title: "Entity_Resolution_And_MDM",
+    status: "IDENTITY",
     statusColor: "keyword",
-    items: ["Generative AI / GPT / BERT", "LLM Workflows / RAG / Prompt Engineering", "SDD & TDD / AI Assisted Workflows", "scikit-learn / ML Pipelines / Anomaly Detection"],
+    items: ["Entity Matching / Record Linkage / Deduplication", "Fuzzy Matching / Canonical ID Assignment", "Master Data Management / Reference Data Management"],
   },
   {
-    title: "Security",
-    status: "AUTH",
-    statusColor: "keyword",
-    items: ["Microsoft Entra ID / OIDC", "OAuth 2.0 / JWT", "RBAC / IAM", "Secure API Design"],
-  },
-  {
-    title: "Data_And_Messaging",
+    title: "Databases_And_Messaging",
     status: "STREAMS",
     statusColor: "func",
-    items: ["Databricks / Data Pipelines", "PostgreSQL / MySQL", "MongoDB / DynamoDB / Redis", "Kafka / RabbitMQ / Event Driven"],
+    items: ["PostgreSQL / Lakebase / MySQL", "MongoDB / DynamoDB / Redis", "Kafka / RabbitMQ", "Indexing / Transactions / Query Optimization"],
   },
   {
-    title: "Cloud_Testing",
+    title: "AI_And_ML",
+    status: "AI",
+    statusColor: "keyword",
+    items: ["PyTorch / CUDA / scikit-learn", "GPT / BERT / RAG / LLM Workflows", "Prompt Engineering / OpenAI APIs", "ML Pipelines / Anomaly Detection"],
+  },
+  {
+    title: "Cloud_And_DevOps",
     status: "DEVOPS",
     statusColor: "success",
-    items: ["AWS / Azure / Docker / GitHub Actions", "CI/CD / Integration Testing", "PyTest / JUnit / React Testing Library"],
+    items: ["AWS / Azure", "Docker / Kubernetes", "GitHub Actions / CI/CD"],
+  },
+  {
+    title: "Security_And_Testing",
+    status: "QUALITY",
+    statusColor: "accent",
+    items: ["OAuth 2.0 / OIDC / PKCE / JWT / RBAC / IAM", "Microsoft Entra ID / Better Auth / SSO", "PyTest / JUnit / React Testing Library", "Integration / E2E / API / Performance Testing"],
+  },
+  {
+    title: "Tools",
+    status: "WORKFLOW",
+    statusColor: "variable",
+    items: ["Git / GitHub Copilot / Claude / OpenAI Codex", "SonarQube / SonarCloud", "ServiceNow / Jira"],
   },
   {
     title: "Architecture",
     status: "DESIGN",
     statusColor: "variable",
-    items: ["System Design / AI Application Architecture", "Data Architecture / ACID Transactions", "Performance Tuning / Scalability / Reliability", "Observability / Distributed Systems"],
+    items: ["Microservices / Distributed Systems / Event-Driven Architecture", "System Design / Technical Leadership", "Design Reviews / Mentoring"],
   },
 ];
 
 export const EXPERIENCE = [
   {
     period: "AUG 2026-PRES",
-    title: "Senior Full-Stack AI Software Engineer FDE",
-    company: "Sherwin Williams",
+    title: "Senior Software Engineer - FullStack AI FDE",
+    company: "Sherwin-Williams",
     location: "Cleveland, OH",
     description: [
-      "Architecting the Cover the Codebase AI enablement platform using Next.js, Microsoft Entra ID, Docker, Azure PostgreSQL, and Databricks, supporting employee learning, AI adoption, engineering analytics, and gamification across approximately 50 change champions",
-      "Engineering Databricks medallion pipelines across GitHub, GitHub Copilot, and application data, transforming pull requests, commits, AI usage, and learning activity into 23 standardized metrics, DORA measures, user insights, and leadership dashboards",
-      "Building ACID transactional architecture with bidirectional delta synchronization between Azure PostgreSQL and Databricks Bronze and Gold, incorporating UTC timestamps, audit logging, batching, and failure recovery to strengthen consistency, traceability, scalability, and reliability",
-      "Developing AI governance and token analytics for monthly usage, allocation, and cost per user, while measuring adoption, throughput, efficiency, quality, and DORA performance for an enterprise landscape of approximately 13k repositories",
+      "Led a team of 5 engineers on Cover the Codebase, an AI-SDLC platform for 2K+ learners. Owned design reviews, code reviews, and pipeline standards while building configurable intake across GitHub, Copilot, Claude, Codex, SonarQube/SonarCloud, ServiceNow, and Jira.",
+      "Built an entity matching service that resolved 2M+ records from GitHub, Entra ID, Pluralsight, and Copilot into canonical learner IDs. Deterministic and fuzzy matching, deduplication, and identity mapping achieved a 98% match rate.",
+      "Architected Databricks Medallion pipelines processing 1.3M+ daily events with PySpark, Delta Lake, Unity Catalog, and Lakeflow Jobs. Partitioning, broadcast joins, skew handling, and Z-ordering cut runtime by 33% across 23 adoption metrics.",
+      "Designed Lakebase PostgreSQL schemas with data quality scoring, status assignment, and correction-aware upserts for downstream dashboards. Load-tested at 5.4M rows and 2K concurrent queries.",
     ],
-    tags: ["NEXT.JS", "AZURE", "DATABRICKS", "AI"],
+    tags: ["PYSPARK", "DATABRICKS", "LAKEBASE", "ENTITY MATCHING", "AI"],
     tagColor: "accent",
   },
   {
     period: "MAR 2026-JUL 2026",
-    title: "Software Engineer (Biotech)",
+    title: "Software Engineer (Healthcare Research)",
     company: "Case Western Reserve University",
     location: "Cleveland, OH",
     description: [
-      "Built an AI assisted microbiome quality system, reducing false positive carryover by 35% through automated feature validation, statistical filtering, and metadata anomaly detection",
-      "Engineered a Python HPC sequencing pipeline, reducing analysis turnaround by 30% across ingestion, quality control, taxonomy profiling, and microbiome analytics",
-      "Designed ML ready microbiome data workflows, improving pipeline reproducibility by 40% through standardized metadata validation, automated quality checks, and structured execution logic",
+      "Built an AI-assisted quality system for clinical microbiome research data. Feature validation, statistical filtering, and metadata anomaly detection reduced false-positive carryover by 35% across 32K+ HMP samples totaling 48+ TB.",
+      "Engineered a Python HPC sequencing pipeline with QIIME2 and DADA2 for clinical sample ingestion, quality control, and taxonomy profiling. Scalable, reproducible execution cut analysis turnaround by 30%.",
+      "Standardized clinical metadata and sample records across research cohorts with validation rules, deduplication, and automated quality checks. Improved pipeline reproducibility by 40% and produced ML-ready healthcare datasets.",
     ],
-    tags: ["PYTHON", "HPC", "MICROBIOME", "AI", "ML"],
+    tags: ["PYTHON", "HPC", "QIIME2", "DADA2", "DATA QUALITY"],
     tagColor: "success",
   },
   {
@@ -124,26 +143,26 @@ export const EXPERIENCE = [
     company: "Musk and Gale",
     location: "Cleveland, OH",
     description: [
-      { text: "Led a Java and Python based Market Data Aggregation Platform, achieving 95% sprint feature clarity by translating market data, compliance, governance, and business rules into scalable engineering deliverables", projectId: "market-data", linkText: "Market Data Aggregation Platform" },
-      "Built a Python Django REST backend with React, reducing API latency by 32% through query optimization, payload tuning, and cleaner frontend service calls",
-      "Engineered real time API data streams using WebSockets and Celery, reaching 1.8M records per hour with reliable ingestion, retry handling, and timeout resilient integrations",
-      "Designed PostgreSQL data models for secure financial aggregation, improving query performance by 41% through indexing, normalized schemas, and encrypted data handling",
+      { text: "Led a 3-engineer team on a Java and Python Market Data Aggregation Platform, owning architecture and design reviews. Built a security master matching 3.1M+ instruments across 40 vendor feeds by CUSIP, ISIN, and ticker into canonical IDs.", projectId: "market-data", linkText: "Market Data Aggregation Platform" },
+      "Built Django REST APIs and React interfaces for customer-facing and internal self-service tools. Query optimization, payload tuning, and cleaner service calls reduced API latency by 32%.",
+      "Engineered configurable ingestion with WebSockets and Celery to onboard vendor feeds through schema reconciliation without code changes. Processed 1.8M records per hour, or 43M+ daily, with retry handling and fault tolerance.",
+      "Designed PostgreSQL data models over 45M+ rows with validation and quality scoring rules. Improved query performance by 41% and set data-modeling standards for the team.",
     ],
-    tags: ["JAVA", "PYTHON", "DJANGO", "REACT", "AWS"],
+    tags: ["JAVA", "PYTHON", "DJANGO", "REACT", "MDM"],
     tagColor: "success",
   },
   {
     period: "JAN 2022-DEC 2023",
     title: "MTS (Full Stack Software Developer - CRM)",
-    company: "Zoho Corporation",
+    company: "ZOHO Corporation",
     location: "Chennai, India",
     description: [
-      { text: "Revamped the Tax Configuration system using Java and API versioning technique, enabling backward compatible tax workflows across 7+ integrated systems", projectId: "tax-config", linkText: "Tax Configuration system" },
-      { text: "Built Java NIO based Custom Validation Rules system for CRM record creation and edit flows, processing 2.3M records per hour with non blocking validation logic", projectId: "record-validation", linkText: "Custom Validation Rules" },
-      { text: "Built a Kafka based Rollup Summary pipeline to instantly update parent aggregation fields from child record changes, processing up to 1.8M record events per second", projectId: "rollup-summary", linkText: "Rollup Summary" },
-      { text: "Rebuilt Zoho CRM Recent Items storage to cache each user's latest 20 records, reducing retrieval latency by 50% for faster record navigation", projectId: "recent-items", linkText: "Recent Items" },
+      { text: "Revamped the Tax Configuration system using Java and API versioning. Enabled backward-compatible tax workflows across 7+ integrated systems with scalable design and reliable release management.", projectId: "tax-config", linkText: "Tax Configuration system" },
+      { text: "Built a Java NIO Custom Validation Rules system for CRM record creation and edit flows. Processed 1.47+M records per day with non-blocking validation and high-throughput execution.", projectId: "record-validation", linkText: "Custom Validation Rules" },
+      { text: "Built a Kafka-based Rollup Summary pipeline to update parent aggregation fields from child record changes. Processed 13+M record events per day with an event-driven architecture.", projectId: "rollup-summary", linkText: "Rollup Summary" },
+      { text: "Rebuilt Zoho CRM Recent Items storage to cache each user's latest 20 records. Reduced retrieval latency by 50% and improved record navigation.", projectId: "recent-items", linkText: "Recent Items" }
     ],
-    tags: ["JAVA", "KAFKA", "REDIS", "MICROSERVICES"],
+    tags: ["JAVA", "NIO", "KAFKA", "API VERSIONING"],
     tagColor: "keyword",
   },
   {
@@ -152,8 +171,8 @@ export const EXPERIENCE = [
     company: "Augusta Hitech Software Solution",
     location: "Coimbatore, India",
     description: [
-      "Developed Angular and Node.js CRM modules for marketing and sales workflows, improving customer engagement by 32% through reusable UI components and API integrations",
-      "Built Node.js lead allocation workflows with Angular dashboards, increasing qualified lead retention by 60% through automated routing and improved sales process visibility",
+      "Developed Angular and Node.js CRM modules for marketing and sales workflows. Reusable UI components, scalable APIs, and workflow automation improved customer engagement by 32%.",
+      "Built Node.js lead allocation workflows with Angular dashboards. Automated routing, real-time visibility, and improved sales execution increased qualified lead retention by 60%.",
     ],
     tags: ["ANGULAR", "NODE.JS", "CRM", "API"],
     tagColor: "func",
@@ -163,19 +182,19 @@ export const EXPERIENCE = [
 export const PROJECTS = [
   {
     title: "Cover the Codebase",
-    subtitle: "AI_ENABLEMENT_PLATFORM",
+    subtitle: "AI_SDLC_PLATFORM",
     description:
-      "Sherwin Williams AI enablement platform built on Next.js, Microsoft Entra ID, Docker, Azure PostgreSQL, and Databricks. Medallion pipelines transform GitHub and Copilot activity into 23 standardized metrics, DORA measures, and leadership dashboards across approximately 13k repositories.",
+      "AI-SDLC platform for 2K+ learners, led by a 5-engineer team. Entity matching resolved 2M+ records with a 98% match rate. Databricks Medallion pipelines process 1.3M+ daily events across 23 adoption metrics, with Spark tuning reducing runtime by 33%.",
     status: "RESTRICTED",
     statusColor: "keyword",
-    tags: ["NEXT.JS", "DATABRICKS", "AZURE", "GENAI"],
+    tags: ["PYSPARK", "DATABRICKS", "LAKEBASE", "ENTITY MATCHING"],
     proprietary: true,
     link: "#",
   },
   {
     title: "AI Assisted Microbiome Quality System",
     description:
-      "Python and ML ready microbiome analytics workflows for quality validation, metadata anomaly detection, and HPC sequencing analysis. Reduced false positive carryover by 35%, analysis turnaround by 30%, and improved reproducibility by 40%.",
+      "Clinical microbiome quality system covering 32K+ HMP samples and 48+ TB. Python HPC pipelines use QIIME2 and DADA2. Reduced false-positive carryover by 35%, analysis turnaround by 30%, and improved reproducibility by 40%.",
     status: "ACTIVE",
     statusColor: "success",
     tags: ["PYTHON", "AI", "MICROBIOME"],
@@ -184,7 +203,7 @@ export const PROJECTS = [
   {
     title: "Market Data Aggregation Platform",
     description:
-      "Java and Python based fintech platform with Python Django REST backend and React frontend. Reaches 1.8M records per hour via WebSockets and Celery, reduces API latency by 32%, and improves PostgreSQL query performance by 41%.",
+      "Java and Python fintech platform with a security master matching 3.1M+ instruments across 40 vendor feeds. Configurable ingestion processes 1.8M records per hour. Django REST and React tools reduce API latency by 32%, while PostgreSQL query performance improves by 41% across 45M+ rows.",
     status: "DEPLOYED",
     statusColor: "accent",
     hasAsciiArt: true,
@@ -194,16 +213,15 @@ export const PROJECTS = [
     title: "OAuth2 SSO & IAM Platform",
     subtitle: "SECURITY_SUBSYSTEM",
     description:
-      "Archived campus identity project using Spring Security, OAuth2/OIDC, and Java microservices. Reduced duplicate logins by 60%, authentication tickets by 35%, and achieved sub-200ms response times.",
-    progress: 99,
-    progressLabel: "UPTIME_SLA",
-    progressColor: "keyword",
+      "Archived campus identity project using Spring Security, OAuth2/OIDC, and Java microservices.",
+    status: "ARCHIVED",
+    statusColor: "keyword",
     link: "#",
   },
   {
     title: "Tax Configuration Engine",
     description:
-      "Java and API versioning based CRM tax workflow across 7+ integrated systems. Paired with Java NIO validation at 2.3M records per hour and Kafka based rollup processing up to 1.8M record events per second.",
+      "Java and API versioning support backward-compatible CRM tax workflows across 7+ integrated systems. Related CRM systems process 1.47+M validation records per day and 13+M rollup record events per day.",
     status: "ACTIVE",
     statusColor: "success",
     tags: ["JAVA", "KAFKA", "REDIS"],
@@ -228,15 +246,17 @@ export const CERTIFICATIONS = [
   { name: "REST / GRAPHQL APIs", color: "variable" },
   { name: "KAFKA / REDIS", color: "func" },
   { name: "PYTEST / JUNIT / RTL", color: "comment" },
-  { name: "DATABRICKS / AZURE", color: "accent", icon: "database" },
+  { name: "DATABRICKS / PYSPARK / DELTA LAKE", color: "accent", icon: "database" },
+  { name: "ENTITY RESOLUTION / MDM", color: "variable" },
+  { name: "TECHNICAL LEADERSHIP", color: "success" },
 ];
 
 export const EDUCATION = [
   {
     institution: "Case Western Reserve University",
     degree: "MS Computer Science",
-    detail: "GPA 3.78/4.0 | Cleveland, OH | January 2025",
-    coursework: "Distributed Systems, Advanced Algorithms, OS, Networking, Database Management, Software Engineering",
+    detail: "GPA 3.78 | Cleveland, OH | 2025",
+    coursework: "",
   },
 ];
 

@@ -536,4 +536,4 @@ export const BOTTLENECKS = {
 };
 
 export const SUMMARY =
-  "This Java and Python based Market Data Aggregation Platform uses a Python Django REST backend with React frontend service calls, real time WebSocket and Celery processing, and PostgreSQL data models for secure financial aggregation. The platform reaches 1.8M records per hour, reduces API latency by 32%, and improves query performance by 41% through indexing, normalized schemas, and encrypted data handling.";
+  "A 3-engineer team built this Java and Python Market Data Aggregation Platform. Its security master matches 3.1M+ instruments across 40 vendor feeds by CUSIP, ISIN, and ticker into canonical IDs. Configurable WebSocket and Celery ingestion processes 1.8M records per hour, or 43M+ daily. Django REST APIs and React tools reduced API latency by 32%. PostgreSQL models with validation and quality scoring improved query performance by 41% across 45M+ rows.";

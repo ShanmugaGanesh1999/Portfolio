@@ -13,7 +13,7 @@ test('portfolio documents have stable routes and searchable source lines', () =>
     assert.ok(doc.content.length > 20);
   }
   assert.ok(JSON.parse(getDocument('skills').content).Languages.includes('Java'));
-  const result = searchDocuments('SHERWIN WILLIAMS').find((item) => item.documentId === 'doc:experience');
+  const result = searchDocuments('SHERWIN-WILLIAMS').find((item) => item.documentId === 'doc:experience');
   assert.ok(result);
   assert.equal(getDocument(result.documentId).content.split('\n')[result.line - 1], result.text);
   assert.deepEqual(searchDocuments('  '), []);

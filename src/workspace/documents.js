@@ -9,7 +9,7 @@ export const DOCUMENTS = [
   document('experience.md', `# Experience\n\n${EXPERIENCE.map((job) => `## ${job.company}\n\n**${job.title}** · ${job.period} · ${job.location}\n\n${job.description.map(bullet).join('\n')}\n\nTechnologies: ${job.tags.join(', ')}`).join('\n\n')}`),
   document('skills.json', JSON.stringify(Object.fromEntries(TECH_STACK.map((group) => [group.title, group.items])), null, 2)),
   document('projects.md', `# Projects\n\n${PROJECTS.map((project) => `## ${project.title}\n\n${project.description}${project.tags ? `\n\nTechnologies: ${project.tags.join(', ')}` : ''}${project.status ? `\n\nStatus: ${project.status}` : ''}`).join('\n\n')}`),
-  document('credentials.md', `# Credentials\n\n## Education\n\n${EDUCATION.map((item) => `### ${item.institution}\n\n${item.degree}\n\n${item.detail}\n\nCoursework: ${item.coursework}`).join('\n\n')}\n\n## Technical expertise\n\n${CERTIFICATIONS.map((item) => bullet(item.name)).join('\n')}`),
+  document('credentials.md', `# Credentials\n\n## Education\n\n${EDUCATION.map((item) => `### ${item.institution}\n\n${item.degree}\n\n${item.detail}${item.coursework ? `\n\nCoursework: ${item.coursework}` : ''}`).join('\n\n')}\n\n## Technical expertise\n\n${CERTIFICATIONS.map((item) => bullet(item.name)).join('\n')}`),
   document('contact.md', `# Contact\n\n${PERSONAL.name}\n\n- Email: [${PERSONAL.email}](mailto:${PERSONAL.email})\n- Phone: ${PERSONAL.phone}\n- Location: ${PERSONAL.location}\n${Object.entries(PERSONAL.socialLinks).map(([label, url]) => `- [${label}](${url})`).join('\n')}${PERSONAL.resumeUrl !== '#' ? `\n- [Resume](${PERSONAL.resumeUrl})` : ''}${PERSONAL.calendlyUrl !== '#' ? `\n- [Schedule a conversation](${PERSONAL.calendlyUrl})` : ''}`),
 ];
 

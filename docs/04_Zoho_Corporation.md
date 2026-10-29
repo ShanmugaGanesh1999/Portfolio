@@ -1,32 +1,31 @@
 # ZOHO Corporation - MTS (Full Stack Software Developer - CRM)
 
-**Period:** January 2022 - December 2023  
-**Location:** Chennai, India  
-**Tags:** `JAVA` · `KAFKA` · `REDIS` · `MICROSERVICES`
+**Period:** January 2022 - December 2023
 
----
+**Location:** Chennai, India
 
-## Role Summary
+**Tags:** `JAVA` · `NIO` · `KAFKA` · `API VERSIONING`
 
-Member of Technical Staff (MTS) Full Stack Software Developer for ZOHO CRM, building Java backend systems for tax configuration, custom validation rules, rollup summary processing, and recent item retrieval.
+## Key accomplishments
 
----
+- Revamped the Tax Configuration system using Java and API versioning. Enabled backward-compatible tax workflows across 7+ integrated systems with scalable design and reliable release management.
 
-## Key Accomplishments
+- Built a Java NIO Custom Validation Rules system for CRM record creation and edit flows. Processed 1.47+M records per day with non-blocking validation and high-throughput execution.
 
-- Revamped the **Tax Configuration system** using Java and API versioning technique, enabling backward compatible tax workflows across **7+ integrated systems**.
-- Built **Java NIO based Custom Validation Rules** for CRM record creation and edit flows, processing **2.3M records per hour** with non blocking validation logic.
-- Built a **Kafka based Rollup Summary pipeline** to instantly update parent aggregation fields from child record changes, processing up to **1.8M record events per second**.
-- Rebuilt **Zoho CRM Recent Items** storage to cache each user's latest **20 records**, reducing retrieval latency by **50%** for faster record navigation.
+- Built a Kafka-based Rollup Summary pipeline to update parent aggregation fields from child record changes. Processed 13+M record events per day with an event-driven architecture.
 
----
+- Rebuilt Zoho CRM Recent Items storage to cache each user's latest 20 records. Reduced retrieval latency by 50% and improved record navigation.
 
 ## Project 1: Tax Configuration & Calculation Service
 
-**Status:** PRODUCTION  
+**Status:** PRODUCTION
 **Tech Stack:** Java, PostgreSQL, Redis, Kafka, DynamoDB
 
-> Java and API versioning based tax workflow across 7+ integrated systems, paired with NIO-based validation at 2.3M records per hour and Kafka based rollup processing up to 1.8M record events per second.
+> Java and API versioning based tax workflow across 7+ integrated systems, paired with NIO-based validation at 1.47+M records per day and Kafka based rollup processing 13+M record events per day.
+
+### Illustrative system design
+
+The design targets and scale estimates below explain architecture tradeoffs. They are not measured production results from the resume.
 
 ### Functional Requirements
 
@@ -77,10 +76,14 @@ ALB → API Gateway (Kong + Rate Limiter)
 
 ## Project 2: Record Validation System at Scale
 
-**Status:** PRODUCTION  
+**Status:** PRODUCTION
 **Tech Stack:** Java, Kafka, Redis, PostgreSQL, NIO
 
-> Java NIO based Custom Validation Rules system for CRM record creation and edit flows, processing 2.3M records per hour with non blocking validation logic.
+> Java NIO based Custom Validation Rules system for CRM record creation and edit flows, processing 1.47+M records per day with non blocking validation logic.
+
+### Illustrative system design
+
+The design targets and scale estimates below explain architecture tradeoffs. They are not measured production results from the resume.
 
 ### Functional Requirements
 
@@ -131,10 +134,14 @@ ALB → API Gateway (Kong)
 
 ## Project 3: Zoho CRM Rollup Summary Field System
 
-**Status:** PRODUCTION  
+**Status:** PRODUCTION
 **Tech Stack:** Java, Kafka, Redis, PostgreSQL, Microservices
 
-> Kafka based Rollup Summary pipeline that instantly updates parent aggregation fields from child record changes, processing up to 1.8M record events per second.
+> Kafka based Rollup Summary pipeline that instantly updates parent aggregation fields from child record changes, processing 13+M record events per day.
+
+### Illustrative system design
+
+The design targets and scale estimates below explain architecture tradeoffs. They are not measured production results from the resume.
 
 ### Functional Requirements
 
@@ -185,10 +192,14 @@ API Gateway (Kong) → Record Service (Java) → PostgreSQL (Transactional Data)
 
 ## Project 4: Zoho CRM Recent Items Feature
 
-**Status:** PRODUCTION  
+**Status:** PRODUCTION
 **Tech Stack:** Java, Kafka, Redis, PostgreSQL, Microservices
 
 > User activity tracking across all CRM modules, caching each user's latest 20 records and reducing retrieval latency by 50% for faster record navigation.
+
+### Illustrative system design
+
+The design targets and scale estimates below explain architecture tradeoffs. They are not measured production results from the resume.
 
 ### Functional Requirements
 
